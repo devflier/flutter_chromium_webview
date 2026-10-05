@@ -12,7 +12,7 @@ delivered to native code, copied into a pixel buffer and shown in Flutter
 through a **Flutter `Texture`**. This lets the web view behave like any other
 widget: it can be clipped, transformed, stacked and overlaid.
 
-> **Status: `0.2.0`.** **Linux (x64)** and **Windows (x64)** are supported.
+> **Status: `0.2.1`.** **Linux (x64)** and **Windows (x64)** are supported.
 
 ## Platform support
 
@@ -27,7 +27,7 @@ widget: it can be clipped, transformed, stacked and overlaid.
 
 ```yaml
 dependencies:
-  flutter_chromium_webview: ^0.2.0
+  flutter_chromium_webview: ^0.2.1
 ```
 
 ### Requirements (Linux)

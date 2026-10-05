@@ -1,6 +1,6 @@
 name: flutter_chromium_webview
 description: Experimental desktop CEF webview with Flutter textures, browser events, and native input integration.
-version: 0.2.0
+version: 0.2.1
 repository: https://github.com/devflier/flutter_chromium_webview/tree/main/packages/flutter_chromium_webview
 issue_tracker: https://github.com/devflier/flutter_chromium_webview/issues
 homepage: https://github.com/devflier/flutter_chromium_webview

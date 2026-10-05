@@ -1,3 +1,7 @@
+## 0.2.1
+
+* Fix Windows packaging, stabilize integration tests and update version status.
+
 ## 0.2.0
 
 * Add Windows (x64) backend support.

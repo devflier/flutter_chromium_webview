@@ -14,10 +14,10 @@ It uses **off-screen rendering (OSR)**. The web content is rendered to an off-sc
 * **Full Desktop Input**: Includes deep integration for keyboard and mouse events natively routed from Flutter to CEF.
 
 ## Current Project Status
-**Experimental / Pre-Release**
+**Status: `0.2.1`.**
 
-Currently, only **Linux** is actively supported for this experimental 0.1.0 release.
-Windows and macOS support are planned but not fully implemented/tested yet.
+**Linux (x64)** and **Windows (x64)** are supported.
+macOS support is planned but not fully implemented/tested yet.
 
 ## Monorepo Layout
 
@@ -42,7 +42,7 @@ Add the dependency to your pubspec.yaml:
 
 `yaml
 dependencies:
-  flutter_chromium_webview: ^0.1.0
+  flutter_chromium_webview: ^0.2.1
 `
 
 Initialize the global CEF runtime once before using the widget:
@@ -78,9 +78,9 @@ Users running the application will need the CEF shared libraries (e.g., libcef.s
 
 ## Roadmap
 
-* **v0.1.x**: Stabilize Linux support, improve testing and pub scores.
-* **v0.2.x**: Implement Windows CEF backend.
-* **v0.3.x**: Implement macOS CEF backend.
+* **v0.1.x**: Linux support.
+* **v0.2.x**: Windows support.
+* **v0.3.x**: macOS support.
 * **v1.0.0**: Stable, multi-platform release.
 
 ## Contributing
