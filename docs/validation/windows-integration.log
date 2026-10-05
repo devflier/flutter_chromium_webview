@@ -1,0 +1,22 @@
+00:00 +0: loading C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/input_scaling_test.dart
+Building Windows application...                                    14.1s
+√ Built build\windows\x64\runner\Debug\flutter_chromium_webview_example.exe
+00:00 +0: C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/input_scaling_test.dart: native click, resize, and wheel coordinates at multiple DPRs
+00:03 +1: C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/input_scaling_test.dart: (tearDownAll)
+00:03 +1: loading C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/native_ui_test.dart
+Building Windows application...                                    14.3s
+√ Built build\windows\x64\runner\Debug\flutter_chromium_webview_example.exe
+Error waiting for a debug connection: The log reader stopped unexpectedly, or never started.
+00:18 +1 -1: loading C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/native_ui_test.dart [E]
+  Failed to load "C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/native_ui_test.dart": Unable to start the app on the device.
+00:18 +1 -1: loading C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/plugin_integration_test.dart
+Building Windows application...                                    14.1s
+√ Built build\windows\x64\runner\Debug\flutter_chromium_webview_example.exe
+Error waiting for a debug connection: The log reader stopped unexpectedly, or never started.
+00:32 +1 -2: loading C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/plugin_integration_test.dart [E]
+  Failed to load "C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/plugin_integration_test.dart": Unable to start the app on the device.
+00:32 +1 -2: Some tests failed.
+
+Failing tests:
+  C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/native_ui_test.dart: loading C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/native_ui_test.dart
+  C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/plugin_integration_test.dart: loading C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/plugin_integration_test.dart

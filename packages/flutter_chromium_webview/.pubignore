@@ -1,0 +1,9 @@
+# Unused generated scaffold retained locally, excluded from the package.
+example/dummy_plugin/
+# Native build artifacts and tool state.
+**/build/
+**/.dart_tool/
+**/ephemeral/
+**/*.iml
+macos/cef/
+**/__pycache__/

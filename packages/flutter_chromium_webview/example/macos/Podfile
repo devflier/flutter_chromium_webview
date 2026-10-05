@@ -1,0 +1,39 @@
+platform :osx, '13.0'
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+project 'Runner', {'Debug' => :debug, 'Profile' => :release, 'Release' => :release}
+
+def flutter_root
+  settings = File.expand_path('Flutter/ephemeral/Flutter-Generated.xcconfig', __dir__)
+  raise 'Run flutter pub get before pod install' unless File.exist?(settings)
+  File.foreach(settings) do |line|
+    match = line.match(/FLUTTER_ROOT\=(.*)/)
+    return match[1].strip if match
+  end
+  raise 'FLUTTER_ROOT not found in generated settings'
+end
+require File.expand_path('packages/flutter_tools/bin/podhelper', flutter_root)
+flutter_macos_podfile_setup
+
+target 'Runner' do
+  use_frameworks!
+  flutter_install_all_macos_pods File.dirname(File.realpath(__FILE__))
+  target 'RunnerTests' do
+    inherit! :search_paths
+  end
+end
+
+# Development pods do not run prepare_command. Build before CocoaPods resolves
+# the vendored wrapper library, rather than during the Runner's link phase.
+cef_plugin = File.join(__dir__, 'Flutter/ephemeral/.symlinks/plugins/flutter_chromium_webview/macos')
+cef_arch = ENV.fetch('CHROMIUM_WEBVIEW_MACOS_ARCH') { `uname -m`.strip }
+raise 'CEF preparation failed' unless system('python3', File.join(cef_plugin, 'scripts/prepare_cef.py'), '--arch', cef_arch)
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_macos_build_settings(target)
+    target.build_configurations.each do |config|
+      config.build_settings['ARCHS'] = cef_arch
+      config.build_settings['MACOSX_DEPLOYMENT_TARGET'] = '13.0'
+    end
+  end
+end

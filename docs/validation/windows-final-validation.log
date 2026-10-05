@@ -1,0 +1,95 @@
+Resolving dependencies...
+Downloading packages...
+  cli_util 0.4.2 (0.6.0 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  test_api 0.7.12 (0.7.14 available)
+  vector_math 2.4.0 (2.4.3 available)
+Got dependencies!
+4 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Resolving dependencies in `.\example`...
+Downloading packages...
+Got dependencies in `.\example`.
+Analyzing flutter_chromium_webview...                           
+No issues found! (ran in 5.6s)
+00:00 +0: loading C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/test/controller_lifecycle_test.dart
+00:00 +0: C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/test/flutter_chromium_webview_method_channel_test.dart: getPlatformVersion
+00:00 +1: C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.0
+00:00 +2: C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.0
+00:00 +3: C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/test/flutter_chromium_webview_test.dart: host transient UI is dismissed on native cancellation, navigation and disposal
+00:00 +4: C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/test/flutter_chromium_webview_test.dart: host transient UI is dismissed on native cancellation, navigation and disposal
+00:00 +5: C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/test/flutter_chromium_webview_test.dart: host transient UI is dismissed on native cancellation, navigation and disposal
+00:00 +6: C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:00 +7: C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:00 +8: C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:00 +9: C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:00 +10: C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:00 +11: C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:00 +12: C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:00 +13: C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:00 +14: C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:00 +15: C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:00 +16: C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 2.0 and follows its view
+00:00 +17: All tests passed!
+Resolving dependencies...
+Downloading packages...
+  code_assets 1.2.1 (2.1.0 available)
+  cupertino_icons 1.0.9 (2.0.0 available)
+  hooks 2.0.2 (2.2.0 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  meta 1.18.3 (1.19.0 available)
+  objective_c 9.5.0 (9.6.2 available)
+  record_use 0.6.0 (1.1.1 available)
+  test_api 0.7.12 (0.7.14 available)
+  vector_math 2.4.0 (2.4.3 available)
+Got dependencies!
+9 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Analyzing example...                                            
+No issues found! (ran in 1.4s)
+00:00 +0: loading C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/test/browser_ui_routes_test.dart
+00:00 +0: C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/test/browser_ui_routes_test.dart: cancellation removes only the owning browser routes and resolves their futures
+00:00 +1: C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/test/widget_test.dart: BrowserScreen widget test
+00:00 +2: All tests passed!
+00:00 +0: loading C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/plugin_integration_test.dart
+Building Windows application...                                    15.3s
+√ Built build\windows\x64\runner\Debug\flutter_chromium_webview_example.exe
+00:00 +0: native lifecycle, focus, and hot-restart session cleanup
+00:01 +1: (tearDownAll)
+00:01 +1: All tests passed!
+00:00 +0: loading C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/input_scaling_test.dart
+Building Windows application...                                    14.2s
+√ Built build\windows\x64\runner\Debug\flutter_chromium_webview_example.exe
+00:00 +0: native click, resize, and wheel coordinates at multiple DPRs
+00:03 +1: (tearDownAll)
+00:03 +1: All tests passed!
+00:00 +0: loading C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/native_ui_test.dart
+Building Windows application...                                    15.8s
+√ Built build\windows\x64\runner\Debug\flutter_chromium_webview_example.exe
+00:00 +0: dialogs, menus, dropdown disposal, and browser isolation
+00:05 +1: (tearDownAll)
+00:05 +1: All tests passed!
+00:00 +0: loading C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/windows_keyboard_test.dart
+Building Windows application...                                    61.1s
+√ Built build\windows\x64\runner\Debug\flutter_chromium_webview_example.exe
+00:00 +0: Windows child HWND forwards Unicode and stops after browser blur
+00:03 +1: (tearDownAll)
+00:03 +1: All tests passed!
+Building Windows application...                                    14.6s
+√ Built build\windows\x64\runner\Debug\flutter_chromium_webview_example.exe
+-- Selecting Windows SDK version 10.0.26100.0 to target Windows 10.0.26200.
+-- Configuring done (1.5s)
+-- Generating done (0.2s)
+-- Build files have been written to: C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/windows/x64
+MSBuild version 18.9.1+a81b43525 for .NET Framework
+
+  1>Checking Build System
+  Generating C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/windows/flutter/ephemeral/flutter_windows.dll, C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/windows/flutter/ephemeral/flutter_export.h, C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/windows/flutter/ephemeral/flutter_windows.h, C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/windows/flutter/ephemeral/flutter_messenger.h, C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/windows/flutter/ephemeral/flutter_plugin_registrar.h, C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/windows/flutter/ephemeral/flutter_texture_registrar.h, C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/windows/flutter/ephemeral/cpp_client_wrapper/core_implementations.cc, C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/windows/flutter/ephemeral/cpp_client_wrapper/standard_codec.cc, C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/windows/flutter/ephemeral/cpp_client_wrapper/plugin_registrar.cc, C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/windows/flutter/ephemeral/cpp_client_wrapper/flutter_engine.cc, C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/windows/flutter/ephemeral/cpp_client_wrapper/flutter_view_controller.cc, _phony_
+  Building Custom Rule C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/windows/flutter/CMakeLists.txt
+  Building Custom Rule C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/windows/flutter/CMakeLists.txt
+  flutter_wrapper_plugin.vcxproj -> C:\Users\User\Projects\flutter_chromium_webview\packages\flutter_chromium_webview\example\build\windows\x64\flutter\Debug\flutter_wrapper_plugin.lib
+  Building Custom Rule C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/windows/flutter/ephemeral/.plugin_symlinks/flutter_chromium_webview/windows/CMakeLists.txt
+  chromium_webview_texture_test.vcxproj -> C:\Users\User\Projects\flutter_chromium_webview\packages\flutter_chromium_webview\example\build\windows\x64\plugins\flutter_chromium_webview\Debug\chromium_webview_texture_test.exe
+Texture ownership, resize, invalid-input and concurrent-paint regressions passed
+Building Windows application...                                    52.0s
+√ Built build\windows\x64\runner\Release\flutter_chromium_webview_example.exe

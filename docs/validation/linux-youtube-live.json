@@ -1,0 +1,216 @@
+{
+  "platform": "linux",
+  "timestamp": "2026-10-05T04:19:40.992681Z",
+  "softwareGraphics": true,
+  "videoId": "M7lc1UVf-VE",
+  "events": [
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "MediaCapabilities": {
+        "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+        "vp9": "probably",
+        "av1": "probably",
+        "h264": "",
+        "aac": "",
+        "opus": "probably"
+      }
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "Ready": true
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "StateChange": -1
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "StateChange": 3
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "ApiChange": true
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "ApiChange": true
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "PlaybackQualityChange": "hd720"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "StateChange": 1
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":0.3955570419616699,\"loadedFraction\":0.014885451017779038}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":0.6325150820159912,\"loadedFraction\":0.014885451017779038}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":0.8456429980926514,\"loadedFraction\":0.014885451017779038}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":1.0771759656677244,\"loadedFraction\":0.014885451017779038}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":1.2715801296997071,\"loadedFraction\":0.014885451017779038}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":1.4967069217987061,\"loadedFraction\":0.014885451017779038}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":1.7183740343322753,\"loadedFraction\":0.014885451017779038}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":1.9460011678466798,\"loadedFraction\":0.014885451017779038}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":2.1691921354217527,\"loadedFraction\":0.014885451017779038}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "StateChange": 2
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "StateChange": 3
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "StateChange": 1
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":10.054926062942505,\"loadedFraction\":0.024361303185848216}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":10.304926062942505,\"loadedFraction\":0.024361303185848216}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":10.521271082015991,\"loadedFraction\":0.024361303185848216}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":10.75349199809265,\"loadedFraction\":0.024361303185848216}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":10.988576965667725,\"loadedFraction\":0.024361303185848216}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":11.372503129699707,\"loadedFraction\":0.024361303185848216}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":11.609606066757202,\"loadedFraction\":0.024361303185848216}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":11.847352034332275,\"loadedFraction\":0.024361303185848216}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":12.08680516784668,\"loadedFraction\":0.024361303185848216}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":12.324601062942504,\"loadedFraction\":0.024361303185848216}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":12.56148908201599,\"loadedFraction\":0.024361303185848216}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":12.907469143051147,\"loadedFraction\":0.024361303185848216}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "StateChange": 2
+    }
+  ],
+  "ready": true,
+  "currentTime": 2.2441919446868894,
+  "playerError": null,
+  "state": 1,
+  "pausedDelta": 0.0,
+  "seekPosition": 10.0,
+  "volume": 35.0,
+  "widgetDetachProgress": 2.3289770972747803,
+  "duration": 1343.661,
+  "videoData": {
+    "video_id": "M7lc1UVf-VE",
+    "author": "Google for Developers",
+    "title": "YouTube Developers Live: Embedded Web Player Customization",
+    "isPlayable": true,
+    "errorCode": null,
+    "video_quality": "hd720",
+    "video_quality_features": [],
+    "backgroundable": false,
+    "eventId": "XyXDaoTqFs6P4dUPxveb6Qk",
+    "cpn": "kBzuMBJH-iSPV5By",
+    "isLive": false,
+    "isWindowedLive": false,
+    "isManifestless": false,
+    "allowLiveDvr": false,
+    "isListed": true,
+    "isMultiChannelAudio": false,
+    "hasProgressBarBoundaries": false,
+    "isPremiere": false,
+    "itct": "CAAQu2kiEwjElYqIg6KXAxXOR7gEHcb7Jp3KAQSQjTDz",
+    "playerResponseCpn": "",
+    "progressBarStartPositionUtcTimeMillis": null,
+    "progressBarEndPositionUtcTimeMillis": null,
+    "paidContentOverlayDurationMs": 0,
+    "isSeekable": null
+  },
+  "passed": true
+}

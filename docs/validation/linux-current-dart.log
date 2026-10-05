@@ -1,0 +1,18 @@
+00:00 +0: loading /home/user/flutter_chromium_release_audit/packages/flutter_chromium_webview/test/flutter_chromium_webview_method_channel_test.dart
+00:00 +0: /home/user/flutter_chromium_release_audit/packages/flutter_chromium_webview/test/flutter_chromium_webview_method_channel_test.dart: getPlatformVersion
+00:00 +1: /home/user/flutter_chromium_release_audit/packages/flutter_chromium_webview/test/flutter_chromium_webview_test.dart: Event routing between multiple controllers
+00:00 +2: /home/user/flutter_chromium_release_audit/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.0
+00:00 +3: /home/user/flutter_chromium_release_audit/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.0
+00:00 +4: /home/user/flutter_chromium_release_audit/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.0
+00:00 +5: /home/user/flutter_chromium_release_audit/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.0
+00:00 +6: /home/user/flutter_chromium_release_audit/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.0
+00:00 +7: /home/user/flutter_chromium_release_audit/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.0
+00:00 +8: /home/user/flutter_chromium_release_audit/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.0
+00:00 +9: /home/user/flutter_chromium_release_audit/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.0
+00:00 +10: /home/user/flutter_chromium_release_audit/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.0
+00:00 +11: /home/user/flutter_chromium_release_audit/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.0
+00:00 +12: /home/user/flutter_chromium_release_audit/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.5
+00:00 +13: /home/user/flutter_chromium_release_audit/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:00 +14: /home/user/flutter_chromium_release_audit/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:01 +15: /home/user/flutter_chromium_release_audit/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 2.0 and follows its view
+00:01 +16: All tests passed!

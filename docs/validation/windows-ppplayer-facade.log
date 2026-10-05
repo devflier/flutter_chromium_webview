@@ -1,0 +1,52 @@
+00:00 +0: loading C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart
+Error: Couldn't resolve the package 'app' in 'package:app/core/playback/chromium_playback_engine.dart'.
+test/core/playback/chromium_playback_engine_test.dart:8:8: Error: Not found: 'package:app/core/playback/chromium_playback_engine.dart'
+import 'package:app/core/playback/chromium_playback_engine.dart';
+       ^
+test/core/playback/chromium_playback_engine_test.dart:131:8: Error: 'ChromiumPlaybackEngine' isn't a type.
+  late ChromiumPlaybackEngine engine;
+       ^^^^^^^^^^^^^^^^^^^^^^
+test/core/playback/chromium_playback_engine_test.dart:139:14: Error: Method not found: 'ChromiumPlaybackEngine'.
+    engine = ChromiumPlaybackEngine(
+             ^^^^^^^^^^^^^^^^^^^^^^
+test/core/playback/chromium_playback_engine_test.dart:244:16: Error: Method not found: 'ChromiumPlaybackEngine'.
+      engine = ChromiumPlaybackEngine(
+               ^^^^^^^^^^^^^^^^^^^^^^
+test/core/playback/chromium_playback_engine_test.dart:275:16: Error: Method not found: 'ChromiumPlaybackEngine'.
+      engine = ChromiumPlaybackEngine(
+               ^^^^^^^^^^^^^^^^^^^^^^
+test/core/playback/chromium_playback_engine_test.dart:257:25: Error: The argument type 'List<dynamic>' can't be assigned to the parameter type 'Iterable<Future<dynamic>>'.
+ - 'List' is from 'dart:core'.
+ - 'Iterable' is from 'dart:core'.
+ - 'Future' is from 'dart:async'.
+      await Future.wait([opening, pause]);
+                        ^
+00:00 +0 -1: loading C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart [E]
+  Failed to load "C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart":
+  Compilation failed for testPath=C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: Error: Couldn't resolve the package 'app' in 'package:app/core/playback/chromium_playback_engine.dart'.
+  test/core/playback/chromium_playback_engine_test.dart:8:8: Error: Not found: 'package:app/core/playback/chromium_playback_engine.dart'
+  import 'package:app/core/playback/chromium_playback_engine.dart';
+         ^
+  test/core/playback/chromium_playback_engine_test.dart:131:8: Error: 'ChromiumPlaybackEngine' isn't a type.
+    late ChromiumPlaybackEngine engine;
+         ^^^^^^^^^^^^^^^^^^^^^^
+  test/core/playback/chromium_playback_engine_test.dart:139:14: Error: Method not found: 'ChromiumPlaybackEngine'.
+      engine = ChromiumPlaybackEngine(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  test/core/playback/chromium_playback_engine_test.dart:244:16: Error: Method not found: 'ChromiumPlaybackEngine'.
+        engine = ChromiumPlaybackEngine(
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  test/core/playback/chromium_playback_engine_test.dart:275:16: Error: Method not found: 'ChromiumPlaybackEngine'.
+        engine = ChromiumPlaybackEngine(
+                 ^^^^^^^^^^^^^^^^^^^^^^
+  test/core/playback/chromium_playback_engine_test.dart:257:25: Error: The argument type 'List<dynamic>' can't be assigned to the parameter type 'Iterable<Future<dynamic>>'.
+   - 'List' is from 'dart:core'.
+   - 'Iterable' is from 'dart:core'.
+   - 'Future' is from 'dart:async'.
+        await Future.wait([opening, pause]);
+                          ^
+  .
+00:00 +0 -1: Some tests failed.
+
+Failing tests:
+  C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: loading C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart

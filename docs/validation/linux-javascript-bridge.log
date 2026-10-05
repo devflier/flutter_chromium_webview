@@ -1,0 +1,6 @@
+00:00 +0: loading /home/user/flutter_chromium_release_audit/packages/flutter_chromium_webview/example/integration_test/javascript_bridge_test.dart
+Building Linux application...                                   
+✓ Built build/linux/x64/debug/bundle/flutter_chromium_webview_example
+00:00 +0: real renderer bridge isolates browsers, origins, navigation and lifetime
+00:01 +1: (tearDownAll)
+00:01 +1: All tests passed!

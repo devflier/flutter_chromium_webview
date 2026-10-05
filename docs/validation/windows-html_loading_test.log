@@ -1,0 +1,6 @@
+00:00 +0: loading C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/html_loading_test.dart
+Building Windows application...                                    52.1s
+√ Built build\windows\x64\runner\Debug\flutter_chromium_webview_example.exe
+00:00 +0: HTML origin, relative resources, reload, replacement and browser isolation
+00:03 +1: (tearDownAll)
+00:03 +1: All tests passed!

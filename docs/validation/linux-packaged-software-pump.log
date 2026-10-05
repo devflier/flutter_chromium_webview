@@ -1,0 +1,6 @@
+[CEF] Initializing runtime
+
+(com.example.flutter_chromium_webview:514): Gtk-WARNING **: 22:37:36.930: gtk_disable_setlocale() must be called before gtk_init()
+[CEF] Initialization result: 1
+[514:514:1004/223737.146069:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.Properties.GetAll: object_path= /org/freedesktop/UPower/devices/DisplayDevice: org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.UPower was not provided by any .service files
+[CEF] Shutdown complete
