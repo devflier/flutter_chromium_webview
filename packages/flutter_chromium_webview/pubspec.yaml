@@ -45,10 +45,6 @@ flutter:
     platforms:
       linux:
         pluginClass: FlutterChromiumWebviewPlugin
-      windows:
-        pluginClass: FlutterChromiumWebviewPluginCApi
-      macos:
-        pluginClass: FlutterChromiumWebviewPlugin
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
@@ -84,4 +80,5 @@ flutter:
 dependency_overrides:
   flutter_chromium_webview_platform_interface:
     path: ../flutter_chromium_webview_platform_interface
+
 
