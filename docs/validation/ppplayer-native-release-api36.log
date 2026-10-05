@@ -1,0 +1,973 @@
+--------- beginning of main
+I/flutter ( 3980): [IMPORTANT:flutter/shell/platform/android/android_context_gl_impeller.cc(104)] Using the Impeller rendering backend (OpenGLES).
+I/flutter ( 3980): NATIVE_RELEASE_BEGIN mode=release platform=android
+I/flutter ( 3980): MPV_LOG: error - media_kit: error: property not found _setProperty(osc, 1)
+I/flutter ( 3980): media_kit: Emulator detected.
+I/flutter ( 3980): media_kit: Enforcing S/W rendering.
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: vo="null" -> 1
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: hwdec="no" -> 1
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: vid="auto" -> 1
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: opengl-es="yes" -> 1
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: force-window="yes" -> 1
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: gpu-context="android" -> 1
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: sub-use-margins="no" -> 1
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: sub-font-provider="none" -> 1
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: sub-scale-with-window="yes" -> 1
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: hwdec-codecs="h264,hevc,mpeg4,mpeg2video,vp8,vp9,av1" -> 1
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: stream-lavf-o="reconnect=1,reconnect_streamed=1,reconnect_delay_max=5,reconnect_on_network_error=1,reconnect_on_http_error=5xx" -> 1
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: cache-secs="100" -> 1
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: demuxer-max-bytes="150000000" -> 1
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: demuxer-max-back-bytes="50000000" -> 1
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: demuxer-cache-dir="/data/user/0/com.ppplayer.app/code_cache/ppplayer-mpv-cache" -> 1
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: hr-seek="yes" -> 1
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: stop, flags=64, args=[flags=""]
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: playlist-clear, flags=64, args=[]
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: playlist-play-index, flags=64, args=[index="none"]
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: pause=true -> 1
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: loadlist, flags=64, args=[url="/data/user/0/com.ppplayer.app/files/8bdde45b-881d-453d-8560-83a54dc05a9a", flags="append"]
+I/flutter ( 3980): MPV_LOG: v - playlist_parser: Parsing playlist file /data/user/0/com.ppplayer.app/files/8bdde45b-881d-453d-8560-83a54dc05a9a...
+I/flutter ( 3980): MPV_LOG: v - file: Opening /data/user/0/com.ppplayer.app/files/8bdde45b-881d-453d-8560-83a54dc05a9a
+I/flutter ( 3980): MPV_LOG: debug - file: resize stream to 131072 bytes, drop 0 bytes
+I/flutter ( 3980): MPV_LOG: debug - file: Stream opened successfully.
+I/flutter ( 3980): MPV_LOG: v - demux: Trying demuxers for level=request.
+I/flutter ( 3980): MPV_LOG: debug - demux: Trying demuxer: playlist (force-level: request)
+I/flutter ( 3980): MPV_LOG: warn - playlist: Reading plaintext playlist.
+I/flutter ( 3980): MPV_LOG: v - playlist: demuxer read all data; closing stream
+I/flutter ( 3980): MPV_LOG: v - demux: Detected file format: txt (Playlist file)
+I/flutter ( 3980): MPV_LOG: v - playlist_parser: Playlist successfully parsed
+I/flutter ( 3980): MPV_LOG: debug - global: state path: 'watch_later' -> '-'
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: pause=false -> 1
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: playlist-pos=0 -> 1
+I/flutter ( 3980): MPV_LOG: debug - global: state path: 'watch_later' -> '-'
+I/flutter ( 3980): MPV_LOG: v - cplayer: Running hook: main/on_load
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: http-header-fields=["User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36","Accept: */*"] -> 1
+I/flutter ( 3980): MPV_LOG: v - file: Opening /data/user/0/com.ppplayer.app/code_cache/ppplayer-release-GVALFT/video.mp4
+I/flutter ( 3980): MPV_LOG: debug - file: resize stream to 131072 bytes, drop 0 bytes
+I/flutter ( 3980): MPV_LOG: debug - file: Stream opened successfully.
+I/flutter ( 3980): MPV_LOG: v - demux: Trying demuxers for level=normal.
+I/flutter ( 3980): MPV_LOG: debug - demux: Trying demuxer: disc (force-level: normal)
+I/flutter ( 3980): MPV_LOG: debug - demux: Trying demuxer: edl (force-level: normal)
+I/flutter ( 3980): MPV_LOG: debug - demux: Trying demuxer: cue (force-level: normal)
+I/flutter ( 3980): MPV_LOG: debug - demux: Trying demuxer: rawaudio (force-level: normal)
+I/flutter ( 3980): MPV_LOG: debug - demux: Trying demuxer: rawvideo (force-level: normal)
+I/flutter ( 3980): MPV_LOG: debug - demux: Trying demuxer: mkv (force-level: normal)
+I/flutter ( 3980): MPV_LOG: debug - demux: Trying demuxer: lavf (force-level: normal)
+I/flutter ( 3980): MPV_LOG: v - lavf: Found 'mov,mp4,m4a,3gp,3g2,mj2' at score=100 size=2048.
+I/flutter ( 3980): MPV_LOG: v - lavf: Could not set AVOption seg_max_retry='5'
+I/flutter ( 3980): MPV_LOG: v - lavf: Could not set AVOption allowed_extensions='ALL'
+I/flutter ( 3980): MPV_LOG: v - demux: Detected file format: mov,mp4,m4a,3gp,3g2,mj2 (libavformat)
+I/flutter ( 3980): MPV_LOG: debug - global: user path: '/data/user/0/com.ppplayer.app/code_cache/ppplayer-mpv-cache' -> '/data/user/0/com.ppplayer.app/code_cache/ppplayer-mpv-cache'
+I/flutter ( 3980): MPV_LOG: v - cplayer: Opening done: /data/user/0/com.ppplayer.app/code_cache/ppplayer-release-GVALFT/video.mp4
+I/flutter ( 3980): MPV_LOG: v - find_files: Loading external files in /data/user/0/com.ppplayer.app/code_cache/ppplayer-release-GVALFT/
+I/flutter ( 3980): MPV_LOG: v - lavf: select track 0
+I/flutter ( 3980): MPV_LOG: v - lavf: select track 1
+I/flutter ( 3980): MPV_LOG: info - cplayer: (+) Video --vid=1 (*) (h264 640x480 30.000fps)
+I/flutter ( 3980): MPV_LOG: info - cplayer: (+) Audio --aid=1 (*) (aac 1ch 44100Hz)
+I/flutter ( 3980): MPV_LOG: v - vd: Container reported FPS: 30.000000
+I/flutter ( 3980): MPV_LOG: v - vd: Codec list:
+I/flutter ( 3980): MPV_LOG: v - vd: h264 - (null)
+I/flutter ( 3980): MPV_LOG: v - vd: h264_v4l2m2m (h264) - (null)
+I/flutter ( 3980): MPV_LOG: v - vd: h264_mediacodec (h264) - (null)
+I/flutter ( 3980): MPV_LOG: v - vd: Opening decoder h264
+I/flutter ( 3980): MPV_LOG: v - vd: No hardware decoding requested.
+I/flutter ( 3980): MPV_LOG: v - vd: Using software decoding.
+I/flutter ( 3980): MPV_LOG: v - vd: Detected 4 logical cores.
+I/flutter ( 3980): MPV_LOG: v - vd: Requesting 5 threads for decoding.
+I/flutter ( 3980): MPV_LOG: v - vd: Selected codec: h264
+I/flutter ( 3980): MPV_LOG: v - vf: User filter list:
+I/flutter ( 3980): MPV_LOG: v - vf: (empty)
+I/flutter ( 3980): MPV_LOG: v - ad: Codec list:
+I/flutter ( 3980): MPV_LOG: v - ad: aac - (null)
+I/flutter ( 3980): MPV_LOG: v - ad: aac_fixed (aac) - (null)
+I/flutter ( 3980): MPV_LOG: v - ad: Opening decoder aac
+I/flutter ( 3980): MPV_LOG: v - ad: Requesting 1 threads for decoding.
+I/flutter ( 3980): MPV_LOG: v - ad: Selected codec: aac
+I/flutter ( 3980): MPV_LOG: v - af: User filter list:
+I/flutter ( 3980): MPV_LOG: v - af: (empty)
+I/flutter ( 3980): MPV_LOG: v - cplayer: Starting playback...
+I/flutter ( 3980): MPV_LOG: debug - lavf: stream 1: resize index to 128
+I/flutter ( 3980): MPV_LOG: debug - ffmpeg/video: h264: Reinit context to 640x480, pix_fmt: yuv444p
+I/flutter ( 3980): MPV_LOG: debug - vd: DR parameter change to 640x482 yuv444p align=64
+I/flutter ( 3980): MPV_LOG: debug - vd: Allocating new (host-cached) DR image...
+I/flutter ( 3980): MPV_LOG: debug - vd: ...failed..
+I/flutter ( 3980): MPV_LOG: v - vd: DR failed - disabling.
+I/flutter ( 3980): MPV_LOG: debug - lavf: stream 0: resize index to 128
+I/flutter ( 3980): MPV_LOG: v - lavf: EOF reached.
+I/flutter ( 3980): MPV_LOG: v - vd: Using software decoding.
+I/flutter ( 3980): MPV_LOG: v - vd: Decoder format: 640x480 yuv444p auto/auto/auto/auto/auto CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vd: Using container aspect ratio.
+I/flutter ( 3980): MPV_LOG: v - vf: [in] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vf: [userdeint] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vf: [userdeint] (disabled)
+I/flutter ( 3980): MPV_LOG: v - vf: [autorotate] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vf: [autorotate] (disabled)
+I/flutter ( 3980): MPV_LOG: v - vf: [convert] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vf: [convert] (disabled)
+I/flutter ( 3980): MPV_LOG: v - vf: [out] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - af: [in] 44100Hz mono 1ch floatp
+I/flutter ( 3980): MPV_LOG: v - af: [userspeed] 44100Hz mono 1ch floatp
+I/flutter ( 3980): MPV_LOG: v - af: [userspeed] (disabled)
+I/flutter ( 3980): MPV_LOG: v - af: [convert] 44100Hz mono 1ch floatp
+I/flutter ( 3980): MPV_LOG: v - ao: Trying audio driver 'opensles'
+I/flutter ( 3980): MPV_LOG: v - ao/opensles: requested format: 44100 Hz, mono channels, floatp
+I/flutter ( 3980): MPV_LOG: v - ao/opensles: device buffer: 11025 samples.
+I/flutter ( 3980): MPV_LOG: v - ao/opensles: using soft-buffer of 11025 samples.
+I/flutter ( 3980): MPV_LOG: info - cplayer: AO: [opensles] 44100Hz stereo 2ch float
+I/flutter ( 3980): MPV_LOG: v - cplayer: AO: Description: OpenSL ES audio output
+I/flutter ( 3980): MPV_LOG: v - autoconvert: inserting resampler
+I/flutter ( 3980): MPV_LOG: v - swresample: format change, reinitializing resampler
+I/flutter ( 3980): MPV_LOG: v - swresample: 44100Hz mono floatp -> 44100Hz stereo float
+I/flutter ( 3980): MPV_LOG: v - swresample: Remix: mono -> stereo
+I/flutter ( 3980): MPV_LOG: v - af: [out] 44100Hz stereo 2ch float
+I/flutter ( 3980): MPV_LOG: info - cplayer: VO: [null] 640x480 yuv444p
+I/flutter ( 3980): MPV_LOG: v - cplayer: VO: Description: Null video output
+I/flutter ( 3980): MPV_LOG: v - vo/null: reconfig to 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - cplayer: first video frame after restart shown
+I/flutter ( 3980): VideoOutput.Resize
+I/flutter ( 3980): {rect: {top: 0, left: 0, width: 640, height: 480}, wid: 14058, handle: 132284178399696, id: 0}
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: vo="null" -> 1
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: android-surface-size="640x480" -> 1
+I/flutter ( 3980): MPV_LOG: v - cplayer: audio ready
+I/flutter ( 3980): MPV_LOG: debug - cplayer: starting video playback
+I/flutter ( 3980): MPV_LOG: v - cplayer: starting audio playback
+I/flutter ( 3980): MPV_LOG: v - cplayer: playback restart complete @ 0.000000, audio=playing, video=playing
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: wid="14058" -> 1
+I/flutter ( 3980): MPV_LOG: debug - vd: Uninit decoder.
+I/flutter ( 3980): MPV_LOG: v - vo/gpu/opengl: Initializing GPU context 'android'
+I/flutter ( 3980): MPV_LOG: v - vo/gpu/opengl: EGL_VERSION=1.4 Android META-EGL
+I/flutter ( 3980): MPV_LOG: v - vo/gpu/opengl: EGL_VENDOR=Android
+I/flutter ( 3980): MPV_LOG: v - vo/gpu/opengl: EGL_CLIENT_APIS=OpenGL_ES
+I/flutter ( 3980): MPV_LOG: v - vo/gpu/opengl: Trying to create GLES 2.x + context.
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: Chosen EGLConfig:
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: EGL_CONFIG_ID=0x1
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: EGL_RED_SIZE=0x8
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: EGL_GREEN_SIZE=0x8
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: EGL_BLUE_SIZE=0x8
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: EGL_ALPHA_SIZE=0x0
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: EGL_COLOR_BUFFER_TYPE=0x308e
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: EGL_CONFIG_CAVEAT=0x3038
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: EGL_CONFORMANT=0x45
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: EGL_NATIVE_VISUAL_ID=0x2
+I/flutter ( 3980): MPV_LOG: v - vo/gpu/opengl: Retrying GLES context without optional flags.
+I/flutter ( 3980): MPV_LOG: v - vo/gpu/opengl: GL_VERSION='OpenGL ES 3.1 (4.5.0 NVIDIA 610.60)'
+I/flutter ( 3980): MPV_LOG: v - vo/gpu/opengl: Detected GLES 3.1.
+I/flutter ( 3980): MPV_LOG: v - vo/gpu/opengl: GL_VENDOR='Google (NVIDIA Corporation)'
+I/flutter ( 3980): MPV_LOG: v - vo/gpu/opengl: GL_RENDERER='Android Emulator OpenGL ES Translator (NVIDIA GeForce RTX 3050 Laptop GPU/PCIe/SSE2)'
+I/flutter ( 3980): MPV_LOG: v - vo/gpu/opengl: GL_SHADING_LANGUAGE_VERSION='OpenGL ES GLSL ES 3.10'
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: Combined OpenGL extensions string:
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: EGL_ANDROID_front_buffer_auto_refresh EGL_ANDROID_get_native_client_buffer EGL_ANDROID_presentation_time EGL_EXT_surface_CTA861_3_metadata EGL_EXT_surface_SMPTE2086_metadata EGL_KHR_get_all_proc_addresses EGL_KHR_swap_buffers_with_damage EGL_ANDROID_get_frame_timestamps EGL_ANDROID_image_native_buffer EGL_ANDROID_native_fence_sync EGL_ANDROID_recordable EGL_KHR_create_context EGL_KHR_fence_sync EGL_KHR_gl_texture_2D_image EGL_KHR_image EGL_KHR_image_base EGL_KHR_wait_sync  GL_EXT_debug_marker GL_EXT_robustness GL_OES_EGL_sync GL_OES_EGL_image GL_OES_EGL_image_external GL_OES_depth24 GL_OES_depth32 GL_OES_element_index_uint GL_OES_texture_float GL_OES_texture_float_linear GL_OES_compressed_paletted_texture GL_OES_compressed_ETC1_RGB8_texture GL_OES_depth_texture GL_OES_texture_half_float GL_OES_texture_half_float_linear GL_OES_packed_depth_stencil GL_OES_vertex_half_float GL_OES_texture_npot GL_OES_rgb8_rgba8 GL_OVR_multiview2 GL_EXT_multiview_texture_multisample GL_EXT_color_b
+I/flutter ( 3980): MPV_LOG: v - vo/gpu/opengl: Loaded extension GL_EXT_color_buffer_half_float.
+I/flutter ( 3980): MPV_LOG: v - vo/gpu/opengl: 16 bit UNORM textures not available.
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: Texture formats:
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: NAME       COMP*TYPE SIZE           DEPTH PER COMP.
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: r8         1*unorm   1B    LF CR ST {8}
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rg8        2*unorm   2B    LF CR ST {8 8}
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgb8       3*unorm   3B    LF CR ST {8 8 8}
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgba8      4*unorm   4B    LF CR ST {8 8 8 8}
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: l          1*unorm   1B    LF CR ST {8}
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: la         2*unorm   2B LA LF CR ST {8 8}
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: r8ui       1*uint    1B       CR ST {8}
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rg8ui      2*uint    2B       CR ST {8 8}
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgb8ui     3*uint    3B          ST {8 8 8}
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgba8ui    4*uint    4B       CR ST {8 8 8 8}
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: r16ui      1*uint    2B       CR ST {16}
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rg16ui     2*uint    4B       CR ST {16 16}
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgb16ui    3*uint    6B          ST {16 16 16}
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgba16ui   4*uint    8B       CR ST {16 16 16 16}
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: r16f       1*float   4B    LF CR ST {32/16}
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rg16f      2*float   8B    LF CR ST {32/16 32/16}
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgb16f     3*float  12B    LF    ST {32/16 32/16 32/16}
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgba16f    4*float  16B    LF CR ST {32/16 32/16 32/16 32/16}
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: r16f       1*float   4B    LF    ST {32/16}
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rg16f      2*float   8B    LF    ST {32/16 32/16}
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgb16f     3*float  12B    LF    ST {32/16 32/16 32/16}
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgba16f    4*float  16B    LF    ST {32/16 32/16 32/16 32/16}
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgb10_a2   4*unorm   4B    LF CR ST {0/10 0/10 0/10 0/2}
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: LA = LUMINANCE_ALPHA hack format
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: LF = linear filterable
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: CR = can be used for render targets
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: ST = can be used for storable images
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: Image formats:
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv444p => 3 planes 1x1 8/0 [r8/r8/r8] (r/g/b) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv420p => 3 planes 2x2 8/0 [r8/r8/r8] (r/g/b) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gray => 1 planes 1x1 8/0 [r8] (r) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gray16 => 1 planes 1x1 16/0 [r16ui] (r) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: uyvy422
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: nv12 => 2 planes 2x2 8/0 [r8/rg8] (r/gb) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: p010 => 2 planes 2x2 16/6 [r16ui/rg16ui] (r/gb) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: argb => 1 planes 1x1 8/0 [rgba8] (argb) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bgra => 1 planes 1x1 8/0 [rgba8] (bgra) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: abgr => 1 planes 1x1 8/0 [rgba8] (abgr) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgba => 1 planes 1x1 8/0 [rgba8] (rgba) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bgr24 => 1 planes 1x1 8/0 [rgb8] (bgr) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgb24 => 1 planes 1x1 8/0 [rgb8] (rgb) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: 0rgb => 1 planes 1x1 8/0 [rgba8] (_rgb) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bgr0 => 1 planes 1x1 8/0 [rgba8] (bgr) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: 0bgr => 1 planes 1x1 8/0 [rgba8] (_bgr) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgb0 => 1 planes 1x1 8/0 [rgba8] (rgb) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgba64 => 1 planes 1x1 16/0 [rgba16ui] (rgba) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgb565
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: pal8
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: vdpau
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: d3d11
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: dxva2_vld
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: mmal
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: mediacodec
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: cuda
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yap8 => 2 planes 1x1 8/0 [r8/r8] (r/a) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yap16 => 2 planes 1x1 16/0 [r16ui/r16ui] (r/a) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: grayaf32 => 2 planes 1x1 32/0 [r16f/r16f] (r/a) [float]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv444pf => 3 planes 1x1 32/0 [r16f/r16f/r16f] (r/g/b) [float]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva444pf => 4 planes 1x1 32/0 [r16f/r16f/r16f/r16f] (r/g/b/a) [float]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv420pf => 3 planes 2x2 32/0 [r16f/r16f/r16f] (r/g/b) [float]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva420pf => 4 planes 2x2 32/0 [r16f/r16f/r16f/r16f] (r/g/b/a) [float]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv422pf => 3 planes 2x1 32/0 [r16f/r16f/r16f] (r/g/b) [float]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva422pf => 4 planes 2x1 32/0 [r16f/r16f/r16f/r16f] (r/g/b/a) [float]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv440pf => 3 planes 1x2 32/0 [r16f/r16f/r16f] (r/g/b) [float]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva440pf => 4 planes 1x2 32/0 [r16f/r16f/r16f/r16f] (r/g/b/a) [float]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv410pf => 3 planes 4x4 32/0 [r16f/r16f/r16f] (r/g/b) [float]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva410pf => 4 planes 4x4 32/0 [r16f/r16f/r16f/r16f] (r/g/b/a) [float]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv411pf => 3 planes 4x1 32/0 [r16f/r16f/r16f] (r/g/b) [float]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva411pf => 4 planes 4x1 32/0 [r16f/r16f/r16f/r16f] (r/g/b/a) [float]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgb30 => 1 planes 1x1 10/0 [rgb10_a2] (bgr) [unknown]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: y1 => 1 planes 1x1 8/-7 [r8] (r) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrp1 => 3 planes 1x1 8/-7 [r8/r8/r8] (g/b/r) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrp2 => 3 planes 1x1 8/-6 [r8/r8/r8] (g/b/r) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrp3 => 3 planes 1x1 8/-5 [r8/r8/r8] (g/b/r) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrp4 => 3 planes 1x1 8/-4 [r8/r8/r8] (g/b/r) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrp5 => 3 planes 1x1 8/-3 [r8/r8/r8] (g/b/r) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrp6 => 3 planes 1x1 8/-2 [r8/r8/r8] (g/b/r) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: vdpau_output
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: vaapi
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: videotoolbox
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: drm_prime
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuyv422
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv422p => 3 planes 2x1 8/0 [r8/r8/r8] (r/g/b) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv410p => 3 planes 4x4 8/0 [r8/r8/r8] (r/g/b) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv411p => 3 planes 4x1 8/0 [r8/r8/r8] (r/g/b) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: monow
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: monob
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuvj422p => 3 planes 2x1 8/0 [r8/r8/r8] (r/g/b) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: uyyvyy411
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bgr8
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bgr4
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bgr4_byte
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgb8
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgb4
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgb4_byte
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: nv21 => 2 planes 2x2 8/0 [r8/rg8] (r/bg) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gray16be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv440p => 3 planes 1x2 8/0 [r8/r8/r8] (r/g/b) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuvj440p => 3 planes 1x2 8/0 [r8/r8/r8] (r/g/b) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva420p => 4 planes 2x2 8/0 [r8/r8/r8/r8] (r/g/b/a) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgb48be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgb48 => 1 planes 1x1 16/0 [rgb16ui] (rgb) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgb565be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgb555be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgb555
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bgr565be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bgr565
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bgr555be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bgr555
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv420p16 => 3 planes 2x2 16/0 [r16ui/r16ui/r16ui] (r/g/b) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv420p16be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv422p16 => 3 planes 2x1 16/0 [r16ui/r16ui/r16ui] (r/g/b) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv422p16be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv444p16 => 3 planes 1x1 16/0 [r16ui/r16ui/r16ui] (r/g/b) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv444p16be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgb444
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgb444be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bgr444
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bgr444be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: ya8 => 1 planes 1x1 8/0 [rg8] (ra) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bgr48be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bgr48 => 1 planes 1x1 16/0 [rgb16ui] (bgr) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv420p9be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv420p9 => 3 planes 2x2 16/-7 [r16ui/r16ui/r16ui] (r/g/b) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv420p10be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv420p10 => 3 planes 2x2 16/-6 [r16ui/r16ui/r16ui] (r/g/b) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv422p10be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv422p10 => 3 planes 2x1 16/-6 [r16ui/r16ui/r16ui] (r/g/b) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv444p9be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv444p9 => 3 planes 1x1 16/-7 [r16ui/r16ui/r16ui] (r/g/b) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv444p10be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv444p10 => 3 planes 1x1 16/-6 [r16ui/r16ui/r16ui] (r/g/b) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv422p9be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv422p9 => 3 planes 2x1 16/-7 [r16ui/r16ui/r16ui] (r/g/b) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrp => 3 planes 1x1 8/0 [r8/r8/r8] (g/b/r) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrp9be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrp9 => 3 planes 1x1 16/-7 [r16ui/r16ui/r16ui] (g/b/r) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrp10be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrp10 => 3 planes 1x1 16/-6 [r16ui/r16ui/r16ui] (g/b/r) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrp16be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrp16 => 3 planes 1x1 16/0 [r16ui/r16ui/r16ui] (g/b/r) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva422p => 4 planes 2x1 8/0 [r8/r8/r8/r8] (r/g/b/a) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva444p => 4 planes 1x1 8/0 [r8/r8/r8/r8] (r/g/b/a) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva420p9be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva420p9 => 4 planes 2x2 16/-7 [r16ui/r16ui/r16ui/r16ui] (r/g/b/a) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva422p9be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva422p9 => 4 planes 2x1 16/-7 [r16ui/r16ui/r16ui/r16ui] (r/g/b/a) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva444p9be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva444p9 => 4 planes 1x1 16/-7 [r16ui/r16ui/r16ui/r16ui] (r/g/b/a) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva420p10be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva420p10 => 4 planes 2x2 16/-6 [r16ui/r16ui/r16ui/r16ui] (r/g/b/a) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva422p10be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva422p10 => 4 planes 2x1 16/-6 [r16ui/r16ui/r16ui/r16ui] (r/g/b/a) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva444p10be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva444p10 => 4 planes 1x1 16/-6 [r16ui/r16ui/r16ui/r16ui] (r/g/b/a) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva420p16be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva420p16 => 4 planes 2x2 16/0 [r16ui/r16ui/r16ui/r16ui] (r/g/b/a) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva422p16be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva422p16 => 4 planes 2x1 16/0 [r16ui/r16ui/r16ui/r16ui] (r/g/b/a) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva444p16be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva444p16 => 4 planes 1x1 16/0 [r16ui/r16ui/r16ui/r16ui] (r/g/b/a) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: xyz12 => 1 planes 1x1 16/4 [rgb16ui] (rgb) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: xyz12be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: nv16 => 2 planes 2x1 8/0 [r8/rg8] (r/gb) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: nv20 => 2 planes 2x1 16/-6 [r16ui/rg16ui] (r/gb) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: nv20be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgba64be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bgra64be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bgra64 => 1 planes 1x1 16/0 [rgba16ui] (bgra) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yvyu422
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: ya16be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: ya16 => 1 planes 1x1 16/0 [rg16ui] (ra) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrap => 4 planes 1x1 8/0 [r8/r8/r8/r8] (g/b/r/a) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrap16be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrap16 => 4 planes 1x1 16/0 [r16ui/r16ui/r16ui/r16ui] (g/b/r/a) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: qsv
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: d3d11va_vld
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv420p12be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv420p12 => 3 planes 2x2 16/-4 [r16ui/r16ui/r16ui] (r/g/b) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv420p14be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv420p14 => 3 planes 2x2 16/-2 [r16ui/r16ui/r16ui] (r/g/b) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv422p12be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv422p12 => 3 planes 2x1 16/-4 [r16ui/r16ui/r16ui] (r/g/b) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv422p14be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv422p14 => 3 planes 2x1 16/-2 [r16ui/r16ui/r16ui] (r/g/b) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv444p12be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv444p12 => 3 planes 1x1 16/-4 [r16ui/r16ui/r16ui] (r/g/b) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv444p14be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv444p14 => 3 planes 1x1 16/-2 [r16ui/r16ui/r16ui] (r/g/b) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrp12be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrp12 => 3 planes 1x1 16/-4 [r16ui/r16ui/r16ui] (g/b/r) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrp14be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrp14 => 3 planes 1x1 16/-2 [r16ui/r16ui/r16ui] (g/b/r) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuvj411p => 3 planes 4x1 8/0 [r8/r8/r8] (r/g/b) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bayer_bggr8
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bayer_rggb8
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bayer_gbrg8
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bayer_grbg8
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bayer_bggr16
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bayer_bggr16be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bayer_rggb16
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bayer_rggb16be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bayer_gbrg16
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bayer_gbrg16be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bayer_grbg16
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: bayer_grbg16be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: xvmc
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv440p10 => 3 planes 1x2 16/-6 [r16ui/r16ui/r16ui] (r/g/b) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv440p10be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv440p12 => 3 planes 1x2 16/-4 [r16ui/r16ui/r16ui] (r/g/b) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuv440p12be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: ayuv64 => 1 planes 1x1 16/0 [rgba16ui] (argb) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: ayuv64be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: p010be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrap12be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrap12 => 4 planes 1x1 16/-4 [r16ui/r16ui/r16ui/r16ui] (g/b/r/a) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrap10be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrap10 => 4 planes 1x1 16/-6 [r16ui/r16ui/r16ui/r16ui] (g/b/r/a) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gray12be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gray12 => 1 planes 1x1 16/-4 [r16ui] (r) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gray10be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gray10 => 1 planes 1x1 16/-6 [r16ui] (r) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: p016 => 2 planes 2x2 16/0 [r16ui/rg16ui] (r/gb) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: p016be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gray9be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gray9 => 1 planes 1x1 16/-7 [r16ui] (r) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrpf32be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrpf32 => 3 planes 1x1 32/0 [r16f/r16f/r16f] (g/b/r) [float]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrapf32be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gbrapf32 => 4 planes 1x1 32/0 [r16f/r16f/r16f/r16f] (g/b/r/a) [float]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: opencl
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gray14be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: gray14 => 1 planes 1x1 16/-2 [r16ui] (r) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: grayf32be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: grayf32 => 1 planes 1x1 32/0 [r16f] (r) [float]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva422p12be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva422p12 => 4 planes 2x1 16/-4 [r16ui/r16ui/r16ui/r16ui] (r/g/b/a) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva444p12be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: yuva444p12 => 4 planes 1x1 16/-4 [r16ui/r16ui/r16ui/r16ui] (r/g/b/a) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: nv24 => 2 planes 1x1 8/0 [r8/rg8] (r/gb) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: nv42 => 2 planes 1x1 8/0 [r8/rg8] (r/bg) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: vulkan
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: y210be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: y210
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: x2rgb10be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: x2bgr10
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: x2bgr10be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: p210be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: p210 => 2 planes 2x1 16/6 [r16ui/rg16ui] (r/gb) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: p410be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: p410 => 2 planes 1x1 16/6 [r16ui/rg16ui] (r/gb) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: p216be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: p216 => 2 planes 2x1 16/0 [r16ui/rg16ui] (r/gb) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: p416be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: p416 => 2 planes 1x1 16/0 [r16ui/rg16ui] (r/gb) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: vuya => 1 planes 1x1 8/0 [rgba8] (bgra) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgbaf16be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgbaf16
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: vuyx => 1 planes 1x1 8/0 [rgba8] (bgr) [unorm]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: p012 => 2 planes 2x2 16/4 [r16ui/rg16ui] (r/gb) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: p012be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: y212be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: y212
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: xv30be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: xv30
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: xv36be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: xv36 => 1 planes 1x1 16/4 [rgba16ui] (grb) [uint ]
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgbf32be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgbf32
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgbaf32be
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: rgbaf32
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Testing FBO format rgba16f
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu: Resizing texture: 16x16
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Using FBO format rgba16f.
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: No advanced processing required. Enabling dumb mode.
+I/flutter ( 3980): MPV_LOG: v - vd: Container reported FPS: 30.000000
+I/flutter ( 3980): MPV_LOG: v - vd: Codec list:
+I/flutter ( 3980): MPV_LOG: v - vd: h264 - (null)
+I/flutter ( 3980): MPV_LOG: v - vd: h264_v4l2m2m (h264) - (null)
+I/flutter ( 3980): MPV_LOG: v - vd: h264_mediacodec (h264) - (null)
+I/flutter ( 3980): MPV_LOG: v - vd: Opening decoder h264
+I/flutter ( 3980): MPV_LOG: v - vd: No hardware decoding requested.
+I/flutter ( 3980): MPV_LOG: v - vd: Using software decoding.
+I/flutter ( 3980): MPV_LOG: v - vd: Detected 4 logical cores.
+I/flutter ( 3980): MPV_LOG: v - vd: Requesting 5 threads for decoding.
+I/flutter ( 3980): MPV_LOG: v - vd: Selected codec: h264
+I/flutter ( 3980): MPV_LOG: v - vf: User filter list:
+I/flutter ( 3980): MPV_LOG: v - vf: (empty)
+I/flutter ( 3980): MPV_LOG: v - lavf: refresh track 0
+I/flutter ( 3980): MPV_LOG: v - lavf: refresh seek to -0.966667
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: vo="gpu" -> 1
+I/flutter ( 3980): MPV_LOG: v - lavf: execute seek (to -0.966667 flags 32)
+I/flutter ( 3980): MPV_LOG: v - lavf: seek done
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: seek, flags=64, args=[target="0.000000", flags="absolute", legacy="unused"]
+I/flutter ( 3980): MPV_LOG: v - lavf: queuing seek to 0.000000
+I/flutter ( 3980): MPV_LOG: v - cplayer: hr-seek, skipping to 0.000000 (no framedrop)
+I/flutter ( 3980): MPV_LOG: v - lavf: execute seek (to 0.000000 flags 32)
+I/flutter ( 3980): MPV_LOG: v - lavf: seek done
+I/flutter ( 3980): MPV_LOG: debug - lavf: stream 1: resize index to 128
+I/flutter ( 3980): MPV_LOG: debug - ffmpeg/video: h264: Reinit context to 640x480, pix_fmt: yuv444p
+I/flutter ( 3980): MPV_LOG: debug - vd: DR parameter change to 640x482 yuv444p align=64
+I/flutter ( 3980): MPV_LOG: debug - vd: Allocating new (host-cached) DR image...
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: DR path suspected slow/uncached, disabling.
+I/flutter ( 3980): MPV_LOG: debug - vd: ...failed..
+I/flutter ( 3980): MPV_LOG: v - vd: DR failed - disabling.
+I/flutter ( 3980): MPV_LOG: debug - lavf: stream 0: resize index to 128
+I/flutter ( 3980): MPV_LOG: v - lavf: EOF reached.
+I/flutter ( 3980): MPV_LOG: v - vd: Using software decoding.
+I/flutter ( 3980): MPV_LOG: v - vd: Decoder format: 640x480 yuv444p auto/auto/auto/auto/auto CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vd: Using container aspect ratio.
+I/flutter ( 3980): MPV_LOG: v - vf: [in] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vf: [userdeint] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vf: [userdeint] (disabled)
+I/flutter ( 3980): MPV_LOG: v - vf: [autorotate] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vf: [autorotate] (disabled)
+I/flutter ( 3980): MPV_LOG: v - vf: [convert] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vf: [convert] (disabled)
+I/flutter ( 3980): MPV_LOG: v - vf: [out] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: info - cplayer: VO: [gpu] 640x480 yuv444p
+I/flutter ( 3980): MPV_LOG: v - cplayer: VO: Description: Shader-based GPU Renderer
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: reconfig to 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Resize: 640x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Window size: 640x480 (Borders: l=0 t=0 r=0 b=0)
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Video source: 640x480 (1:1)
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Video display: (0, 0) 640x480 -> (0, 0) 640x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Video scale: 1.000000/1.000000
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: OSD borders: l=0 t=0 r=0 b=0
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Video borders: l=0 t=0 r=0 b=0
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Reported display depth: 8
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Texture for plane 0: 640x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Texture for plane 1: 640x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Texture for plane 2: 640x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Testing FBO format rgba16f
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu: Resizing texture: 16x16
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Using FBO format rgba16f.
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: No advanced processing required. Enabling dumb mode.
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: vertex shader source:
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [  1] #version 310 es
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [  2] #ifdef GL_FRAGMENT_PRECISION_HIGH
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [  3] precision highp float;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [  4] #else
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [  5] precision mediump float;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [  6] #endif
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [  7] precision mediump sampler2D;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [  8] precision mediump sampler3D;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [  9] #define tex1D texture
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 10] #define tex3D texture
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 11] #define LUT_POS(x, lut_size) mix(0.5 / (lut_size), 1.0 - 0.5 / (lut_size), (x))
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 12] in vec2 vertex_position;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 13] in vec2 vertex_texcoord0;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 14] out vec2 texcoord0;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 15] in vec2 vertex_texcoord1;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 16] out vec2 texcoord1;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 17] in vec2 vertex_texcoord2;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 18] out vec2 texcoord2;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 19] void main() {
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 20] gl_Position = vec4(vertex_position, 1.0, 1.0);
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 21] texcoord0 = vertex_texcoord0;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 22] texcoord1 = vertex_texcoord1;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 23] texcoord2 = vertex_texcoord2;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 24] }
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: fragment shader source:
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [  1] #version 310 es
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [  2] #ifdef GL_FRAGMENT_PRECISION_HIGH
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [  3] precision highp float;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [  4] #else
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [  5] precision mediump float;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [  6] #endif
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [  7] precision mediump sampler2D;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [  8] precision mediump sampler3D;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [  9] #define tex1D texture
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 10] #define tex3D texture
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 11] #define LUT_POS(x, lut_size) mix(0.5 / (lut_size), 1.0 - 0.5 / (lut_size), (x))
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 12] out vec4 out_color;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 13] in vec2 texcoord0;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 14] in vec2 texcoord1;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 15] in vec2 texcoord2;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 16] uniform mat3 colormatrix;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 17] uniform vec3 colormatrix_c;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 18] uniform vec3 src_luma;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 19] uniform vec3 dst_luma;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 20] uniform sampler2D texture0;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 21] uniform vec2 texture_size0;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 22] uniform mat2 texture_rot0;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 23] uniform vec2 texture_off0;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 24] uniform vec2 pixel_size0;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 25] uniform sampler2D texture1;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 26] uniform vec2 texture_size1;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 27] uniform mat2 texture_rot1;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 28] uniform vec2 texture_off1;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 29] uniform vec2 pixel_size1;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 30] uniform sampler2D texture2;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 31] uniform vec2 texture_size2;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 32] uniform mat2 texture_rot2;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 33] uniform vec2 texture_off2;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 34] uniform vec2 pixel_size2;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 35] void main() {
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 36] vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 37] color.r = 1.000000 * vec4(texture(texture0, texcoord0)).r;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 38] color.g = 1.000000 * vec4(texture(texture1, texcoord1)).r;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 39] color.b = 1.000000 * vec4(texture(texture2, texcoord2)).r;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 40] color = color.rgbr;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 41] color.rgb = mat3(colormatrix) * color.rgb + colormatrix_c;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 42] color.a = 1.0;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 43] // color mapping
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 44] color.rgb *= vec3(1.000000);
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 45] color.rgb *= vec3(1.000000);
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 46] out_color = color;
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: [ 47] }
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu/opengl: shader link log (status=1):
+I/flutter ( 3980): MPV_LOG: v - cplayer: first video frame after restart shown
+I/flutter ( 3980): MPV_LOG: v - cplayer: audio ready
+I/flutter ( 3980): MPV_LOG: debug - cplayer: starting video playback
+I/flutter ( 3980): MPV_LOG: v - cplayer: starting audio playback
+I/flutter ( 3980): MPV_LOG: v - cplayer: playback restart complete @ 0.000000, audio=playing, video=playing
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: pause=true -> 1
+I/flutter ( 3980): NATIVE_RELEASE_VIDEO_READY round=1
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: seek, flags=64, args=[target="2.511000", flags="absolute", legacy="unused"]
+I/flutter ( 3980): MPV_LOG: v - lavf: queuing seek to 2.511000
+I/flutter ( 3980): MPV_LOG: v - lavf: cached range 0: -0.023220 <-> 4.992290 (bof=1, eof=1)
+I/flutter ( 3980): MPV_LOG: v - lavf: ...using this range for in-cache seek.
+I/flutter ( 3980): MPV_LOG: v - lavf: seeking stream 0 (video) to packet 0.000000/-0.066667
+I/flutter ( 3980): MPV_LOG: v - lavf: seeking stream 1 (audio) to packet 2.507755/2.507755
+I/flutter ( 3980): MPV_LOG: v - cplayer: hr-seek, skipping to 2.511000 (no framedrop)
+I/flutter ( 3980): MPV_LOG: v - lavf: EOF reached.
+I/flutter ( 3980): MPV_LOG: debug - ffmpeg/video: h264: Reinit context to 640x480, pix_fmt: yuv444p
+I/flutter ( 3980): MPV_LOG: v - vd: Decoder format: 640x480 yuv444p auto/auto/auto/auto/auto CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vd: Using container aspect ratio.
+I/flutter ( 3980): MPV_LOG: v - cplayer: first video frame after restart shown
+I/flutter ( 3980): MPV_LOG: v - cplayer: audio ready
+I/flutter ( 3980): MPV_LOG: debug - cplayer: starting video playback
+I/flutter ( 3980): MPV_LOG: v - cplayer: starting audio playback
+I/flutter ( 3980): MPV_LOG: v - cplayer: playback restart complete @ 2.533333, audio=playing, video=playing (paused)
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: pause=false -> 1
+I/flutter ( 3980): NATIVE_RELEASE_ROUND_PASS round=1 position=0:00:03.033333 video=640x480
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: stop, flags=64, args=[flags=""]
+I/flutter ( 3980): MPV_LOG: v - cplayer: EOF code: 4
+I/flutter ( 3980): MPV_LOG: v - cplayer: Running hook: main/on_unload
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: http-header-fields=null -> -2
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: start="none" -> 1
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: end="none" -> 1
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: playlist-clear, flags=64, args=[]
+I/flutter ( 3980): MPV_LOG: debug - ad: Uninit decoder.
+I/flutter ( 3980): MPV_LOG: debug - vd: Uninit decoder.
+I/flutter ( 3980): MPV_LOG: v - cplayer: finished playback, success (reason 2)
+I/flutter ( 3980): MPV_LOG: info - cplayer: 
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: reconfig to 960x480 yuv444p auto/auto/auto/auto/auto CL=unknown
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Resize: 640x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Window size: 640x480 (Borders: l=0 t=0 r=0 b=0)
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Video source: 960x480 (1:1)
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Video display: (0, 0) 960x480 -> (0, 80) 640x320
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Video scale: 0.666667/0.666667
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: OSD borders: l=0 t=80 r=0 b=80
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Video borders: l=0 t=80 r=0 b=80
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Reported display depth: 8
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Texture for plane 0: 960x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Texture for plane 1: 960x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Texture for plane 2: 960x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Testing FBO format rgba16f
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu: Resizing texture: 16x16
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Using FBO format rgba16f.
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: No advanced processing required. Enabling dumb mode.
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: playlist-play-index, flags=64, args=[index="none"]
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: hr-seek="yes" -> 1
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: stop, flags=64, args=[flags=""]
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: playlist-clear, flags=64, args=[]
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: playlist-play-index, flags=64, args=[index="none"]
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: pause=true -> 1
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: loadlist, flags=64, args=[url="/data/user/0/com.ppplayer.app/files/c975cc81-bc73-4062-a1e8-ba3e0529d78d", flags="append"]
+I/flutter ( 3980): MPV_LOG: v - playlist_parser: Parsing playlist file /data/user/0/com.ppplayer.app/files/c975cc81-bc73-4062-a1e8-ba3e0529d78d...
+I/flutter ( 3980): MPV_LOG: v - file: Opening /data/user/0/com.ppplayer.app/files/c975cc81-bc73-4062-a1e8-ba3e0529d78d
+I/flutter ( 3980): MPV_LOG: debug - file: resize stream to 131072 bytes, drop 0 bytes
+I/flutter ( 3980): MPV_LOG: debug - file: Stream opened successfully.
+I/flutter ( 3980): MPV_LOG: v - demux: Trying demuxers for level=request.
+I/flutter ( 3980): MPV_LOG: debug - demux: Trying demuxer: playlist (force-level: request)
+I/flutter ( 3980): MPV_LOG: warn - playlist: Reading plaintext playlist.
+I/flutter ( 3980): MPV_LOG: v - playlist: demuxer read all data; closing stream
+I/flutter ( 3980): MPV_LOG: v - demux: Detected file format: txt (Playlist file)
+I/flutter ( 3980): MPV_LOG: v - playlist_parser: Playlist successfully parsed
+I/flutter ( 3980): MPV_LOG: debug - global: state path: 'watch_later' -> '-'
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: pause=false -> 1
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: playlist-pos=0 -> 1
+I/flutter ( 3980): MPV_LOG: debug - global: state path: 'watch_later' -> '-'
+I/flutter ( 3980): MPV_LOG: v - cplayer: Running hook: main/on_load
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: http-header-fields=["User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36","Accept: */*"] -> 1
+I/flutter ( 3980): MPV_LOG: v - file: Opening /data/user/0/com.ppplayer.app/code_cache/ppplayer-release-GVALFT/video.mp4
+I/flutter ( 3980): MPV_LOG: debug - file: resize stream to 131072 bytes, drop 0 bytes
+I/flutter ( 3980): MPV_LOG: debug - file: Stream opened successfully.
+I/flutter ( 3980): MPV_LOG: v - demux: Trying demuxers for level=normal.
+I/flutter ( 3980): MPV_LOG: debug - demux: Trying demuxer: disc (force-level: normal)
+I/flutter ( 3980): MPV_LOG: debug - demux: Trying demuxer: edl (force-level: normal)
+I/flutter ( 3980): MPV_LOG: debug - demux: Trying demuxer: cue (force-level: normal)
+I/flutter ( 3980): MPV_LOG: debug - demux: Trying demuxer: rawaudio (force-level: normal)
+I/flutter ( 3980): MPV_LOG: debug - demux: Trying demuxer: rawvideo (force-level: normal)
+I/flutter ( 3980): MPV_LOG: debug - demux: Trying demuxer: mkv (force-level: normal)
+I/flutter ( 3980): MPV_LOG: debug - demux: Trying demuxer: lavf (force-level: normal)
+I/flutter ( 3980): MPV_LOG: v - lavf: Found 'mov,mp4,m4a,3gp,3g2,mj2' at score=100 size=2048.
+I/flutter ( 3980): MPV_LOG: v - lavf: Could not set AVOption seg_max_retry='5'
+I/flutter ( 3980): MPV_LOG: v - lavf: Could not set AVOption allowed_extensions='ALL'
+I/flutter ( 3980): MPV_LOG: v - demux: Detected file format: mov,mp4,m4a,3gp,3g2,mj2 (libavformat)
+I/flutter ( 3980): MPV_LOG: debug - global: user path: '/data/user/0/com.ppplayer.app/code_cache/ppplayer-mpv-cache' -> '/data/user/0/com.ppplayer.app/code_cache/ppplayer-mpv-cache'
+I/flutter ( 3980): MPV_LOG: v - cplayer: Opening done: /data/user/0/com.ppplayer.app/code_cache/ppplayer-release-GVALFT/video.mp4
+I/flutter ( 3980): MPV_LOG: v - find_files: Loading external files in /data/user/0/com.ppplayer.app/code_cache/ppplayer-release-GVALFT/
+I/flutter ( 3980): MPV_LOG: v - lavf: select track 0
+I/flutter ( 3980): MPV_LOG: v - lavf: select track 1
+I/flutter ( 3980): MPV_LOG: info - cplayer: (+) Video --vid=1 (*) (h264 640x480 30.000fps)
+I/flutter ( 3980): MPV_LOG: info - cplayer: (+) Audio --aid=1 (*) (aac 1ch 44100Hz)
+I/flutter ( 3980): MPV_LOG: v - vd: Container reported FPS: 30.000000
+I/flutter ( 3980): MPV_LOG: v - vd: Codec list:
+I/flutter ( 3980): MPV_LOG: v - vd: h264 - (null)
+I/flutter ( 3980): MPV_LOG: v - vd: h264_v4l2m2m (h264) - (null)
+I/flutter ( 3980): MPV_LOG: v - vd: h264_mediacodec (h264) - (null)
+I/flutter ( 3980): MPV_LOG: v - vd: Opening decoder h264
+I/flutter ( 3980): MPV_LOG: v - vd: No hardware decoding requested.
+I/flutter ( 3980): MPV_LOG: v - vd: Using software decoding.
+I/flutter ( 3980): MPV_LOG: v - vd: Detected 4 logical cores.
+I/flutter ( 3980): MPV_LOG: v - vd: Requesting 5 threads for decoding.
+I/flutter ( 3980): MPV_LOG: v - vd: Selected codec: h264
+I/flutter ( 3980): MPV_LOG: v - vf: User filter list:
+I/flutter ( 3980): MPV_LOG: v - vf: (empty)
+I/flutter ( 3980): MPV_LOG: v - ad: Codec list:
+I/flutter ( 3980): MPV_LOG: v - ad: aac - (null)
+I/flutter ( 3980): MPV_LOG: v - ad: aac_fixed (aac) - (null)
+I/flutter ( 3980): MPV_LOG: v - ad: Opening decoder aac
+I/flutter ( 3980): MPV_LOG: v - ad: Requesting 1 threads for decoding.
+I/flutter ( 3980): MPV_LOG: v - ad: Selected codec: aac
+I/flutter ( 3980): MPV_LOG: v - af: User filter list:
+I/flutter ( 3980): MPV_LOG: v - af: (empty)
+I/flutter ( 3980): MPV_LOG: v - cplayer: Starting playback...
+I/flutter ( 3980): MPV_LOG: debug - lavf: stream 1: resize index to 128
+I/flutter ( 3980): MPV_LOG: debug - ffmpeg/video: h264: Reinit context to 640x480, pix_fmt: yuv444p
+I/flutter ( 3980): MPV_LOG: debug - vd: DR parameter change to 640x482 yuv444p align=64
+I/flutter ( 3980): MPV_LOG: debug - vd: Allocating new (host-cached) DR image...
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: DR path suspected slow/uncached, disabling.
+I/flutter ( 3980): MPV_LOG: debug - vd: ...failed..
+I/flutter ( 3980): MPV_LOG: v - vd: DR failed - disabling.
+I/flutter ( 3980): MPV_LOG: v - vd: Using software decoding.
+I/flutter ( 3980): MPV_LOG: v - vd: Decoder format: 640x480 yuv444p auto/auto/auto/auto/auto CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vd: Using container aspect ratio.
+I/flutter ( 3980): MPV_LOG: v - vf: [in] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vf: [userdeint] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vf: [userdeint] (disabled)
+I/flutter ( 3980): MPV_LOG: v - vf: [autorotate] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vf: [autorotate] (disabled)
+I/flutter ( 3980): MPV_LOG: v - vf: [convert] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: debug - lavf: stream 0: resize index to 128
+I/flutter ( 3980): MPV_LOG: v - lavf: EOF reached.
+I/flutter ( 3980): MPV_LOG: v - vf: [convert] (disabled)
+I/flutter ( 3980): MPV_LOG: v - vf: [out] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - af: [in] 44100Hz mono 1ch floatp
+I/flutter ( 3980): MPV_LOG: v - af: [userspeed] 44100Hz mono 1ch floatp
+I/flutter ( 3980): MPV_LOG: v - af: [userspeed] (disabled)
+I/flutter ( 3980): MPV_LOG: v - af: [convert] 44100Hz mono 1ch floatp
+I/flutter ( 3980): MPV_LOG: v - ao: Trying audio driver 'opensles'
+I/flutter ( 3980): MPV_LOG: v - ao/opensles: requested format: 44100 Hz, mono channels, floatp
+I/flutter ( 3980): MPV_LOG: v - ao/opensles: device buffer: 11025 samples.
+I/flutter ( 3980): MPV_LOG: v - ao/opensles: using soft-buffer of 11025 samples.
+I/flutter ( 3980): MPV_LOG: info - cplayer: AO: [opensles] 44100Hz stereo 2ch float
+I/flutter ( 3980): MPV_LOG: v - cplayer: AO: Description: OpenSL ES audio output
+I/flutter ( 3980): MPV_LOG: v - autoconvert: inserting resampler
+I/flutter ( 3980): MPV_LOG: v - swresample: format change, reinitializing resampler
+I/flutter ( 3980): MPV_LOG: v - swresample: 44100Hz mono floatp -> 44100Hz stereo float
+I/flutter ( 3980): MPV_LOG: v - swresample: Remix: mono -> stereo
+I/flutter ( 3980): MPV_LOG: v - af: [out] 44100Hz stereo 2ch float
+I/flutter ( 3980): MPV_LOG: info - cplayer: VO: [gpu] 640x480 yuv444p
+I/flutter ( 3980): MPV_LOG: v - cplayer: VO: Description: Shader-based GPU Renderer
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: reconfig to 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Resize: 640x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Window size: 640x480 (Borders: l=0 t=0 r=0 b=0)
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Video source: 640x480 (1:1)
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Video display: (0, 0) 640x480 -> (0, 0) 640x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Video scale: 1.000000/1.000000
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: OSD borders: l=0 t=0 r=0 b=0
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Video borders: l=0 t=0 r=0 b=0
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Reported display depth: 8
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Texture for plane 0: 640x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Texture for plane 1: 640x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Texture for plane 2: 640x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Testing FBO format rgba16f
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu: Resizing texture: 16x16
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Using FBO format rgba16f.
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: No advanced processing required. Enabling dumb mode.
+I/flutter ( 3980): MPV_LOG: v - cplayer: first video frame after restart shown
+I/flutter ( 3980): MPV_LOG: v - cplayer: audio ready
+I/flutter ( 3980): MPV_LOG: debug - cplayer: starting video playback
+I/flutter ( 3980): MPV_LOG: v - cplayer: starting audio playback
+I/flutter ( 3980): MPV_LOG: v - cplayer: playback restart complete @ 0.000000, audio=playing, video=playing
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: pause=true -> 1
+I/flutter ( 3980): NATIVE_RELEASE_VIDEO_READY round=2
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: seek, flags=64, args=[target="2.511000", flags="absolute", legacy="unused"]
+I/flutter ( 3980): MPV_LOG: v - lavf: queuing seek to 2.511000
+I/flutter ( 3980): MPV_LOG: v - lavf: cached range 0: -0.023220 <-> 4.992290 (bof=1, eof=1)
+I/flutter ( 3980): MPV_LOG: v - lavf: ...using this range for in-cache seek.
+I/flutter ( 3980): MPV_LOG: v - lavf: seeking stream 0 (video) to packet 0.000000/-0.066667
+I/flutter ( 3980): MPV_LOG: v - lavf: seeking stream 1 (audio) to packet 2.507755/2.507755
+I/flutter ( 3980): MPV_LOG: v - cplayer: hr-seek, skipping to 2.511000 (no framedrop)
+I/flutter ( 3980): MPV_LOG: debug - ffmpeg/video: h264: Reinit context to 640x480, pix_fmt: yuv444p
+I/flutter ( 3980): MPV_LOG: v - lavf: EOF reached.
+I/flutter ( 3980): MPV_LOG: v - vd: Decoder format: 640x480 yuv444p auto/auto/auto/auto/auto CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vd: Using container aspect ratio.
+I/flutter ( 3980): MPV_LOG: v - cplayer: first video frame after restart shown
+I/flutter ( 3980): MPV_LOG: v - cplayer: audio ready
+I/flutter ( 3980): MPV_LOG: debug - cplayer: starting video playback
+I/flutter ( 3980): MPV_LOG: v - cplayer: starting audio playback
+I/flutter ( 3980): MPV_LOG: v - cplayer: playback restart complete @ 2.533333, audio=playing, video=playing (paused)
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: pause=false -> 1
+I/flutter ( 3980): NATIVE_RELEASE_ROUND_PASS round=2 position=0:00:03.033333 video=640x480
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: stop, flags=64, args=[flags=""]
+I/flutter ( 3980): MPV_LOG: v - cplayer: EOF code: 4
+I/flutter ( 3980): MPV_LOG: v - cplayer: Running hook: main/on_unload
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: playlist-clear, flags=64, args=[]
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: http-header-fields=null -> -2
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: start="none" -> 1
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: end="none" -> 1
+I/flutter ( 3980): MPV_LOG: debug - ad: Uninit decoder.
+I/flutter ( 3980): MPV_LOG: debug - vd: Uninit decoder.
+I/flutter ( 3980): MPV_LOG: v - cplayer: finished playback, success (reason 2)
+I/flutter ( 3980): MPV_LOG: info - cplayer: 
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: reconfig to 960x480 yuv444p auto/auto/auto/auto/auto CL=unknown
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Resize: 640x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Window size: 640x480 (Borders: l=0 t=0 r=0 b=0)
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Video source: 960x480 (1:1)
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Video display: (0, 0) 960x480 -> (0, 80) 640x320
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Video scale: 0.666667/0.666667
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: OSD borders: l=0 t=80 r=0 b=80
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Video borders: l=0 t=80 r=0 b=80
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Reported display depth: 8
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Texture for plane 0: 960x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Texture for plane 1: 960x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Texture for plane 2: 960x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Testing FBO format rgba16f
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu: Resizing texture: 16x16
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Using FBO format rgba16f.
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: No advanced processing required. Enabling dumb mode.
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: playlist-play-index, flags=64, args=[index="none"]
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: hr-seek="yes" -> 1
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: stop, flags=64, args=[flags=""]
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: playlist-clear, flags=64, args=[]
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: playlist-play-index, flags=64, args=[index="none"]
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: pause=true -> 1
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: loadlist, flags=64, args=[url="/data/user/0/com.ppplayer.app/files/afb6996f-055d-4cb5-bdaa-d40838fd4836", flags="append"]
+I/flutter ( 3980): MPV_LOG: v - playlist_parser: Parsing playlist file /data/user/0/com.ppplayer.app/files/afb6996f-055d-4cb5-bdaa-d40838fd4836...
+I/flutter ( 3980): MPV_LOG: v - file: Opening /data/user/0/com.ppplayer.app/files/afb6996f-055d-4cb5-bdaa-d40838fd4836
+I/flutter ( 3980): MPV_LOG: debug - file: resize stream to 131072 bytes, drop 0 bytes
+I/flutter ( 3980): MPV_LOG: debug - file: Stream opened successfully.
+I/flutter ( 3980): MPV_LOG: v - demux: Trying demuxers for level=request.
+I/flutter ( 3980): MPV_LOG: debug - demux: Trying demuxer: playlist (force-level: request)
+I/flutter ( 3980): MPV_LOG: warn - playlist: Reading plaintext playlist.
+I/flutter ( 3980): MPV_LOG: v - playlist: demuxer read all data; closing stream
+I/flutter ( 3980): MPV_LOG: v - demux: Detected file format: txt (Playlist file)
+I/flutter ( 3980): MPV_LOG: v - playlist_parser: Playlist successfully parsed
+I/flutter ( 3980): MPV_LOG: debug - global: state path: 'watch_later' -> '-'
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: pause=false -> 1
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: playlist-pos=0 -> 1
+I/flutter ( 3980): MPV_LOG: debug - global: state path: 'watch_later' -> '-'
+I/flutter ( 3980): MPV_LOG: v - cplayer: Running hook: main/on_load
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: http-header-fields=["User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36","Accept: */*"] -> 1
+I/flutter ( 3980): MPV_LOG: v - file: Opening /data/user/0/com.ppplayer.app/code_cache/ppplayer-release-GVALFT/video.mp4
+I/flutter ( 3980): MPV_LOG: debug - file: resize stream to 131072 bytes, drop 0 bytes
+I/flutter ( 3980): MPV_LOG: debug - file: Stream opened successfully.
+I/flutter ( 3980): MPV_LOG: v - demux: Trying demuxers for level=normal.
+I/flutter ( 3980): MPV_LOG: debug - demux: Trying demuxer: disc (force-level: normal)
+I/flutter ( 3980): MPV_LOG: debug - demux: Trying demuxer: edl (force-level: normal)
+I/flutter ( 3980): MPV_LOG: debug - demux: Trying demuxer: cue (force-level: normal)
+I/flutter ( 3980): MPV_LOG: debug - demux: Trying demuxer: rawaudio (force-level: normal)
+I/flutter ( 3980): MPV_LOG: debug - demux: Trying demuxer: rawvideo (force-level: normal)
+I/flutter ( 3980): MPV_LOG: debug - demux: Trying demuxer: mkv (force-level: normal)
+I/flutter ( 3980): MPV_LOG: debug - demux: Trying demuxer: lavf (force-level: normal)
+I/flutter ( 3980): MPV_LOG: v - lavf: Found 'mov,mp4,m4a,3gp,3g2,mj2' at score=100 size=2048.
+I/flutter ( 3980): MPV_LOG: v - lavf: Could not set AVOption seg_max_retry='5'
+I/flutter ( 3980): MPV_LOG: v - lavf: Could not set AVOption allowed_extensions='ALL'
+I/flutter ( 3980): MPV_LOG: v - demux: Detected file format: mov,mp4,m4a,3gp,3g2,mj2 (libavformat)
+I/flutter ( 3980): MPV_LOG: debug - global: user path: '/data/user/0/com.ppplayer.app/code_cache/ppplayer-mpv-cache' -> '/data/user/0/com.ppplayer.app/code_cache/ppplayer-mpv-cache'
+I/flutter ( 3980): MPV_LOG: v - cplayer: Opening done: /data/user/0/com.ppplayer.app/code_cache/ppplayer-release-GVALFT/video.mp4
+I/flutter ( 3980): MPV_LOG: v - find_files: Loading external files in /data/user/0/com.ppplayer.app/code_cache/ppplayer-release-GVALFT/
+I/flutter ( 3980): MPV_LOG: v - lavf: select track 0
+I/flutter ( 3980): MPV_LOG: v - lavf: select track 1
+I/flutter ( 3980): MPV_LOG: info - cplayer: (+) Video --vid=1 (*) (h264 640x480 30.000fps)
+I/flutter ( 3980): MPV_LOG: info - cplayer: (+) Audio --aid=1 (*) (aac 1ch 44100Hz)
+I/flutter ( 3980): MPV_LOG: v - vd: Container reported FPS: 30.000000
+I/flutter ( 3980): MPV_LOG: v - vd: Codec list:
+I/flutter ( 3980): MPV_LOG: v - vd: h264 - (null)
+I/flutter ( 3980): MPV_LOG: v - vd: h264_v4l2m2m (h264) - (null)
+I/flutter ( 3980): MPV_LOG: v - vd: h264_mediacodec (h264) - (null)
+I/flutter ( 3980): MPV_LOG: v - vd: Opening decoder h264
+I/flutter ( 3980): MPV_LOG: v - vd: No hardware decoding requested.
+I/flutter ( 3980): MPV_LOG: v - vd: Using software decoding.
+I/flutter ( 3980): MPV_LOG: v - vd: Detected 4 logical cores.
+I/flutter ( 3980): MPV_LOG: v - vd: Requesting 5 threads for decoding.
+I/flutter ( 3980): MPV_LOG: v - vd: Selected codec: h264
+I/flutter ( 3980): MPV_LOG: v - vf: User filter list:
+I/flutter ( 3980): MPV_LOG: v - vf: (empty)
+I/flutter ( 3980): MPV_LOG: v - ad: Codec list:
+I/flutter ( 3980): MPV_LOG: v - ad: aac - (null)
+I/flutter ( 3980): MPV_LOG: v - ad: aac_fixed (aac) - (null)
+I/flutter ( 3980): MPV_LOG: v - ad: Opening decoder aac
+I/flutter ( 3980): MPV_LOG: v - ad: Requesting 1 threads for decoding.
+I/flutter ( 3980): MPV_LOG: v - ad: Selected codec: aac
+I/flutter ( 3980): MPV_LOG: v - af: User filter list:
+I/flutter ( 3980): MPV_LOG: v - af: (empty)
+I/flutter ( 3980): MPV_LOG: v - cplayer: Starting playback...
+I/flutter ( 3980): MPV_LOG: debug - lavf: stream 1: resize index to 128
+I/flutter ( 3980): MPV_LOG: debug - ffmpeg/video: h264: Reinit context to 640x480, pix_fmt: yuv444p
+I/flutter ( 3980): MPV_LOG: debug - vd: DR parameter change to 640x482 yuv444p align=64
+I/flutter ( 3980): MPV_LOG: debug - vd: Allocating new (host-cached) DR image...
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: DR path suspected slow/uncached, disabling.
+I/flutter ( 3980): MPV_LOG: debug - vd: ...failed..
+I/flutter ( 3980): MPV_LOG: v - vd: DR failed - disabling.
+I/flutter ( 3980): MPV_LOG: v - vd: Using software decoding.
+I/flutter ( 3980): MPV_LOG: debug - lavf: stream 0: resize index to 128
+I/flutter ( 3980): MPV_LOG: v - lavf: EOF reached.
+I/flutter ( 3980): MPV_LOG: v - vd: Decoder format: 640x480 yuv444p auto/auto/auto/auto/auto CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vd: Using container aspect ratio.
+I/flutter ( 3980): MPV_LOG: v - vf: [in] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vf: [userdeint] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vf: [userdeint] (disabled)
+I/flutter ( 3980): MPV_LOG: v - vf: [autorotate] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vf: [autorotate] (disabled)
+I/flutter ( 3980): MPV_LOG: v - vf: [convert] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vf: [convert] (disabled)
+I/flutter ( 3980): MPV_LOG: v - vf: [out] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - af: [in] 44100Hz mono 1ch floatp
+I/flutter ( 3980): MPV_LOG: v - af: [userspeed] 44100Hz mono 1ch floatp
+I/flutter ( 3980): MPV_LOG: v - af: [userspeed] (disabled)
+I/flutter ( 3980): MPV_LOG: v - af: [convert] 44100Hz mono 1ch floatp
+I/flutter ( 3980): MPV_LOG: v - ao: Trying audio driver 'opensles'
+I/flutter ( 3980): MPV_LOG: v - ao/opensles: requested format: 44100 Hz, mono channels, floatp
+I/flutter ( 3980): MPV_LOG: v - ao/opensles: device buffer: 11025 samples.
+I/flutter ( 3980): MPV_LOG: v - ao/opensles: using soft-buffer of 11025 samples.
+I/flutter ( 3980): MPV_LOG: info - cplayer: AO: [opensles] 44100Hz stereo 2ch float
+I/flutter ( 3980): MPV_LOG: v - cplayer: AO: Description: OpenSL ES audio output
+I/flutter ( 3980): MPV_LOG: v - autoconvert: inserting resampler
+I/flutter ( 3980): MPV_LOG: v - swresample: format change, reinitializing resampler
+I/flutter ( 3980): MPV_LOG: v - swresample: 44100Hz mono floatp -> 44100Hz stereo float
+I/flutter ( 3980): MPV_LOG: v - swresample: Remix: mono -> stereo
+I/flutter ( 3980): MPV_LOG: v - af: [out] 44100Hz stereo 2ch float
+I/flutter ( 3980): MPV_LOG: info - cplayer: VO: [gpu] 640x480 yuv444p
+I/flutter ( 3980): MPV_LOG: v - cplayer: VO: Description: Shader-based GPU Renderer
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: reconfig to 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Resize: 640x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Window size: 640x480 (Borders: l=0 t=0 r=0 b=0)
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Video source: 640x480 (1:1)
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Video display: (0, 0) 640x480 -> (0, 0) 640x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Video scale: 1.000000/1.000000
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: OSD borders: l=0 t=0 r=0 b=0
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Video borders: l=0 t=0 r=0 b=0
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Reported display depth: 8
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Texture for plane 0: 640x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Texture for plane 1: 640x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Texture for plane 2: 640x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Testing FBO format rgba16f
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu: Resizing texture: 16x16
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Using FBO format rgba16f.
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: No advanced processing required. Enabling dumb mode.
+I/flutter ( 3980): MPV_LOG: v - cplayer: first video frame after restart shown
+I/flutter ( 3980): MPV_LOG: v - cplayer: audio ready
+I/flutter ( 3980): MPV_LOG: debug - cplayer: starting video playback
+I/flutter ( 3980): MPV_LOG: v - cplayer: starting audio playback
+I/flutter ( 3980): MPV_LOG: v - cplayer: playback restart complete @ 0.000000, audio=playing, video=playing
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: pause=true -> 1
+I/flutter ( 3980): NATIVE_RELEASE_VIDEO_READY round=3
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: seek, flags=64, args=[target="2.511000", flags="absolute", legacy="unused"]
+I/flutter ( 3980): MPV_LOG: v - lavf: queuing seek to 2.511000
+I/flutter ( 3980): MPV_LOG: v - lavf: cached range 0: -0.023220 <-> 4.992290 (bof=1, eof=1)
+I/flutter ( 3980): MPV_LOG: v - lavf: ...using this range for in-cache seek.
+I/flutter ( 3980): MPV_LOG: v - lavf: seeking stream 0 (video) to packet 0.000000/-0.066667
+I/flutter ( 3980): MPV_LOG: v - lavf: seeking stream 1 (audio) to packet 2.507755/2.507755
+I/flutter ( 3980): MPV_LOG: v - cplayer: hr-seek, skipping to 2.511000 (no framedrop)
+I/flutter ( 3980): MPV_LOG: debug - ffmpeg/video: h264: Reinit context to 640x480, pix_fmt: yuv444p
+I/flutter ( 3980): MPV_LOG: v - lavf: EOF reached.
+I/flutter ( 3980): MPV_LOG: v - vd: Decoder format: 640x480 yuv444p auto/auto/auto/auto/auto CL=mpeg2/4/h264 crop=640x480+0+0
+I/flutter ( 3980): MPV_LOG: v - vd: Using container aspect ratio.
+I/flutter ( 3980): MPV_LOG: v - cplayer: first video frame after restart shown
+I/flutter ( 3980): MPV_LOG: v - cplayer: audio ready
+I/flutter ( 3980): MPV_LOG: debug - cplayer: starting video playback
+I/flutter ( 3980): MPV_LOG: v - cplayer: starting audio playback
+I/flutter ( 3980): MPV_LOG: v - cplayer: playback restart complete @ 2.533333, audio=playing, video=playing (paused)
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: pause=false -> 1
+I/flutter ( 3980): NATIVE_RELEASE_ROUND_PASS round=3 position=0:00:03.033333 video=640x480
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: stop, flags=64, args=[flags=""]
+I/flutter ( 3980): MPV_LOG: v - cplayer: EOF code: 4
+I/flutter ( 3980): MPV_LOG: v - cplayer: Running hook: main/on_unload
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: http-header-fields=null -> -2
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: start="none" -> 1
+I/flutter ( 3980): MPV_LOG: v - cplayer: Set property: end="none" -> 1
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: playlist-clear, flags=64, args=[]
+I/flutter ( 3980): MPV_LOG: debug - ad: Uninit decoder.
+I/flutter ( 3980): MPV_LOG: debug - vd: Uninit decoder.
+I/flutter ( 3980): MPV_LOG: v - cplayer: finished playback, success (reason 2)
+I/flutter ( 3980): MPV_LOG: info - cplayer: 
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: reconfig to 960x480 yuv444p auto/auto/auto/auto/auto CL=unknown
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Resize: 640x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Window size: 640x480 (Borders: l=0 t=0 r=0 b=0)
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Video source: 960x480 (1:1)
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Video display: (0, 0) 960x480 -> (0, 80) 640x320
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Video scale: 0.666667/0.666667
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: OSD borders: l=0 t=80 r=0 b=80
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Video borders: l=0 t=80 r=0 b=80
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Reported display depth: 8
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Texture for plane 0: 960x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Texture for plane 1: 960x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Texture for plane 2: 960x480
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Testing FBO format rgba16f
+I/flutter ( 3980): MPV_LOG: debug - vo/gpu: Resizing texture: 16x16
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: Using FBO format rgba16f.
+I/flutter ( 3980): MPV_LOG: v - vo/gpu: No advanced processing required. Enabling dumb mode.
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: playlist-play-index, flags=64, args=[index="none"]
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: stop, flags=64, args=[flags=""]
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: playlist-clear, flags=64, args=[]
+I/flutter ( 3980): MPV_LOG: debug - cplayer: Run command: playlist-play-index, flags=64, args=[index="none"]
+I/flutter ( 3980): NATIVE_RELEASE_PASS rounds=3

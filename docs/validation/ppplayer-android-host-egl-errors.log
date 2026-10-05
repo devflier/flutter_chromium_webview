@@ -1,0 +1,3 @@
+10-05 14:23:03.157 29859 30104 E EGL_emulation: tid 30104: eglCreateContext(1749): error 0x3004 (EGL_BAD_ATTRIBUTE)
+10-05 14:23:03.164 29859 30105 E EGL_emulation: tid 30105: eglCreateContext(1749): error 0x3004 (EGL_BAD_ATTRIBUTE)
+10-05 14:23:24.008 29859 30309 E EGL_emulation: tid 30309: eglCreateContext(1749): error 0x3004 (EGL_BAD_ATTRIBUTE)

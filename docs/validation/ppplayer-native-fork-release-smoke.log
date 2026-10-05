@@ -1,0 +1,10 @@
+Performing Streamed Install
+Success
+Starting: Intent { cmp=com.ppplayer.app/.MainActivity }
+Status: ok
+LaunchState: COLD
+Activity: com.google.android.permissioncontroller/com.android.permissioncontroller.permission.ui.GrantPermissionsActivity
+TotalTime: 2346
+WaitTime: 2351
+Complete
+Running app PID: 5251

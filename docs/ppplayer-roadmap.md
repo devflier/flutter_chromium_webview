@@ -45,7 +45,7 @@ Audible speaker output, visual quality and minimized-window playback remain unve
 
 The main app at `C:/Users/User/Projects/ppplayermusic/app` and the preview share
 commit `93c4af5`. The main checkout's local changes remain untouched.
-The preview now has 43 passing playback/media-command regression tests and clean
+The preview now has 107 passing native-engine/app playback regression tests and clean
 analysis, including lazy Android service ownership and iOS command routing.
 Its native integration scenario passes on Windows and WSLg using the real
 Chromium browser, ppplayer facade and PlaybackView, plus MediaKit local-video
@@ -94,9 +94,94 @@ The preview fixes first-build ordering of MediaKit header extraction and WebView
 downloads on Windows. WSL's copied Cargokit shell scripts needed LF normalization;
 the preview adds a Git line-ending rule for future shell-script checkouts.
 
+### Screen-off and source-switch follow-up (upstream baseline)
+
+The Android emulator screen-off phase passes: the activity stays stopped,
+PowerManager reports the device non-interactive, and the live browser advances
+from 19.37 to 39.33 seconds during a 20-second interval. System media pause/play
+and activity restoration also pass. The upstream combined test failed when returning
+to local video for the second time, so this is a phase result, not a passing
+end-to-end Android suite. See
+`validation/ppplayer-android-screen-off-sources.log` and its `.screen-off.txt`.
+
+Windows passes three local-video/live-YouTube round trips through PlayerScreen
+(`validation/ppplayer-windows-source-switch.log`). WSLg passes two consecutive
+runs of three round trips using continuous native video frames
+(`validation/ppplayer-linux-source-switch.log` and
+`validation/ppplayer-linux-source-switch-repeat.log`). Earlier WSLg renderer
+initialization failures remain in the validation archive.
+
+Native session teardown had been executed twice; the preview now queues and
+awaits it once before opening a replacement. All 107 native engine/app playback
+regression tests pass, including exact-once cleanup and waiting for an already
+detached session (`validation/ppplayer-playback-regressions-current.log`).
+Analysis of the changed engine and integration test is clean.
+
+With upstream native artifacts, Android repeated source switching failed. Host graphics report
+`EGL_BAD_ATTRIBUTE` when creating MediaKit video output
+(`validation/ppplayer-android-host-egl-errors.log`). Both SwiftShader and ANGLE
+software emulator runs lost the device during live YouTube startup before source
+switching. Those runs are inconclusive
+(`validation/ppplayer-android-screen-off-swiftshader.log` and
+`validation/ppplayer-android-screen-off-swangle.log`). The AVD's saved GPU
+configuration has not been modified; the emulator is restored to host graphics.
+
+The updated Android ARM64/x64 release APK builds successfully, with Flutter/Dart
+and metadata libraries confirmed for both architectures
+(`validation/ppplayer-android-release-current.log` and
+`validation/ppplayer-android-release-current-abis.log`). Earlier desktop release
+builds predate the cleanup change.
+
+### Native startup progress and Android 15 comparison (upstream baseline)
+
+The native startup watchdog no longer cancels on a playing acknowledgement alone.
+Position must advance beyond the requested initial seek point. A zero-progress
+playing session now reports a playback timeout rather than an inaccessible-file
+error. The 107 regression tests include a stalled playing acknowledgement,
+a seek without progress and successful progress beyond the seek point. See
+`validation/ppplayer-native-progress-watchdog-tests.log` and
+`validation/ppplayer-native-progress-watchdog-analysis.log`.
+
+A separate emulator using the already installed Android 15/API 35 image
+(`Codex_PPPlayer_API35`, port 5556) repeats the screen-off and media-command phases
+successfully. The browser advances from 14.69 to 34.70 seconds with the screen off.
+Its second local-video switch reproduces the EGL context failure; the watchdog
+reports the stalled start after five seconds. The complete combined test fails.
+See `validation/ppplayer-android-api35-live-sources.log` and
+`validation/ppplayer-android-api35-egl-errors.log`.
+
+Windows Application Error records confirm that both software-emulator exits were
+host QEMU access violations (0xc0000005), separate from the app's runtime test
+assertions (`validation/ppplayer-android-emulator-host-crashes.log`).
+The earlier release APK and desktop runtime runs predate this watchdog change.
+The package ownership strategy is in `media-package-strategy.md`. A local native
+Android fork now exists at `C:/Users/User/Projects/ppplayer_native_media`, based on
+upstream native-build v1.1.7. Its actual mpv EGL function regression test passes
+with a fallback that omits optional context flags. Both ARM64 and x86_64 native
+builds and packages pass export, dependency and 16 KiB alignment checks.
+Complete live acceptance tests pass on Android 15 and Android 16, including all
+three local-video/live-YouTube round trips and the six background/screen-off/
+system-media phases. The new fallback runs in both logs. The installed debug
+APK's x86_64 native library hashes match the local artifacts. All 107 playback
+regression tests pass with the private override, and changed-file analysis is clean.
+Android 16 runs with 16 KiB memory pages. Service cleanup leaves no ppplayer services.
+See `validation/ppplayer-native-fork-status.md`,
+`validation/ppplayer-native-fork-api35.log` and
+`validation/ppplayer-native-fork-api36.log`. A fresh ARM64/x86_64 release APK builds
+and its native hashes match both local artifacts. Release install and startup reach
+the first-run notification permission request with MediaKit initialized; release
+playback and production signing are not yet validated. See
+`validation/ppplayer-native-fork-release.log` and
+`validation/ppplayer-native-fork-release-apk.log`.
+Nothing has been published or pushed.
+
 ## Next work available here
 
-1. Exercise full catalog navigation and source/playlist switching in the isolated
+1. Validate the local native Android fork on a physical ARM64 device, then decide
+   how to host and version its source and native artifacts. Android 15/16 emulator
+   source-switch and background tests now pass with the fork. Windows and WSLg
+   source round trips pass. Exercise full catalog navigation
+   and playlist switching in the isolated
    ppplayer preview on Windows, WSLg and Android. Its
    opt-in `PPPLAYER_CHROMIUM` playback facade maps online video IDs into Chromium,
    preserves local/playlist fallback and the existing network-output wrapper,

@@ -1,0 +1,200 @@
+00:00 +0: loading /home/user/ppplayer_chromium_preview/integration_test/chromium_live_ui_test.dart
+Building Linux application...                                   
+[webview_win_floating] webkit2gtk library found: webkit2gtk-4.1
+✓ Built build/linux/x64/debug/bundle/ppplayer
+00:00 +0: live YouTube through ppplayer screen controls
+[VideoInit] Player Screen mounted — checking initial state
+[VideoInit] playerView=PlayerView.video
+[VideoInit] activeTrack=none
+[VideoInit] hasVideo=false
+[VideoInit] waiting for media...
+[VideoInit] skipped: hasVideo=false (initial_mount) — waiting for media
+media_kit: NativeReferenceHolder: Allocated 107421748915264
+[VideoInit] skipped: hasVideo=false (probe_500ms) — waiting for media
+PlayerNotifier: Resolving track Live probe
+[VideoInit] activeTrack changed (null -> live-probe)
+[VideoInit] hasVideo became true
+[VideoInit] slot unavailable (probe_1000ms) → retry 1/5
+14:18:30.187 [PipDebug][VIDEO_SURFACE] event=ensureVideoSurfaceReady reason=track_change hasVideo=true videoView=true visible=false slotExists=true slotSize=1280.0x720.0 rect=Rect.fromLTRB(0.0, 0.0, 1280.0, 720.0) providerBounds=Rect.fromLTRB(0.0, 0.0, 1280.0, 720.0) generation=1
+[VideoInit #1] hidden=true, applying native bounds
+[VideoInit #1] scheduling reveal (next frame)
+14:18:30.191 [PipDebug][VIDEO_SURFACE] event=ensureVideoSurfaceReady reason=hasVideo_true hasVideo=true videoView=true visible=false slotExists=true slotSize=1280.0x720.0 rect=Rect.fromLTRB(0.0, 0.0, 1280.0, 720.0) providerBounds=Rect.fromLTRB(0.0, 0.0, 1280.0, 720.0) generation=2
+[VideoInit #2] hidden=true, applying native bounds
+[VideoInit #2] scheduling reveal (next frame)
+14:18:30.194 [PipDebug][VIDEO_SURFACE] event=ensureVideoSurfaceReady reason=slot_retry_0 hasVideo=true videoView=true visible=false slotExists=true slotSize=1280.0x720.0 rect=Rect.fromLTRB(0.0, 0.0, 1280.0, 720.0) providerBounds=Rect.fromLTRB(0.0, 0.0, 1280.0, 720.0) generation=3
+[VideoInit #3] hidden=true, applying native bounds
+[VideoInit #3] scheduling reveal (next frame)
+14:18:30.196 [PipDebug][VIDEO_SURFACE] event=ensureVideoSurfaceReady reason=slot_reflow hasVideo=true videoView=true visible=false slotExists=true slotSize=1280.0x720.0 rect=Rect.fromLTRB(0.0, 0.0, 1280.0, 720.0) providerBounds=Rect.fromLTRB(0.0, 0.0, 1280.0, 720.0) generation=4
+[VideoInit #4] hidden=true, applying native bounds
+[VideoInit #4] scheduling reveal (next frame)
+14:18:30.319 [PipDebug][VIDEO_SURFACE] event=ensureVideoSurfaceReady reason=probe_1500ms hasVideo=true videoView=true visible=false slotExists=true slotSize=1280.0x720.0 rect=Rect.fromLTRB(0.0, 0.0, 1280.0, 720.0) providerBounds=Rect.fromLTRB(0.0, 0.0, 1280.0, 720.0) generation=5
+[VideoInit #5] hidden=true, applying native bounds
+[VideoInit #5] scheduling reveal (next frame)
+[VideoInit #1] reveal skipped: stale (current=5)
+[VideoInit #2] reveal skipped: stale (current=5)
+[VideoInit #3] reveal skipped: stale (current=5)
+[VideoInit #4] reveal skipped: stale (current=5)
+[VideoInit #5] frame committed → native visible=true
+LIVE_BROWSER_EVENT {playerId: Youtube1, generation: 1, StateChange: -1}
+LIVE_BROWSER_EVENT {playerId: Youtube1, generation: 1, StateChange: 3}
+LIVE_BROWSER_EVENT {playerId: Youtube1, generation: 1, StateChange: 1}
+LIVE_BROWSER_EVENT {playerId: Youtube1, generation: 1, StateChange: 2}
+LIVE_BROWSER_EVENT {playerId: Youtube1, generation: 1, StateChange: 3}
+LIVE_BROWSER_EVENT {playerId: Youtube1, generation: 1, StateChange: 1}
+PlayerNotifier: Resolving track Local source probe
+[VideoInit] activeTrack changed (live-probe -> local:source-probe)
+[VideoInit] hasVideo became true
+ENGINE: play called for track local:source-probe (startAt: 0:00:00.000000)
+14:18:44.111 [BASELINE] STATE PlaybackState.idle → PlaybackState.preparing gen=4 intended=PlaybackState.playing activityStopped=false
+[VideoInit] hasVideo became true
+MPV_LOG: v - ao/pulse: Library version: 17.0.0
+MPV_LOG: v - ao/pulse: Proto: 35
+MPV_LOG: debug - select: reading options for select
+MPV_LOG: debug - select: script-opts/select.conf not found.
+MPV_LOG: debug - select: lua-settings/select.conf not found.
+MPV_LOG: debug - context_menu: reading options for context_menu
+MPV_LOG: debug - context_menu: script-opts/context_menu.conf not found.
+MPV_LOG: debug - context_menu: lua-settings/context_menu.conf not found.
+MPV_LOG: v - ao/pulse: Server proto: 35
+MPV_LOG: debug - commands: reading options for commands
+MPV_LOG: debug - commands: script-opts/commands.conf not found.
+MPV_LOG: debug - commands: lua-settings/commands.conf not found.
+MPV_LOG: debug - cplayer: Run command: define-section, flags=64, args=[name="input_select", contents="", flags="default"]
+MPV_LOG: debug - cplayer: Run command: define-section, flags=64, args=[name="input_commands", contents="", flags="default"]
+MPV_LOG: debug - cplayer: Run command: enable-section, flags=64, args=[name="input_select", flags="allow-hide-cursor+allow-vo-dragging"]
+MPV_LOG: debug - cplayer: Run command: enable-section, flags=64, args=[name="input_commands", flags="allow-hide-cursor+allow-vo-dragging"]
+MPV_LOG: debug - cplayer: Run command: define-section, flags=64, args=[name="input_forced_select", contents="", flags="force"]
+MPV_LOG: debug - cplayer: Run command: enable-section, flags=64, args=[name="input_forced_select", flags="allow-hide-cursor+allow-vo-dragging"]
+MPV_LOG: debug - cplayer: Run command: define-section, flags=64, args=[name="input_forced_commands", contents="", flags="force"]
+MPV_LOG: debug - cplayer: Run command: enable-section, flags=64, args=[name="input_forced_commands", flags="allow-hide-cursor+allow-vo-dragging"]
+MPV_LOG: debug - console: reading options for console
+MPV_LOG: debug - console: script-opts/console.conf not found.
+MPV_LOG: debug - console: lua-settings/console.conf not found.
+MPV_LOG: v - cplayer: Done loading scripts.
+MPV_LOG: debug - cplayer: Run command: define-section, flags=64, args=[name="input_console", contents="", flags="default"]
+MPV_LOG: debug - cplayer: Run command: enable-section, flags=64, args=[name="input_console", flags="allow-hide-cursor+allow-vo-dragging"]
+MPV_LOG: debug - cplayer: Run command: define-section, flags=64, args=[name="input_forced_console", contents="", flags="force"]
+MPV_LOG: debug - cplayer: Run command: enable-section, flags=64, args=[name="input_forced_console", flags="allow-hide-cursor+allow-vo-dragging"]
+MPV_LOG: debug - auto_profiles: Destroying client handle...
+MPV_LOG: v - cplayer: Set property: vo="libmpv" -> 1
+MPV_LOG: v - cplayer: Set property: hwdec="auto" -> 1
+MPV_LOG: v - cplayer: Set property: vid="auto" -> 1
+14:18:58.917 [BASELINE] STATE PlaybackState.preparing → PlaybackState.error gen=4 intended=PlaybackState.playing activityStopped=false
+PlayerNotifier: Candidate null failed. Trying next candidate.
+14:18:58.922 [BASELINE] STATE PlaybackState.error → PlaybackState.idle gen=5 intended=PlaybackState.paused activityStopped=false
+VideoOutput.Resize
+{handle: 107421765692752, id: 107421748442448, rect: {left: 0, top: 0, width: 1, height: 1}}
+NativeVideoController: Texture ID: 107421748442448
+MPV_LOG: debug - cplayer: Setting option 'video-sync' = "audio" (flags = 0) -> 0
+MPV_LOG: v - cplayer: Set property: stream-lavf-o="reconnect=1,reconnect_streamed=1,reconnect_delay_max=5,reconnect_on_network_error=1,reconnect_on_http_error=5xx" -> 1
+MPV_LOG: v - cplayer: Set property: cache-secs="100" -> 1
+MPV_LOG: v - cplayer: Set property: hr-seek="no" -> 1
+MPV_LOG: v - cplayer: Set property: demuxer-max-bytes="150000000" -> 1
+MPV_LOG: v - cplayer: Set property: demuxer-max-back-bytes="50000000" -> 1
+MPV_LOG: v - cplayer: Set property: sub-delay="0.0" -> 1
+MPV_LOG: v - cplayer: Set property: sub-font-size="24.0" -> 1
+MPV_LOG: debug - cplayer: Run command: stop, flags=64, args=[flags=""]
+MPV_LOG: v - cplayer: Set property: sub-back-color="#80000000" -> 1
+MPV_LOG: debug - cplayer: Run command: playlist-clear, flags=64, args=[]
+MPV_LOG: debug - cplayer: Run command: playlist-play-index, flags=64, args=[index="none"]
+MPV_LOG: v - cplayer: Set property: pause=true -> 1
+MPV_LOG: debug - cplayer: Run command: loadlist, flags=64, args=[url="/tmp/278632e7-3e61-4109-bd03-1e9739e221a1", flags="append", index="-1"]
+MPV_LOG: v - playlist_parser: Parsing playlist file /tmp/278632e7-3e61-4109-bd03-1e9739e221a1...
+MPV_LOG: v - ifo_dvdnav: Opening /tmp/278632e7-3e61-4109-bd03-1e9739e221a1
+MPV_LOG: v - bdmv/bluray: Opening /tmp/278632e7-3e61-4109-bd03-1e9739e221a1
+MPV_LOG: v - file: Opening /tmp/278632e7-3e61-4109-bd03-1e9739e221a1
+MPV_LOG: debug - file: resize stream to 131072 bytes, drop 0 bytes
+PlayerNotifier: Track exhausted. Auto-skipping to next (failure count: 1)
+MPV_LOG: debug - file: Stream opened successfully.
+MPV_LOG: v - demux: Trying demuxers for level=request.
+MPV_LOG: debug - demux: Trying demuxer: playlist (force-level: request)
+MPV_LOG: warn - playlist: Reading plaintext playlist.
+MPV_LOG: v - playlist: demuxer read all data; closing stream
+MPV_LOG: v - demux: Detected file format: txt (Playlist file)
+MPV_LOG: v - playlist_parser: Playlist successfully parsed
+MPV_LOG: debug - global: state path: 'watch_later' -> '-'
+MPV_LOG: v - cplayer: Set property: playlist-pos=0 -> 1
+MPV_LOG: v - cplayer: Running hook: auto_profiles/on_before_start_file
+MPV_LOG: v - cplayer: Failed sending hook command auto_profiles/on_before_start_file. Removing hook.
+MPV_LOG: debug - global: state path: 'watch_later' -> '-'
+MPV_LOG: info - cplayer: Playing: /tmp/ppplayer-source-probe-BCYZKE/video.mp4
+MPV_LOG: v - cplayer: Running hook: auto_profiles/on_load
+MPV_LOG: v - cplayer: Failed sending hook command auto_profiles/on_load. Removing hook.
+MPV_LOG: v - cplayer: Running hook: ytdl_hook/on_load
+MPV_LOG: v - cplayer: Running hook: ytdl_hook/on_load
+MPV_LOG: v - ytdl_hook: playlist hook
+MPV_LOG: v - cplayer: Running hook: main/on_load
+MPV_LOG: v - cplayer: Set property: volume=35.000000 -> 1
+MPV_LOG: v - cplayer: Set property: http-header-fields=["User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36","Accept: */*"] -> 1
+MPV_LOG: v - ifo_dvdnav: Opening /tmp/ppplayer-source-probe-BCYZKE/video.mp4
+MPV_LOG: v - bdmv/bluray: Opening /tmp/ppplayer-source-probe-BCYZKE/video.mp4
+MPV_LOG: v - file: Opening /tmp/ppplayer-source-probe-BCYZKE/video.mp4
+MPV_LOG: debug - file: resize stream to 131072 bytes, drop 0 bytes
+MPV_LOG: debug - file: Stream opened successfully.
+MPV_LOG: v - demux: Trying demuxers for level=normal.
+MPV_LOG: debug - demux: Trying demuxer: directory (force-level: normal)
+MPV_LOG: debug - demux: Trying demuxer: disc (force-level: normal)
+MPV_LOG: debug - demux: Trying demuxer: edl (force-level: normal)
+MPV_LOG: debug - demux: Trying demuxer: cue (force-level: normal)
+MPV_LOG: debug - demux: Trying demuxer: rawaudio (force-level: normal)
+MPV_LOG: debug - demux: Trying demuxer: rawvideo (force-level: normal)
+MPV_LOG: debug - demux: Trying demuxer: mkv (force-level: normal)
+MPV_LOG: debug - demux: Trying demuxer: libarchive (force-level: normal)
+MPV_LOG: v - cplayer: Set property: speed=1.000000 -> 1
+MPV_LOG: debug - demux: Trying demuxer: lavf (force-level: normal)
+MPV_LOG: debug - cplayer: Run command: stop, flags=64, args=[flags=""]
+MPV_LOG: debug - cplayer: Run command: playlist-clear, flags=64, args=[]
+MPV_LOG: debug - cplayer: Run command: playlist-play-index, flags=64, args=[index="none"]
+MPV_LOG: v - lavf: Found 'mov,mp4,m4a,3gp,3g2,mj2' at score=100 size=2048.
+MPV_LOG: v - lavf: Could not set AVOption seg_max_retry='5'
+MPV_LOG: v - lavf: Could not set AVOption allowed_extensions='ALL'
+MPV_LOG: v - demux: Detected file format: mov,mp4,m4a,3gp,3g2,mj2 (libavformat)
+MPV_LOG: debug - global: cache path: '' -> '-'
+MPV_LOG: error - lavf: Failed to create file cache.
+MPV_LOG: v - cplayer: Opening done: /tmp/ppplayer-source-probe-BCYZKE/video.mp4
+MPV_LOG: v - cplayer: Running hook: main/on_unload
+MPV_LOG: v - cplayer: Set property: http-header-fields=null -> -2
+MPV_LOG: v - cplayer: Set property: start="none" -> 1
+MPV_LOG: v - cplayer: Set property: end="none" -> 1
+MPV_LOG: v - cplayer: finished playback, success (reason 2)
+MPV_LOG: v - cplayer: Running hook: ytdl_hook/on_after_end_file
+MPV_LOG: debug - cplayer: Run command: del, flags=64, args=[name="user-data/mpv/ytdl/json-subprocess-result"]
+[VideoInit] skipped: hasVideo=false (slot_reflow) — waiting for media
+MPV_LOG: v - ao/pipewire: Headers version: 1.6.0
+MPV_LOG: v - ao/pipewire: Library version: 1.6.2
+MPV_LOG: v - ao/pulse: Library version: 17.0.0
+MPV_LOG: v - ao/pulse: Proto: 35
+MPV_LOG: v - ao/pulse: Server proto: 35
+[Output] dlna disposed
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: true
+  Actual: <false>
+Local switch 1 did not progress: null, state=PlaybackState.idle, position=0:00:00.000000
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.waitFor (file:///home/user/ppplayer_chromium_preview/integration_test/chromium_live_ui_test.dart:145:7)
+<asynchronous suspension>
+#5      main.<anonymous closure> (file:///home/user/ppplayer_chromium_preview/integration_test/chromium_live_ui_test.dart:326:11)
+<asynchronous suspension>
+#6      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#7      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///home/user/ppplayer_chromium_preview/integration_test/chromium_live_ui_test.dart line 145
+The test description was:
+  live YouTube through ppplayer screen controls
+════════════════════════════════════════════════════════════════════════════════════════════════════
+01:16 +0 -1: live YouTube through ppplayer screen controls [E]
+  Test failed. See exception logs above.
+  The test description was: live YouTube through ppplayer screen controls
+  
+01:16 +0 -1: (tearDownAll)
+01:16 +0 -1: Some tests failed.
+
+Failing tests:
+  /home/user/ppplayer_chromium_preview/integration_test/chromium_live_ui_test.dart: live YouTube through ppplayer screen controls

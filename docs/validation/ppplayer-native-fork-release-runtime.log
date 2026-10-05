@@ -1,0 +1,64 @@
+--------- beginning of main
+10-05 15:35:43.038  5251  5251 I om.ppplayer.app: Using CollectorTypeCC GC.
+10-05 15:35:43.039  5251  5251 W om.ppplayer.app: Unexpected CPU variant for x86: x86_64.
+10-05 15:35:43.039  5251  5251 W om.ppplayer.app: Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, alderlake, default
+10-05 15:35:43.041  5251  5251 E om.ppplayer.app: Not starting debugger since process cannot load the jdwp agent.
+10-05 15:35:43.044  5251  5251 D nativeloader: Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+10-05 15:35:43.124  5251  5251 D ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+10-05 15:35:43.124  5251  5251 D ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.sidecar.jar
+10-05 15:35:43.132  5251  5251 D nativeloader: Configuring clns-9 for other apk /data/app/~~3A4B8DPxSVrUnNWLHPCwfw==/com.ppplayer.app-8D7TNRIqnmo6Hk5E6_oa2A==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~3A4B8DPxSVrUnNWLHPCwfw==/com.ppplayer.app-8D7TNRIqnmo6Hk5E6_oa2A==/lib/x86_64:/data/app/~~3A4B8DPxSVrUnNWLHPCwfw==/com.ppplayer.app-8D7TNRIqnmo6Hk5E6_oa2A==/base.apk!/lib/x86_64, permitted_path=/data:/mnt/expand:/data/user/0/com.ppplayer.app
+10-05 15:35:43.145  5251  5251 I om.ppplayer.app: AssetManager2(0x78158cd7a438) locale list changing from [] to [en-US]
+10-05 15:35:43.155  5251  5251 V GraphicsEnvironment: Currently set values for:
+10-05 15:35:43.155  5251  5251 V GraphicsEnvironment:   angle_gl_driver_selection_pkgs=[]
+10-05 15:35:43.155  5251  5251 V GraphicsEnvironment:   angle_gl_driver_selection_values=[]
+10-05 15:35:43.155  5251  5251 V GraphicsEnvironment: com.ppplayer.app is not listed in per-application setting
+10-05 15:35:43.155  5251  5251 V GraphicsEnvironment: ANGLE allowlist from config: com.dreamgames.royalmatch com.dts.freefiremax com.dxx.firenow com.gramgames.mergedragons com.ludo.king com.mojang.minecraftpe com.my.defense com.nintendo.zaka com.os.airforce com.playrix.fishdomdd.gplay io.teslatech.callbreak jp.konami.prospia net.peakgames.toonblast
+10-05 15:35:43.155  5251  5251 V GraphicsEnvironment: com.ppplayer.app is not listed in ANGLE allowlist or settings, returning default
+10-05 15:35:43.155  5251  5251 V GraphicsEnvironment: Neither updatable production driver nor prerelease driver is supported.
+10-05 15:35:43.181  5251  5251 D WM-WrkMgrInitializer: Initializing WorkManager with default configuration.
+--------- beginning of system
+10-05 15:35:43.397  5251  5288 I DisplayManager: Choreographer implicitly registered for the refresh rate.
+10-05 15:35:43.432  5251  5276 E ashmem  : Pinning is deprecated since Android Q. Please use trim or other methods.
+10-05 15:35:43.441  5251  5251 I om.ppplayer.app: AssetManager2(0x78158cd80b58) locale list changing from [] to [en-US]
+10-05 15:35:43.530  5251  5291 D nativeloader: Load /data/app/~~3A4B8DPxSVrUnNWLHPCwfw==/com.ppplayer.app-8D7TNRIqnmo6Hk5E6_oa2A==/base.apk!/lib/x86_64/libflutter.so using class loader ns clns-9 (caller=/data/app/~~3A4B8DPxSVrUnNWLHPCwfw==/com.ppplayer.app-8D7TNRIqnmo6Hk5E6_oa2A==/base.apk): ok
+10-05 15:35:43.531  5251  5288 I EGL_emulation: Opening libGLESv1_CM_emulation.so
+10-05 15:35:43.531  5251  5288 I EGL_emulation: Opening libGLESv2_emulation.so
+10-05 15:35:43.541  5251  5288 W HWUI    : Failed to choose config with EGL_SWAP_BEHAVIOR_PRESERVED, retrying without...
+10-05 15:35:43.542  5251  5288 W HWUI    : Failed to initialize 101010-2 format, error = EGL_SUCCESS
+10-05 15:35:43.544  5251  5292 D skia    : [SkFontMgr Android Parser] '/product/etc/fonts_customization.xml' could not be opened
+10-05 15:35:43.584  5251  5251 W om.ppplayer.app: type=1400 audit(0.0:41): avc:  denied  { read } for  name="max_map_count" dev="proc" ino=15922 scontext=u:r:untrusted_app:s0:c214,c256,c512,c768 tcontext=u:object_r:proc_max_map_count:s0 tclass=file permissive=0 app=com.ppplayer.app
+10-05 15:35:43.636  5251  5251 D MediaBrowserCompat: Connecting to a MediaBrowserService.
+10-05 15:35:43.656  5251  5251 D AudioSystem: onNewService: media.audio_policy service obtained 0x78142cddd2a0
+10-05 15:35:43.665  5251  5251 D AudioSystem: getService: checking for service media.audio_policy: 0x78142cddd2a0
+10-05 15:35:43.697  5251  5251 D nativeloader: Load /data/app/~~3A4B8DPxSVrUnNWLHPCwfw==/com.ppplayer.app-8D7TNRIqnmo6Hk5E6_oa2A==/base.apk!/lib/x86_64/libdartjni.so using class loader ns clns-9 (caller=/data/app/~~3A4B8DPxSVrUnNWLHPCwfw==/com.ppplayer.app-8D7TNRIqnmo6Hk5E6_oa2A==/base.apk): ok
+10-05 15:35:43.708  5251  5251 D nativeloader: Load /data/app/~~3A4B8DPxSVrUnNWLHPCwfw==/com.ppplayer.app-8D7TNRIqnmo6Hk5E6_oa2A==/base.apk!/lib/x86_64/libmpv.so using class loader ns clns-9 (caller=/data/app/~~3A4B8DPxSVrUnNWLHPCwfw==/com.ppplayer.app-8D7TNRIqnmo6Hk5E6_oa2A==/base.apk): ok
+10-05 15:35:43.709  5251  5251 I media_kit: package:media_kit_libs_android_video attached.
+10-05 15:35:43.722  5251  5251 D nativeloader: Load /data/app/~~3A4B8DPxSVrUnNWLHPCwfw==/com.ppplayer.app-8D7TNRIqnmo6Hk5E6_oa2A==/base.apk!/lib/x86_64/libmediakitandroidhelper.so using class loader ns clns-9 (caller=/data/app/~~3A4B8DPxSVrUnNWLHPCwfw==/com.ppplayer.app-8D7TNRIqnmo6Hk5E6_oa2A==/base.apk): ok
+10-05 15:35:43.723  5251  5251 D media_kit: google
+10-05 15:35:43.723  5251  5251 D media_kit: emu64xa16k
+10-05 15:35:43.723  5251  5251 D media_kit: google/sdk_gphone16k_x86_64/emu64xa16k:16/BE2A.250530.026.F3/13894323:user/dev-keys
+10-05 15:35:43.723  5251  5251 D media_kit: ranchu
+10-05 15:35:43.723  5251  5251 D media_kit: sdk_gphone16k_x86_64
+10-05 15:35:43.723  5251  5251 D media_kit: Google
+10-05 15:35:43.723  5251  5251 D media_kit: sdk_gphone16k_x86_64
+10-05 15:35:43.724  5251  5251 I media_kit: Saved application context.
+10-05 15:35:43.745  5251  5293 I flutter : [IMPORTANT:flutter/shell/platform/android/android_context_gl_impeller.cc(104)] Using the Impeller rendering backend (OpenGLES).
+10-05 15:35:43.876  5251  5251 D CompatChangeReporter: Compat change id reported: 377864165; UID 10214; state: ENABLED
+10-05 15:35:43.879  5251  5251 D DesktopModeFlags: Toggle override initialized to: OVERRIDE_UNSET
+10-05 15:35:43.881  5251  5251 D PipDebug: 15:35:43.881 [NATIVE] event=onStart pip=false focus=false size=0x0 isFinishing=false
+10-05 15:35:43.883  5251  5251 D PipDebug: 15:35:43.883 [NATIVE] event=onResume pip=false focus=false size=0x0 isFinishing=false
+10-05 15:35:43.888  5251  5251 W HWUI    : Unknown dataspace 0
+10-05 15:35:43.918  5251  5251 I flutter : [startup 0ms] main() entered
+10-05 15:35:43.921  5251  5251 I flutter : [startup 3ms] Flutter binding initialized
+10-05 15:35:43.923  5251  5251 I flutter : [startup 4ms] MediaKit initialized
+10-05 15:35:43.923  5251  5251 I flutter : [startup 4ms] dotenv load start
+10-05 15:35:43.927  5251  5251 I flutter : Warning: .env file not found or could not be loaded. Relying on --dart-define or defaults.
+10-05 15:35:43.927  5251  5251 I flutter : [startup 8ms] dotenv load complete
+10-05 15:35:43.927  5251  5251 I flutter : [startup 8ms] notification permission check start
+10-05 15:35:43.941  5251  5251 I WindowExtensionsImpl: Initializing Window Extensions, vendor API level=9, activity embedding enabled=true
+10-05 15:35:44.906  5251  5251 I System.out: flutterEngine warmed up
+10-05 15:35:44.909  5251  5251 I Choreographer: Skipped 57 frames!  The application may be doing too much work on its main thread.
+10-05 15:35:44.925  5251  5251 D WindowLayoutComponentImpl: Register WindowLayoutInfoListener on Context=com.ppplayer.app.MainActivity@7f89a07, of which baseContext=android.app.ContextImpl@bd6e8cc
+10-05 15:35:44.928  5251  5251 D PipDebug: 15:35:44.928 [NATIVE] event=onUserLeaveHint pip=false focus=false size=1280x2856 isFinishing=false
+10-05 15:35:44.929  5251  5251 D PipDebug: 15:35:44.929 [NATIVE] event=onPause pip=false focus=false size=1280x2856 isFinishing=false
+10-05 15:35:49.325  5251  5343 D ProfileInstaller: Installing profile for com.ppplayer.app

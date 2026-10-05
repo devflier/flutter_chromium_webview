@@ -1,0 +1,69 @@
+00:00 +0: loading C:/Users/User/Projects/ppplayer_chromium_preview/integration_test/chromium_live_ui_test.dart
+Running Gradle task 'assembleDebug'...                          
+WARNING: Your Android app project: app located at: C:\Users\User\Projects\ppplayer_chromium_preview\android\app\build.gradle.kts
+applies the Kotlin Gradle Plugin, which will cause build failures in future versions of Flutter.
+Please migrate your app to Built-in Kotlin using this guide: https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin/for-app-developers
+
+WARNING: Your app uses the following plugins that apply Kotlin Gradle Plugin (KGP): image_picker_android, url_launcher_android, webview_flutter_android
+Future versions of Flutter will fail to build if your app uses plugins that apply KGP.
+
+Please check the changelogs of these plugins and upgrade to a version that supports Built-in Kotlin.
+If no such version exists, report the issue to the plugin. If necessary, here is a guide on filing
+an issue against a plugin: https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin/for-app-developers#report-incompatible-kotlin-gradle-plugin-usage-to-plugin-authors
+
+If you are a plugin author, please migrate your plugin to Built-in Kotlin using this guide: https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin/for-plugin-authors
+INFO: Precompiled binaries are disabled
+FINER: Running command rustup toolchain list
+FINER: Running command rustup target list --toolchain stable-x86_64-pc-windows-msvc --installed
+INFO: Building metadata_god for x86_64-linux-android
+FINER: Running command rustup run stable cargo build --manifest-path C:\Users\User\Projects\ppplayer_chromium_preview\lib\core\playback\packages\metadata_god\rust\Cargo.toml -p metadata_god --target x86_64-linux-android --target-dir C:\Users\User\Projects\ppplayer_chromium_preview\build\metadata_god/build
+INFO: Building metadata_god for i686-linux-android
+FINER: Running command rustup run stable cargo build --manifest-path C:\Users\User\Projects\ppplayer_chromium_preview\lib\core\playback\packages\metadata_god\rust\Cargo.toml -p metadata_god --target i686-linux-android --target-dir C:\Users\User\Projects\ppplayer_chromium_preview\build\metadata_god/build
+INFO: Building metadata_god for x86_64-linux-android
+FINER: Running command rustup run stable cargo build --manifest-path C:\Users\User\Projects\ppplayer_chromium_preview\lib\core\playback\packages\metadata_god\rust\Cargo.toml -p metadata_god --target x86_64-linux-android --target-dir C:\Users\User\Projects\ppplayer_chromium_preview\build\metadata_god/build
+Running Gradle task 'assembleDebug'...                             64.2s
+ÔêÜ Built build\app\outputs\flutter-apk\app-debug.apk
+Installing build\app\outputs\flutter-apk\app-debug.apk...          12.8s
+00:00 +0: live YouTube through ppplayer screen controls
+14:26:53.146 [PipDebug][HANDLER] event=onActivityStarted old=false new=false inPip=false pipRequestPending=false
+[VideoInit] Player Screen mounted ÔÇö checking initial state
+[VideoInit] playerView=PlayerView.video
+[VideoInit] activeTrack=none
+[VideoInit] hasVideo=false
+[VideoInit] waiting for media...
+[VideoInit] skipped: hasVideo=false (initial_mount) ÔÇö waiting for media
+media_kit: NativeReferenceHolder: Allocated 137894521463664
+[VideoInit] skipped: hasVideo=false (probe_500ms) ÔÇö waiting for media
+PlayerNotifier: Resolving track Live probe
+[VideoInit] activeTrack changed (null -> live-probe)
+2026-10-05T14:26:55.000895 AUDIO_HANDLER publish playing=false position=0:00:00.000000
+2026-10-05T14:26:55.095635 AUDIO_HANDLER publish playing=false position=0:00:00.000000
+[VideoInit] skipped: hasVideo=false (track_change) ÔÇö waiting for media
+[VideoInit] skipped: hasVideo=false (slot_reflow) ÔÇö waiting for media
+[VideoInit] skipped: hasVideo=false (probe_1000ms) ÔÇö waiting for media
+00:11 +0: live YouTube through ppplayer screen controls - did not complete [E]
+00:11 +0: (tearDownAll) - did not complete [E]
+00:11 +0: Some tests failed.
+
+Failing tests:
+  C:/Users/User/Projects/ppplayer_chromium_preview/integration_test/chromium_live_ui_test.dart: (tearDownAll) (did not complete)
+  C:/Users/User/Projects/ppplayer_chromium_preview/integration_test/chromium_live_ui_test.dart: live YouTube through ppplayer screen controls (did not complete)
+No tests were found.
+adb uninstall failed: ProcessException: Process exited abnormally with exit code 1:
+adb.exe: device offline
+  Command: C:\Users\User\AppData\Local\Android\sdk\platform-tools\adb.exe -s emulator-5554 uninstall com.ppplayer.app
+unhandled error during finalization of test:
+C:/Users/User/Projects/ppplayer_chromium_preview/integration_test/chromium_live_ui_test.dart
+PathNotFoundException: Deletion failed, path = 'C:\Users\User\AppData\Local\Temp\flutter_tools.37662dac\flutter_test_listener.da92795' (OS Error: The system cannot find the path specified, errno = 3)
+#0      _Directory._deleteSync (dart:io/directory_impl.dart:216:7)
+#1      FileSystemEntity.deleteSync (dart:io/file_system_entity.dart:425:7)
+#2      ForwardingFileSystemEntity.deleteSync (package:file/src/forwarding/forwarding_file_system_entity.dart:70:16)
+#3      ErrorHandlingDirectory.deleteSync.<anonymous closure> (package:flutter_tools/src/base/error_handling_io.dart:717:22)
+#4      _runSync (package:flutter_tools/src/base/error_handling_io.dart:1118:16)
+#5      ErrorHandlingDirectory.deleteSync (package:flutter_tools/src/base/error_handling_io.dart:716:12)
+#6      FlutterPlatform._createListenerDart.<anonymous closure> (package:flutter_tools/src/test/flutter_platform.dart:786:15)
+#7      FlutterPlatform._startTest.finalize (package:flutter_tools/src/test/flutter_platform.dart:591:26)
+<asynchronous suspension>
+#8      FlutterPlatform._startTest (package:flutter_tools/src/test/flutter_platform.dart:762:7)
+<asynchronous suspension>
+

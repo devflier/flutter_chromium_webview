@@ -1,0 +1,27 @@
+
+TimeCreated : 05/10/2026 14:33:26
+Message     : Faulting application name: qemu-system-x86_64-headless.exe, version: 0.0.0.0, time stamp: 0x6a61155d
+              Faulting module name: unknown, version: 0.0.0.0, time stamp: 0x00000000
+              Exception code: 0xc0000005
+              Fault offset: 0x0000016956b35474
+              Faulting process id: 0x6EB8
+              Faulting application start time: 0x1DD54F72B17BC5D
+              Faulting application path: C:\Users\User\AppData\Local\Android\Sdk\emulator\qemu\windows-x86_64\qemu-system-x86_64-headless.exe
+              Faulting module path: unknown
+              Report Id: 47e147ae-7713-409f-bdde-6eb9e57f5e65
+              Faulting package full name: 
+              Faulting package-relative application ID: 
+
+TimeCreated : 05/10/2026 14:26:59
+Message     : Faulting application name: qemu-system-x86_64-headless.exe, version: 0.0.0.0, time stamp: 0x6a61155d
+              Faulting module name: unknown, version: 0.0.0.0, time stamp: 0x00000000
+              Exception code: 0xc0000005
+              Fault offset: 0x0000026c54c29474
+              Faulting process id: 0x4FE0
+              Faulting application start time: 0x1DD54F6BEE0A8F9
+              Faulting application path: C:\Users\User\AppData\Local\Android\Sdk\emulator\qemu\windows-x86_64\qemu-system-x86_64-headless.exe
+              Faulting module path: unknown
+              Report Id: e3365e1b-6dbe-4bfe-b217-508032d8be5e
+              Faulting package full name: 
+              Faulting package-relative application ID: 
+
