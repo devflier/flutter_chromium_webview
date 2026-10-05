@@ -1,0 +1,42 @@
+# Build outputs
+build/
+*.class
+
+# Gradle
+.gradle/
+gradle-wrapper.jar
+
+# Android local files
+local.properties
+
+# macOS
+.DS_Store
+__MACOSX/
+
+# Windows
+Thumbs.db
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# CEF download artifacts (fetched at build time)
+**/cef/root/
+cef-artifacts/
+
+# Flutter/Dart
+.dart_tool/
+.pub-cache/
+.pub/
+pubspec.lock
+/coverage/
+
+# Logs generated during validation sessions (ppplayer investigation)
+docs/validation/ppplayer-*.log
+docs/validation/ppplayer-*.txt
+docs/validation/ppplayer-*.png
+docs/validation/ppplayer-*.md
+docs/validation/ppplayer-*.json
