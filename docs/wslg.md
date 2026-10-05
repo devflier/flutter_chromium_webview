@@ -26,18 +26,27 @@ To test the default graphics configuration (using hardware acceleration if the h
 
 ## Running the example
 
-From Ubuntu, with the Linux Flutter SDK on PATH:
+From Ubuntu, with the Linux Flutter SDK on PATH, copy the current sources to a
+separate Linux directory first. Windows and Linux must not share Flutter's
+generated dependency/build metadata. To include uncommitted Windows changes:
 
 ```bash
-cd /mnt/c/Users/User/Projects/flutter_chromium_webview
+mkdir -p ~/projects/flutter_chromium_webview
+rsync -a --exclude=.git --exclude=.dart_tool --exclude=build --exclude=.gradle --exclude=.kotlin --exclude=ephemeral --exclude=local.properties /mnt/c/Users/User/Projects/flutter_chromium_webview/ ~/projects/flutter_chromium_webview/
+cd ~/projects/flutter_chromium_webview
 bash scripts/run_wsl.sh
+# Full regression and release checks:
+bash scripts/validate_linux.sh
 ```
 
 The launcher builds a release bundle, then runs with X11 and Mesa llvmpipe. The example selects Flutter's Skia renderer when `WSL_DISTRO_NAME` is present.
 To reuse an existing bundle, run `bash scripts/run_wsl.sh --no-build`.
 The initial page is https://example.com.
 
-The build requires Flutter's Linux desktop dependencies (Clang, CMake, Ninja, pkg-config, and GTK3 development files). The first build downloads CEF and builds its wrapper. CEF is large; packaging on `/mnt/c` can take several minutes.
+The build requires Flutter's Linux desktop dependencies (Clang, CMake, Ninja,
+pkg-config, and GTK3 development files). The first build downloads CEF and builds
+its wrapper. Keep the build on the Linux filesystem; both scripts reject a WSL
+checkout under `/mnt/c` to protect the Windows environment.
 
 ## Troubleshooting
 

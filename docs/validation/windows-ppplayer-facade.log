@@ -1,52 +1,8 @@
 00:00 +0: loading C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart
-Error: Couldn't resolve the package 'app' in 'package:app/core/playback/chromium_playback_engine.dart'.
-test/core/playback/chromium_playback_engine_test.dart:8:8: Error: Not found: 'package:app/core/playback/chromium_playback_engine.dart'
-import 'package:app/core/playback/chromium_playback_engine.dart';
-       ^
-test/core/playback/chromium_playback_engine_test.dart:131:8: Error: 'ChromiumPlaybackEngine' isn't a type.
-  late ChromiumPlaybackEngine engine;
-       ^^^^^^^^^^^^^^^^^^^^^^
-test/core/playback/chromium_playback_engine_test.dart:139:14: Error: Method not found: 'ChromiumPlaybackEngine'.
-    engine = ChromiumPlaybackEngine(
-             ^^^^^^^^^^^^^^^^^^^^^^
-test/core/playback/chromium_playback_engine_test.dart:244:16: Error: Method not found: 'ChromiumPlaybackEngine'.
-      engine = ChromiumPlaybackEngine(
-               ^^^^^^^^^^^^^^^^^^^^^^
-test/core/playback/chromium_playback_engine_test.dart:275:16: Error: Method not found: 'ChromiumPlaybackEngine'.
-      engine = ChromiumPlaybackEngine(
-               ^^^^^^^^^^^^^^^^^^^^^^
-test/core/playback/chromium_playback_engine_test.dart:257:25: Error: The argument type 'List<dynamic>' can't be assigned to the parameter type 'Iterable<Future<dynamic>>'.
- - 'List' is from 'dart:core'.
- - 'Iterable' is from 'dart:core'.
- - 'Future' is from 'dart:async'.
-      await Future.wait([opening, pause]);
-                        ^
-00:00 +0 -1: loading C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart [E]
-  Failed to load "C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart":
-  Compilation failed for testPath=C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: Error: Couldn't resolve the package 'app' in 'package:app/core/playback/chromium_playback_engine.dart'.
-  test/core/playback/chromium_playback_engine_test.dart:8:8: Error: Not found: 'package:app/core/playback/chromium_playback_engine.dart'
-  import 'package:app/core/playback/chromium_playback_engine.dart';
-         ^
-  test/core/playback/chromium_playback_engine_test.dart:131:8: Error: 'ChromiumPlaybackEngine' isn't a type.
-    late ChromiumPlaybackEngine engine;
-         ^^^^^^^^^^^^^^^^^^^^^^
-  test/core/playback/chromium_playback_engine_test.dart:139:14: Error: Method not found: 'ChromiumPlaybackEngine'.
-      engine = ChromiumPlaybackEngine(
-               ^^^^^^^^^^^^^^^^^^^^^^
-  test/core/playback/chromium_playback_engine_test.dart:244:16: Error: Method not found: 'ChromiumPlaybackEngine'.
-        engine = ChromiumPlaybackEngine(
-                 ^^^^^^^^^^^^^^^^^^^^^^
-  test/core/playback/chromium_playback_engine_test.dart:275:16: Error: Method not found: 'ChromiumPlaybackEngine'.
-        engine = ChromiumPlaybackEngine(
-                 ^^^^^^^^^^^^^^^^^^^^^^
-  test/core/playback/chromium_playback_engine_test.dart:257:25: Error: The argument type 'List<dynamic>' can't be assigned to the parameter type 'Iterable<Future<dynamic>>'.
-   - 'List' is from 'dart:core'.
-   - 'Iterable' is from 'dart:core'.
-   - 'Future' is from 'dart:async'.
-        await Future.wait([opening, pause]);
-                          ^
-  .
-00:00 +0 -1: Some tests failed.
-
-Failing tests:
-  C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: loading C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart
+00:00 +0: maps playing, progress, buffering, pause and one end event
+00:00 +1: prepare preserves subsecond seek and volume scale
+00:00 +2: switching to local and playlist keeps fallback and ignores old video events
+00:00 +3: late old player error cannot corrupt new track
+00:00 +4: pause while readiness is pending cues rather than starts playback
+00:00 +5: stop invalidates an in-flight open and disposal rejects new work
+00:00 +6: All tests passed!

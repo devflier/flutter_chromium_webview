@@ -9,6 +9,17 @@ example/dummy_plugin/
 # SHA-256 verified archive into the CMake binary directory (build/) at build time.
 **/build/
 **/.dart_tool/
+**/.gradle/
+**/.kotlin/
+**/local.properties
+**/gradlew
+**/gradlew.bat
+**/gradle/wrapper/gradle-wrapper.jar
+**/.cxx/
+**/GeneratedPluginRegistrant.java
+**/key.properties
+**/*.keystore
+**/*.jks
 **/ephemeral/
 **/doc/api/
 **/__pycache__/

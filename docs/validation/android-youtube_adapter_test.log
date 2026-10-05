@@ -1,0 +1,7 @@
+00:00 +0: loading C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/youtube_adapter_test.dart
+Running Gradle task 'assembleDebug'...                             19.3s
+√ Built build\app\outputs\flutter-apk\app-debug.apk
+Installing build\app\outputs\flutter-apk\app-debug.apk...          925ms
+00:00 +0: renderer executes YouTube adapter contract and isolates players
+00:02 +1: (tearDownAll)
+00:02 +1: All tests passed!

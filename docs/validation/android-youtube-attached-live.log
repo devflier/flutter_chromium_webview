@@ -1,0 +1,36 @@
+00:00 +0: loading C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/youtube_live_test.dart
+Running Gradle task 'assembleDebug'...                             24.0s
+√ Built build\app\outputs\flutter-apk\app-debug.apk
+Installing build\app\outputs\flutter-apk\app-debug.apk...        1,944ms
+00:00 +0: live YouTube readiness and playback progress
+YOUTUBE_PROBE {"platform":"android","timestamp":"2026-10-05T13:11:32.040405Z","softwareGraphics":false,"videoId":"M7lc1UVf-VE","events":[{"playerId":"Youtube1","generation":1,"MediaCapabilities":{"userAgent":"Mozilla/5.0 (Linux; Android 16; sdk_gphone16k_x86_64 Build/BE2A.250530.026.F3; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/133.0.6943.137 Mobile Safari/537.36","vp9":"probably","av1":"probably","h264":"probably","aac":"probably","opus":"probably"}},{"playerId":"Youtube1","generation":1,"Ready":true},{"playerId":"Youtube1","generation":1,"StateChange":-1},{"playerId":"Youtube1","generation":1,"StateChange":3},{"playerId":"Youtube1","generation":1,"PlaybackQualityChange":"hd720"},{"playerId":"Youtube1","generation":1,"ApiChange":true},{"playerId":"Youtube1","generation":1,"ApiChange":true},{"playerId":"Youtube1","generation":1,"StateChange":1},{"playerId":"Youtube1","generation":1,"VideoState":"{\"currentTime\":0.3081670190734863,\"loadedFraction\":0.014885451017779038}"},{"playerId":"Youtube1","generation":1,"VideoState":"{\"currentTime\":0.39831591416931156,\"loadedFraction\":0.014885451017779038}"},{"playerId":"Youtube1","generation":1,"VideoState":"{\"currentTime\":0.6475850476837158,\"loadedFraction\":0.014885451017779038}"},{"playerId":"Youtube1","generation":1,"VideoState":"{\"currentTime\":0.8974850152587891,\"loadedFraction\":0.014885451017779038}"},{"playerId":"Youtube1","generation":1,"VideoState":"{\"currentTime\":1.1453829408721923,\"loadedFraction\":0.014885451017779038}"},{"playerId":"Youtube1","generation":1,"VideoState":"{\"currentTime\":1.3983038779296875,\"loadedFraction\":0.014885451017779038}"},{"playerId":"Youtube1","generation":1,"VideoState":"{\"currentTime\":1.6450429179840087,\"loadedFraction\":0.014885451017779038}"},{"playerId":"Youtube1","generation":1,"VideoState":"{\"currentTime\":1.8976820820159912,\"loadedFraction\":0.014885451017779038}"},{"playerId":"Youtube1","generation":1,"VideoState":"{\"currentTime\":2.1462769465942384,\"loadedFraction\":0.014885451017779038}"},{"playerId":"Youtube1","generation":1,"StateChange":2},{"playerId":"Youtube1","generation":1,"StateChange":3},{"playerId":"Youtube1","generation":1,"StateChange":1},{"playerId":"Youtube1","generation":1,"VideoState":"{\"currentTime\":10.31347212588501,\"loadedFraction\":0.024361055355480284}"},{"playerId":"Youtube1","generation":1,"VideoState":"{\"currentTime\":10.576061032424926,\"loadedFraction\":0.024361055355480284}"},{"playerId":"Youtube1","generation":1,"VideoState":"{\"currentTime\":10.81606104196167,\"loadedFraction\":0.024361055355480284}"},{"playerId":"Youtube1","generation":1,"VideoState":"{\"currentTime\":11.06537211253357,\"loadedFraction\":0.024361055355480284}"},{"playerId":"Youtube1","generation":1,"StateChange":2}],"ready":true,"currentTime":2.120276923706055,"playerError":null,"state":1,"pausedDelta":0.0,"seekPosition":10.0,"volume":35.0,"widgetDetachProgress":0.13881511444091643,"passed":false,"failure":"Expected: a value greater than <0.5>\n  Actual: <0.13881511444091643>\n   Which: is not a value greater than <0.5>\n"}
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: a value greater than <0.5>
+  Actual: <0.13881511444091643>
+   Which: is not a value greater than <0.5>
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/youtube_live_test.dart:116:7)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/youtube_live_test.dart line 116
+The test description was:
+  live YouTube readiness and playback progress
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:24 +0 -1: live YouTube readiness and playback progress [E]
+  Test failed. See exception logs above.
+  The test description was: live YouTube readiness and playback progress
+  
+00:24 +0 -1: (tearDownAll)
+00:25 +0 -1: Some tests failed.
+
+Failing tests:
+  C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/youtube_live_test.dart: live YouTube readiness and playback progress

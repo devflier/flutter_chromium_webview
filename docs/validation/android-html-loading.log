@@ -1,0 +1,36 @@
+00:00 +0: loading C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/html_loading_test.dart
+Running Gradle task 'assembleDebug'...                             22.7s
+√ Built build\app\outputs\flutter-apk\app-debug.apk
+Installing build\app\outputs\flutter-apk\app-debug.apk...        1,329ms
+00:00 +0: HTML origin, relative resources, reload, replacement and browser isolation
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: true
+  Actual: <false>
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.waitFor (file:///C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/html_loading_test.dart:63:9)
+<asynchronous suspension>
+#5      main.<anonymous closure> (file:///C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/html_loading_test.dart:77:9)
+<asynchronous suspension>
+#6      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#7      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/html_loading_test.dart line 63
+The test description was:
+  HTML origin, relative resources, reload, replacement and browser isolation
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:18 +0 -1: HTML origin, relative resources, reload, replacement and browser isolation [E]
+  Test failed. See exception logs above.
+  The test description was: HTML origin, relative resources, reload, replacement and browser isolation
+  
+00:18 +0 -1: (tearDownAll)
+00:18 +0 -1: Some tests failed.
+
+Failing tests:
+  C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/html_loading_test.dart: HTML origin, relative resources, reload, replacement and browser isolation

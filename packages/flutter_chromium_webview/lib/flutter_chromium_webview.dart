@@ -1,4 +1,4 @@
-/// A Chromium Embedded Framework (CEF) web view for Flutter desktop.
+/// A Chromium web view using CEF on desktop and the system WebView on Android.
 ///
 /// Create a [ChromiumWebViewController], initialize the runtime once with
 /// [ChromiumWebViewController.initialize], and show the browser with the
@@ -13,14 +13,17 @@
 /// );
 /// ```
 ///
-/// Linux (x64) and Windows (x64) are supported.
+/// Linux (x64), Windows (x64) and Android (API 24+) are supported.
 // ignore: unnecessary_library_name
 library flutter_chromium_webview;
 
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart' show defaultTargetPlatform;
+
 import 'package:flutter/gestures.dart';
+import 'package:flutter/rendering.dart' show PlatformViewHitTestBehavior;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_chromium_webview_platform_interface/flutter_chromium_webview_platform_interface.dart';
@@ -514,6 +517,7 @@ class ChromiumWebViewController extends ChangeNotifier {
   }
 
   int? _textureId;
+  bool _usesPlatformView = false;
 
   /// The Flutter texture ID used for rendering the browser's pixel buffer.
   ///
@@ -637,8 +641,10 @@ class ChromiumWebViewController extends ChangeNotifier {
   /// it returns the existing [Future]. The browser will automatically begin
   /// loading the [initialUrl] once created.
   Future<void> createBrowser() {
-    if (_isDisposed || _textureId != null) return Future.value();
-    return _creation ??= _create();
+    if (_isDisposed) return Future.value();
+    if (_creation != null) return _creation!;
+    if (_browserId != null) return Future.value();
+    return _creation = _create();
   }
 
   Future<void> _create() async {
@@ -659,8 +665,11 @@ class ChromiumWebViewController extends ChangeNotifier {
       );
       final newBrowserId = result.browserId;
       _browserId = newBrowserId;
-      _textureId = result.textureId;
-      _popupTextureId = result.popupTextureId;
+      _textureId = result.textureId >= 0 ? result.textureId : null;
+      _usesPlatformView = result.textureId < 0;
+      _popupTextureId = result.popupTextureId >= 0
+          ? result.popupTextureId
+          : null;
       _controllers[newBrowserId] = this;
       final pending = _pendingEvents.remove(newBrowserId);
       if (pending != null) {
@@ -923,6 +932,10 @@ class ChromiumWebView extends StatefulWidget {
 }
 
 class _ChromiumWebViewState extends State<ChromiumWebView> {
+  bool get _usesAndroidView =>
+      defaultTargetPlatform == TargetPlatform.android &&
+      (widget.controller._usesPlatformView ||
+          widget.controller.browserId == null);
   final FocusNode _focus = FocusNode(debugLabel: 'ChromiumWebView');
   final GlobalKey _viewKey = GlobalKey();
   final LayerLink _popupLink = LayerLink();
@@ -957,6 +970,7 @@ class _ChromiumWebViewState extends State<ChromiumWebView> {
   void _syncPopup() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
+      if (_usesAndroidView) return;
       if (widget.controller.isPopupShowing &&
           widget.controller.popupTextureId != null &&
           Overlay.maybeOf(context) != null) {
@@ -1149,6 +1163,42 @@ class _ChromiumWebViewState extends State<ChromiumWebView> {
   Widget build(BuildContext context) {
     if (_error != null) {
       return Center(child: Text('Unable to create browser: $_error'));
+    }
+    if (_usesAndroidView) {
+      return ListenableBuilder(
+        listenable: widget.controller,
+        builder: (context, _) {
+          final browserId = widget.controller.browserId;
+          if (browserId == null) return const SizedBox.expand();
+          return PlatformViewLink(
+            key: ValueKey(browserId),
+            viewType: 'flutter_chromium_webview/browser',
+            surfaceFactory: (context, controller) => AndroidViewSurface(
+              controller: controller as AndroidViewController,
+              hitTestBehavior: PlatformViewHitTestBehavior.opaque,
+              gestureRecognizers: const {},
+            ),
+            onCreatePlatformView: (params) {
+              final controller = PlatformViewsService.initExpensiveAndroidView(
+                id: params.id,
+                viewType: 'flutter_chromium_webview/browser',
+                creationParams: {'browserId': browserId},
+                creationParamsCodec: const StandardMessageCodec(),
+                layoutDirection: Directionality.of(context),
+                onFocus: () => params.onFocusChanged(true),
+              );
+              controller.addOnPlatformViewCreatedListener(
+                params.onPlatformViewCreated,
+              );
+              controller.addOnPlatformViewCreatedListener((_) {
+                if (widget.autofocus) _send(widget.controller.setFocus(true));
+              });
+              _send(controller.create());
+              return controller;
+            },
+          );
+        },
+      );
     }
     return Focus(
       focusNode: _focus,

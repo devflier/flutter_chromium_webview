@@ -314,22 +314,30 @@ class _BrowserScreenState extends State<BrowserScreen> {
                       },
                     ),
                   ),
-                  TextButton(
-                    onPressed: () => _controller.loadRequest(inputTestUrl),
-                    child: const Text('Input test'),
-                  ),
-                  TextButton(
-                    onPressed: () => _controller.loadRequest(popupTestUrl),
-                    child: const Text('Popup test'),
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute<void>(
-                        builder: (_) => const YoutubeTestPage(),
+                  PopupMenuButton<String>(
+                    tooltip: 'Test pages',
+                    onSelected: (page) {
+                      if (page == 'youtube') {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (_) => const YoutubeTestPage(),
+                          ),
+                        );
+                      } else {
+                        _controller.loadRequest(
+                          page == 'input' ? inputTestUrl : popupTestUrl,
+                        );
+                      }
+                    },
+                    itemBuilder: (_) => const [
+                      PopupMenuItem(value: 'input', child: Text('Input test')),
+                      PopupMenuItem(value: 'popup', child: Text('Popup test')),
+                      PopupMenuItem(
+                        value: 'youtube',
+                        child: Text('YouTube test'),
                       ),
-                    ),
-                    child: const Text('YouTube test'),
+                    ],
                   ),
                 ],
               ),

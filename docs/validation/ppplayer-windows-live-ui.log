@@ -1,0 +1,41 @@
+00:00 +0: loading C:/Users/User/Projects/ppplayer_chromium_preview/integration_test/chromium_live_ui_test.dart
+Building Windows application...                                   102.3s
+√ Built build\windows\x64\runner\Debug\ppplayer.exe
+00:00 +0: live YouTube through ppplayer screen controls
+[VideoInit] Player Screen mounted — checking initial state
+[VideoInit] playerView=PlayerView.video
+[VideoInit] activeTrack=none
+[VideoInit] hasVideo=false
+[VideoInit] waiting for media...
+[VideoInit] skipped: hasVideo=false (initial_mount) — waiting for media
+media_kit: NativeReferenceHolder: Allocated 2535291457792
+[VideoInit] skipped: hasVideo=false (probe_500ms) — waiting for media
+PlayerNotifier: Resolving track Live probe
+[VideoInit] activeTrack changed (null -> live-probe)
+[VideoInit] hasVideo became true
+[VideoInit] slot unavailable (probe_1000ms) → retry 1/5
+[VideoInit] slot unavailable (probe_1500ms) — retry already pending
+13:42:19.612 [PipDebug][VIDEO_SURFACE] event=ensureVideoSurfaceReady reason=track_change hasVideo=true videoView=true visible=false slotExists=true slotSize=1264.0x681.0 rect=Rect.fromLTRB(0.0, 0.0, 1264.0, 681.0) providerBounds=Rect.fromLTRB(0.0, 0.0, 1264.0, 681.0) generation=1
+[VideoInit #1] hidden=true, applying native bounds
+[VideoInit #1] scheduling reveal (next frame)
+13:42:19.616 [PipDebug][VIDEO_SURFACE] event=ensureVideoSurfaceReady reason=hasVideo_true hasVideo=true videoView=true visible=false slotExists=true slotSize=1264.0x681.0 rect=Rect.fromLTRB(0.0, 0.0, 1264.0, 681.0) providerBounds=Rect.fromLTRB(0.0, 0.0, 1264.0, 681.0) generation=2
+[VideoInit #2] hidden=true, applying native bounds
+[VideoInit #2] scheduling reveal (next frame)
+13:42:19.617 [PipDebug][VIDEO_SURFACE] event=ensureVideoSurfaceReady reason=slot_retry_0 hasVideo=true videoView=true visible=false slotExists=true slotSize=1264.0x681.0 rect=Rect.fromLTRB(0.0, 0.0, 1264.0, 681.0) providerBounds=Rect.fromLTRB(0.0, 0.0, 1264.0, 681.0) generation=3
+[VideoInit #3] hidden=true, applying native bounds
+[VideoInit #3] scheduling reveal (next frame)
+13:42:19.619 [PipDebug][VIDEO_SURFACE] event=ensureVideoSurfaceReady reason=slot_reflow hasVideo=true videoView=true visible=false slotExists=true slotSize=1264.0x681.0 rect=Rect.fromLTRB(0.0, 0.0, 1264.0, 681.0) providerBounds=Rect.fromLTRB(0.0, 0.0, 1264.0, 681.0) generation=4
+[VideoInit #4] hidden=true, applying native bounds
+[VideoInit #4] scheduling reveal (next frame)
+13:42:19.882 [PipDebug][VIDEO_SURFACE] event=ensureVideoSurfaceReady reason=probe_2000ms hasVideo=true videoView=true visible=false slotExists=true slotSize=1264.0x681.0 rect=Rect.fromLTRB(0.0, 0.0, 1264.0, 681.0) providerBounds=Rect.fromLTRB(0.0, 0.0, 1264.0, 681.0) generation=5
+[VideoInit #5] hidden=true, applying native bounds
+[VideoInit #5] scheduling reveal (next frame)
+[VideoInit #1] reveal skipped: stale (current=5)
+[VideoInit #2] reveal skipped: stale (current=5)
+[VideoInit #3] reveal skipped: stale (current=5)
+[VideoInit #4] reveal skipped: stale (current=5)
+[VideoInit #5] frame committed → native visible=true
+PPPLAYER_LIVE_UI_PASS platform=windows volume=35.0
+[Output] dlna disposed
+00:10 +1: (tearDownAll)
+00:10 +1: All tests passed!

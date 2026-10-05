@@ -1,0 +1,19 @@
+Performing Streamed Install
+Success
+Starting: Intent { cmp=com.example.flutter_chromium_webview_example/.MainActivity }
+Status: ok
+LaunchState: COLD
+Activity: com.example.flutter_chromium_webview_example/.MainActivity
+TotalTime: 2183
+WaitTime: 2190
+Complete
+/sdcard/chromium-smoke-ui.xml: 1 file pulled, 0 skipped. 3.2 MB/s (7677 bytes in 0.002s)
+/sdcard/chromium-smoke-ui.xml: 1 file pulled, 0 skipped. 1.5 MB/s (5030 bytes in 0.003s)
+/sdcard/chromium-smoke-ui.xml: 1 file pulled, 0 skipped. 7.4 MB/s (15047 bytes in 0.002s)
+/sdcard/chromium-smoke-ui.xml: 1 file pulled, 0 skipped. 8.1 MB/s (15110 bytes in 0.002s)
+/sdcard/chromium-smoke-ui.xml: 1 file pulled, 0 skipped. 6.5 MB/s (15145 bytes in 0.002s)
+/sdcard/chromium-smoke-ui.xml: 1 file pulled, 0 skipped. 6.8 MB/s (15145 bytes in 0.002s)
+/sdcard/chromium-smoke-ui.xml: 1 file pulled, 0 skipped. 2.2 MB/s (6133 bytes in 0.003s)
+/sdcard/chromium-smoke-ui.xml: 1 file pulled, 0 skipped. 2.6 MB/s (6133 bytes in 0.002s)
+/sdcard/chromium-smoke-ui.xml: 1 file pulled, 0 skipped. 7.7 MB/s (15145 bytes in 0.002s)
+/sdcard/chromium-smoke.png: 1 file pulled, 0 skipped. 52.1 MB/s (267841 bytes in 0.005s)

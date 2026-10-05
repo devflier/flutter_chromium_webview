@@ -1,0 +1,382 @@
+00:00 +0: loading C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart
+00:00 +0: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: paused load preserves autoplay=false for local restoration
+00:00 +1: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: 1. PiP active → activityStopped: foreground remains owner, background never starts
+13:39:05.040 [PipDebug][ENGINE] PiP confirmed active; owner already foreground. gen=1
+13:39:05.045 [PipDebug][ENGINE] Background handoff deferred: pipRequestPending=false inPip=true owner=EngineOwner.foreground gen=1
+00:00 +2: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: 2. Race: activityStopped → PiP confirmed: background never starts, owner=foreground
+13:39:05.107 [PipDebug][ENGINE] Background handoff deferred: pipRequestPending=true inPip=false owner=EngineOwner.foreground gen=1
+13:39:05.165 [PipDebug][ENGINE] PiP confirmed active; owner already foreground. gen=1
+00:00 +3: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: 3. PiP closes while activity stopped → background becomes owner
+13:39:05.232 [PipDebug][ENGINE] PiP confirmed active; owner already foreground. gen=1
+13:39:05.232 [PipDebug][ENGINE] Background handoff deferred: pipRequestPending=false inPip=true owner=EngineOwner.foreground gen=1
+13:39:05.290 [PipDebug][ENGINE] PiP exited while activity stopped; initiating background handoff. gen=1
+13:39:05.291 [PipDebug][ENGINE] event=handoff_requested target=EngineOwner.background ownerBefore=EngineOwner.foreground inPip=false pipRequestPending=false activityStopped=true deferred=false gen=2 fg=playing bg=paused pos=0ms
+13:39:05.293 [PipDebug][ENGINE] Handoff: play(startAt: 0:00:00.000000) on EngineOwner.background
+13:39:05.297 [PipDebug][ENGINE] Handoff complete
+00:00 +4: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: 4. PiP expanded back to fullscreen → foreground remains owner
+13:39:05.358 [PipDebug][ENGINE] PiP confirmed active; owner already foreground. gen=1
+13:39:05.359 [PipDebug][ENGINE] Background handoff deferred: pipRequestPending=false inPip=true owner=EngineOwner.foreground gen=1
+00:00 +5: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: 4. PiP expanded back to fullscreen → foreground remains owner
+00:00 +6: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: 4. PiP expanded back to fullscreen → foreground remains owner
+00:00 +7: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: 4. PiP expanded back to fullscreen → foreground remains owner
+00:00 +8: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: 4. PiP expanded back to fullscreen → foreground remains owner
+00:00 +9: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: 5. Home with PiP disabled → background handoff occurs normally
+13:39:05.482 [PipDebug][ENGINE] event=handoff_requested target=EngineOwner.background ownerBefore=EngineOwner.foreground inPip=false pipRequestPending=false activityStopped=true deferred=false gen=2 fg=playing bg=paused pos=0ms
+13:39:05.482 [PipDebug][ENGINE] Containment: Inactive engine EngineOwner.foreground emitted playing, pausing it.
+13:39:05.482 [PipDebug][ENGINE] Handoff: play(startAt: 0:00:00.000000) on EngineOwner.background
+13:39:05.483 [PipDebug][ENGINE] Handoff complete
+00:00 +10: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: 6. Rapid PiP enter/exit/re-enter: latest transition wins (generation guard)
+13:39:05.545 [PipDebug][ENGINE] PiP confirmed active; owner already foreground. gen=1
+13:39:05.546 [PipDebug][ENGINE] Background handoff deferred: pipRequestPending=false inPip=true owner=EngineOwner.foreground gen=1
+13:39:05.603 [PipDebug][ENGINE] PiP exited while activity stopped; initiating background handoff. gen=1
+13:39:05.603 [PipDebug][ENGINE] event=handoff_requested target=EngineOwner.background ownerBefore=EngineOwner.foreground inPip=false pipRequestPending=false activityStopped=true deferred=false gen=2 fg=playing bg=paused pos=0ms
+13:39:05.604 [PipDebug][ENGINE] Handoff: play(startAt: 0:00:00.000000) on EngineOwner.background
+13:39:05.618 [PipDebug][ENGINE] SAFETY NET: PiP confirmed active but owner=EngineOwner.background; recovering to foreground. gen=2
+13:39:05.618 [PipDebug][ENGINE] event=handoff_requested target=EngineOwner.foreground ownerBefore=EngineOwner.background inPip=true pipRequestPending=false activityStopped=true deferred=false gen=3 fg=paused bg=buffering pos=0ms
+13:39:05.619 [PipDebug][ENGINE] Handoff: play(startAt: 0:00:00.000000) on EngineOwner.foreground
+13:39:05.619 [PipDebug][ENGINE] Handoff complete
+13:39:05.634 [PipDebug][ENGINE] Containment: Inactive engine EngineOwner.background emitted playing, pausing it.
+00:00 +11: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: late metadata does not fail playback and progress refreshes duration
+00:00 +11: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: 7. PiP active: track change, pause, resume do not cause owner divergence
+13:39:05.702 [PipDebug][ENGINE] PiP confirmed active; owner already foreground. gen=1
+13:39:05.702 [PipDebug][ENGINE] Background handoff deferred: pipRequestPending=false inPip=true owner=EngineOwner.foreground gen=1
+00:00 +11: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/player/player_notifier_playback_speed_test.dart: Playback Speed in PlayerNotifier setSpeed sets state and delegates to local engine when playing local
+PlayerNotifier: Resolving track Local
+00:00 +12: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: late metadata does not fail playback and progress refreshes duration
+00:00 +12: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/player/player_notifier_playback_speed_test.dart: Playback Speed in PlayerNotifier setSpeed throws/ignores or resets when online is playing
+PlayerNotifier: Resolving track Online
+00:00 +13: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: late metadata does not fail playback and progress refreshes duration
+00:00 +13: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/player/player_notifier_playback_speed_test.dart: Playback Speed in PlayerNotifier transitions between supported and unsupported tracks reset/preserve speed correctly
+PlayerNotifier: Resolving track Local
+PlayerNotifier: Resolving track Online
+PlayerNotifier: Resolving track Local
+00:00 +14: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: late metadata does not fail playback and progress refreshes duration
+00:01 +15: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: late metadata does not fail playback and progress refreshes duration
+00:01 +15: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: 8. PiP requested → activityStopped → PiP entry fails → background becomes owner
+13:39:05.949 [PipDebug][ENGINE] Background handoff deferred: pipRequestPending=true inPip=false owner=EngineOwner.foreground gen=1
+13:39:06.009 [PipDebug][HANDLER] event=notifyPipEntryFailed activityStopped=true
+13:39:06.010 [PipDebug][ENGINE] PiP entry failed. activityStopped=true
+13:39:06.011 [PipDebug][ENGINE] event=handoff_requested target=EngineOwner.background ownerBefore=EngineOwner.foreground inPip=false pipRequestPending=false activityStopped=true deferred=false gen=2 fg=playing bg=paused pos=0ms
+13:39:06.012 [PipDebug][ENGINE] Handoff: play(startAt: 0:00:00.000000) on EngineOwner.background
+13:39:06.012 [PipDebug][ENGINE] Handoff complete
+00:01 +16: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: late metadata does not fail playback and progress refreshes duration
+00:01 +16: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: Rapid minimize/reopen takes latest transition (generation guard)
+13:39:06.075 [PipDebug][ENGINE] event=handoff_requested target=EngineOwner.background ownerBefore=EngineOwner.foreground inPip=false pipRequestPending=false activityStopped=true deferred=false gen=2 fg=playing bg=paused pos=0ms
+13:39:06.076 [PipDebug][ENGINE] event=handoff_requested target=EngineOwner.foreground ownerBefore=EngineOwner.background inPip=false pipRequestPending=false activityStopped=false deferred=false gen=3 fg=paused bg=paused pos=0ms
+13:39:06.076 [PipDebug][ENGINE] Handoff: play(startAt: 0:00:00.000000) on EngineOwner.foreground
+13:39:06.077 [PipDebug][ENGINE] Handoff complete
+00:01 +17: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: late metadata does not fail playback and progress refreshes duration
+00:01 +17: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: Track changes during handoff: new track wins on background
+13:39:06.138 [PipDebug][ENGINE] event=handoff_requested target=EngineOwner.background ownerBefore=EngineOwner.foreground inPip=false pipRequestPending=false activityStopped=true deferred=false gen=2 fg=playing bg=paused pos=0ms
+13:39:06.138 [PipDebug][ENGINE] Containment: Inactive engine EngineOwner.foreground emitted playing, pausing it.
+13:39:06.138 [PipDebug][ENGINE] Handoff: play(startAt: 0:00:00.000000) on EngineOwner.background
+00:01 +17: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/media_sync_pause_test.dart: selection prepares while stopped and foreground resume dispatches current video
+
+--------------------------------------------------------------------------------
+media_kit: ERROR: MediaKit.ensureInitialized
+This indicates that one or more required dependencies could not be located.
+
+Refer to "Installation" section of the README for further details:
+GitHub  : https://github.com/media-kit/media-kit#installation
+pub.dev : https://pub.dev/packages/media_kit#installation
+
+TIP: Copy-paste required packages from the above link to your pubspec.yaml.
+
+If you recently added the packages, make sure to re-run the project ("hot-restart" & "hot-reload" is not sufficient for native plugins).
+--------------------------------------------------------------------------------
+
+MediaKitPlaybackEngine: MediaKit.ensureInitialized skipped (test env?): Exception: Cannot find libmpv-2.dll in your system %PATH%. One way to deal with this is to ship libmpv-2.dll with your compiled executable or script in the same directory.
+PlayerNotifier: Resolving track Test Track
+ENGINE: play called for track videoAAAAAA (startAt: 0:00:00.000000)
+13:39:06.169 [BASELINE] STATE PlaybackState.idle → PlaybackState.preparing gen=2 intended=PlaybackState.playing activityStopped=true
+MediaKitPlaybackEngine: [INIT] Creating YoutubePlayerController (persistent singleton)
+13:39:06.171 [BASELINE] ENGINE _load() BLOCKED: not eligible to play.
+13:39:06.171 [BASELINE] STATE PlaybackState.preparing → PlaybackState.paused gen=2 intended=PlaybackState.playing activityStopped=true
+13:39:06.177 [BASELINE] ENGINE resume() iframeMode=true activityStopped=false gen=2
+00:01 +18: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: late metadata does not fail playback and progress refreshes duration
+00:01 +18: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/media_sync_pause_test.dart: retry prepares while stopped and foreground resume dispatches current video
+
+--------------------------------------------------------------------------------
+media_kit: ERROR: MediaKit.ensureInitialized
+This indicates that one or more required dependencies could not be located.
+
+Refer to "Installation" section of the README for further details:
+GitHub  : https://github.com/media-kit/media-kit#installation
+pub.dev : https://pub.dev/packages/media_kit#installation
+
+TIP: Copy-paste required packages from the above link to your pubspec.yaml.
+
+If you recently added the packages, make sure to re-run the project ("hot-restart" & "hot-reload" is not sufficient for native plugins).
+--------------------------------------------------------------------------------
+
+MediaKitPlaybackEngine: MediaKit.ensureInitialized skipped (test env?): Exception: Cannot find libmpv-2.dll in your system %PATH%. One way to deal with this is to ship libmpv-2.dll with your compiled executable or script in the same directory.
+PlayerNotifier: Resolving track Test Track
+ENGINE: play called for track videoAAAAAA (startAt: 0:00:00.000000)
+13:39:06.212 [BASELINE] STATE PlaybackState.idle → PlaybackState.preparing gen=2 intended=PlaybackState.playing activityStopped=true
+MediaKitPlaybackEngine: [INIT] Creating YoutubePlayerController (persistent singleton)
+13:39:06.212 [BASELINE] ENGINE _load() BLOCKED: not eligible to play.
+13:39:06.212 [BASELINE] STATE PlaybackState.preparing → PlaybackState.paused gen=2 intended=PlaybackState.playing activityStopped=true
+PlayerNotifier: Resolving track Test Track
+13:39:06.213 [BASELINE] STATE PlaybackState.paused → PlaybackState.idle gen=3 intended=PlaybackState.paused activityStopped=true
+ENGINE: play called for track videoAAAAAA (startAt: 0:00:00.000000)
+13:39:06.214 [BASELINE] STATE PlaybackState.idle → PlaybackState.preparing gen=4 intended=PlaybackState.playing activityStopped=true
+13:39:06.214 [BASELINE] ENGINE _load() BLOCKED: not eligible to play.
+13:39:06.214 [BASELINE] STATE PlaybackState.preparing → PlaybackState.paused gen=4 intended=PlaybackState.playing activityStopped=true
+13:39:06.215 [BASELINE] ENGINE resume() iframeMode=true activityStopped=false gen=4
+00:01 +19: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: late metadata does not fail playback and progress refreshes duration
+00:01 +20: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: late metadata does not fail playback and progress refreshes duration
+00:01 +20: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: Source pause confirmed before destination starts
+13:39:06.230 [PipDebug][ENGINE] event=handoff_requested target=EngineOwner.background ownerBefore=EngineOwner.foreground inPip=false pipRequestPending=false activityStopped=true deferred=false gen=2 fg=playing bg=paused pos=0ms
+13:39:06.230 [PipDebug][ENGINE] Containment: Inactive engine EngineOwner.foreground emitted playing, pausing it.
+00:01 +20: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/media_sync_pause_test.dart: queue prepares while stopped and foreground resume dispatches current video
+
+--------------------------------------------------------------------------------
+media_kit: ERROR: MediaKit.ensureInitialized
+This indicates that one or more required dependencies could not be located.
+
+Refer to "Installation" section of the README for further details:
+GitHub  : https://github.com/media-kit/media-kit#installation
+pub.dev : https://pub.dev/packages/media_kit#installation
+
+TIP: Copy-paste required packages from the above link to your pubspec.yaml.
+
+If you recently added the packages, make sure to re-run the project ("hot-restart" & "hot-reload" is not sufficient for native plugins).
+--------------------------------------------------------------------------------
+
+MediaKitPlaybackEngine: MediaKit.ensureInitialized skipped (test env?): Exception: Cannot find libmpv-2.dll in your system %PATH%. One way to deal with this is to ship libmpv-2.dll with your compiled executable or script in the same directory.
+PlayerNotifier: Resolving track Test Track
+ENGINE: play called for track videoAAAAAA (startAt: 0:00:00.000000)
+13:39:06.235 [BASELINE] STATE PlaybackState.idle → PlaybackState.preparing gen=2 intended=PlaybackState.playing activityStopped=true
+MediaKitPlaybackEngine: [INIT] Creating YoutubePlayerController (persistent singleton)
+13:39:06.235 [BASELINE] ENGINE _load() BLOCKED: not eligible to play.
+13:39:06.235 [BASELINE] STATE PlaybackState.preparing → PlaybackState.paused gen=2 intended=PlaybackState.playing activityStopped=true
+PlayerNotifier: Resolving track Test Track
+13:39:06.237 [BASELINE] STATE PlaybackState.paused → PlaybackState.idle gen=3 intended=PlaybackState.paused activityStopped=true
+ENGINE: play called for track videoBBBBBB (startAt: 0:00:00.000000)
+13:39:06.237 [BASELINE] STATE PlaybackState.idle → PlaybackState.preparing gen=4 intended=PlaybackState.playing activityStopped=true
+13:39:06.237 [BASELINE] ENGINE _load() BLOCKED: not eligible to play.
+13:39:06.237 [BASELINE] STATE PlaybackState.preparing → PlaybackState.paused gen=4 intended=PlaybackState.playing activityStopped=true
+13:39:06.240 [BASELINE] ENGINE resume() iframeMode=true activityStopped=false gen=4
+00:01 +21: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: late metadata does not fail playback and progress refreshes duration
+00:01 +21: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: Source pause confirmed before destination starts
+13:39:06.257 [PipDebug][ENGINE] Handoff: play(startAt: 0:00:00.000000) on EngineOwner.background
+13:39:06.258 [PipDebug][ENGINE] Handoff complete
+00:01 +21: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/media_sync_pause_test.dart: restore prepares while stopped and foreground resume dispatches current video
+
+--------------------------------------------------------------------------------
+media_kit: ERROR: MediaKit.ensureInitialized
+This indicates that one or more required dependencies could not be located.
+
+Refer to "Installation" section of the README for further details:
+GitHub  : https://github.com/media-kit/media-kit#installation
+pub.dev : https://pub.dev/packages/media_kit#installation
+
+TIP: Copy-paste required packages from the above link to your pubspec.yaml.
+
+If you recently added the packages, make sure to re-run the project ("hot-restart" & "hot-reload" is not sufficient for native plugins).
+--------------------------------------------------------------------------------
+
+MediaKitPlaybackEngine: MediaKit.ensureInitialized skipped (test env?): Exception: Cannot find libmpv-2.dll in your system %PATH%. One way to deal with this is to ship libmpv-2.dll with your compiled executable or script in the same directory.
+PlayerNotifier: resume() blocked — restore in progress
+13:39:06.271 [BASELINE] STATE PlaybackState.idle → PlaybackState.preparing gen=1 intended=PlaybackState.paused activityStopped=true
+MediaKitPlaybackEngine: [INIT] Creating YoutubePlayerController (persistent singleton)
+13:39:06.272 [BASELINE] ENGINE _load() BLOCKED (prepare path): skipping spurious paused emit.
+13:39:06.273 [BASELINE] PREPARE cueVideo/Playlist gen=1 videoId=videoAAAAAA ss=5.0
+13:39:06.278 [BASELINE] BRIDGE gen=1 iframeState=PlayerState.cued engineState=PlaybackState.preparing intended=PlaybackState.paused activityStopped=true
+13:39:06.278 [BASELINE] STATE PlaybackState.preparing → PlaybackState.paused gen=1 intended=PlaybackState.paused activityStopped=true
+PlayerNotifier: restore complete — guard cleared (engine paused)
+13:39:06.280 [BASELINE] ENGINE resume() iframeMode=true activityStopped=false gen=1
+13:39:06.281 [BASELINE] DISPATCH playVideo gen=1 source=resume
+00:01 +22: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: late metadata does not fail playback and progress refreshes duration
+00:01 +22: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/media_sync_pause_test.dart: engine pause propagates through player and handler while bridge is pending; stale states cannot restore playing
+
+--------------------------------------------------------------------------------
+media_kit: ERROR: MediaKit.ensureInitialized
+This indicates that one or more required dependencies could not be located.
+
+Refer to "Installation" section of the README for further details:
+GitHub  : https://github.com/media-kit/media-kit#installation
+pub.dev : https://pub.dev/packages/media_kit#installation
+
+TIP: Copy-paste required packages from the above link to your pubspec.yaml.
+
+If you recently added the packages, make sure to re-run the project ("hot-restart" & "hot-reload" is not sufficient for native plugins).
+--------------------------------------------------------------------------------
+
+MediaKitPlaybackEngine: MediaKit.ensureInitialized skipped (test env?): Exception: Cannot find libmpv-2.dll in your system %PATH%. One way to deal with this is to ship libmpv-2.dll with your compiled executable or script in the same directory.
+ENGINE: play called for track videoAAAAAA (startAt: 0:00:00.000000)
+13:39:06.311 [BASELINE] STATE PlaybackState.idle → PlaybackState.preparing gen=1 intended=PlaybackState.playing activityStopped=false
+MediaKitPlaybackEngine: [INIT] Creating YoutubePlayerController (persistent singleton)
+00:01 +23: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: late metadata does not fail playback and progress refreshes duration
+00:01 +23: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/media_sync_pause_test.dart: engine pause propagates through player and handler while bridge is pending; stale states cannot restore playing
+13:39:06.312 [BASELINE] BRIDGE gen=1 iframeState=PlayerState.cued engineState=PlaybackState.preparing intended=PlaybackState.playing activityStopped=false
+13:39:06.312 [BASELINE] STATE PlaybackState.preparing → PlaybackState.paused gen=1 intended=PlaybackState.playing activityStopped=false
+13:39:06.312 [BASELINE] DISPATCH playVideo gen=1 source=cued
+00:01 +23: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/ios_media_commands_test.dart: WebKit state changes do not repeatedly activate the app audio session
+
+--------------------------------------------------------------------------------
+media_kit: ERROR: MediaKit.ensureInitialized
+This indicates that one or more required dependencies could not be located.
+
+Refer to "Installation" section of the README for further details:
+GitHub  : https://github.com/media-kit/media-kit#installation
+pub.dev : https://pub.dev/packages/media_kit#installation
+
+TIP: Copy-paste required packages from the above link to your pubspec.yaml.
+
+If you recently added the packages, make sure to re-run the project ("hot-restart" & "hot-reload" is not sufficient for native plugins).
+--------------------------------------------------------------------------------
+
+00:01 +23: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/media_sync_pause_test.dart: engine pause propagates through player and handler while bridge is pending; stale states cannot restore playing
+13:39:06.312 [BASELINE] BRIDGE gen=1 iframeState=PlayerState.playing engineState=PlaybackState.paused intended=PlaybackState.playing activityStopped=false
+13:39:06.312 [BASELINE] STATE PlaybackState.paused → PlaybackState.playing gen=1 intended=PlaybackState.playing activityStopped=false
+2026-10-05T13:39:06.316793 AUDIO_HANDLER publish playing=false position=0:00:00.000000
+00:01 +23: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: Containment: inactive engine emitting playing gets paused
+13:39:06.325 [PipDebug][ENGINE] event=handoff_requested target=EngineOwner.background ownerBefore=EngineOwner.foreground inPip=false pipRequestPending=false activityStopped=true deferred=false gen=2 fg=playing bg=paused pos=0ms
+13:39:06.325 [PipDebug][ENGINE] Containment: Inactive engine EngineOwner.foreground emitted playing, pausing it.
+13:39:06.325 [PipDebug][ENGINE] Handoff: play(startAt: 0:00:00.000000) on EngineOwner.background
+00:01 +23: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/media_sync_pause_test.dart: engine pause propagates through player and handler while bridge is pending; stale states cannot restore playing
+2026-10-05T13:39:06.318795 AUDIO_HANDLER publish playing=false position=0:00:00.000000
+2026-10-05T13:39:06.318795 AUDIO_HANDLER publish playing=true position=0:00:00.000000
+00:01 +23: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: Containment: inactive engine emitting playing gets paused
+13:39:06.326 [PipDebug][ENGINE] Handoff complete
+00:01 +23: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/media_sync_pause_test.dart: engine pause propagates through player and handler while bridge is pending; stale states cannot restore playing
+13:39:06.321 [BASELINE] ENGINE pause() caller=user failOnTimeout=false intendedWas=PlaybackState.playing gen=1
+00:01 +23: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/ios_media_commands_test.dart: WebKit state changes do not repeatedly activate the app audio session
+MediaKitPlaybackEngine: MediaKit.ensureInitialized skipped (test env?): Exception: Cannot find libmpv-2.dll in your system %PATH%. One way to deal with this is to ship libmpv-2.dll with your compiled executable or script in the same directory.
+00:01 +23: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/media_sync_pause_test.dart: engine pause propagates through player and handler while bridge is pending; stale states cannot restore playing
+13:39:06.322 [BASELINE] STATE PlaybackState.playing → PlaybackState.paused gen=1 intended=PlaybackState.paused activityStopped=false
+00:01 +23: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/ios_media_commands_test.dart: WebKit state changes do not repeatedly activate the app audio session
+2026-10-05T13:39:06.295649 AUDIO_HANDLER publish playing=true position=0:00:00.000000
+00:01 +23: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/media_sync_pause_test.dart: engine pause propagates through player and handler while bridge is pending; stale states cannot restore playing
+2026-10-05T13:39:06.324300 AUDIO_HANDLER publish playing=false position=0:00:00.000000
+13:39:06.326 [BASELINE] BRIDGE gen=1 iframeState=PlayerState.playing engineState=PlaybackState.paused intended=PlaybackState.paused activityStopped=false
+13:39:06.326 [BASELINE] BRIDGE SPURIOUS-PLAY: intendedState=paused. [BASELINE] forcing pauseVideo().
+13:39:06.326 [BASELINE] BRIDGE gen=1 iframeState=PlayerState.buffering engineState=PlaybackState.paused intended=PlaybackState.paused activityStopped=false
+13:39:06.326 [BASELINE] BRIDGE SPURIOUS-PLAY: intendedState=paused. [BASELINE] forcing pauseVideo().
+00:01 +24: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: late metadata does not fail playback and progress refreshes duration
+00:01 +25: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: late metadata does not fail playback and progress refreshes duration
+00:01 +26: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: late metadata does not fail playback and progress refreshes duration
+00:01 +26: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/ios_media_commands_test.dart: WebKit state changes do not repeatedly activate the app audio session
+2026-10-05T13:39:06.326317 AUDIO_HANDLER publish playing=false position=0:00:00.000000
+2026-10-05T13:39:06.327319 AUDIO_HANDLER publish playing=true position=0:00:00.000000
+2026-10-05T13:39:06.328317 AUDIO_HANDLER publish playing=false position=0:00:00.000000
+2026-10-05T13:39:06.329316 AUDIO_HANDLER publish playing=true position=0:00:00.000000
+[MediaControls] iOS remote command=play source=native
+13:39:06.337 [BASELINE] ENGINE resume() iframeMode=false activityStopped=false gen=0
+[MediaControls] iOS remote command=pause source=native
+13:39:06.340 [BASELINE] ENGINE pause() caller=user failOnTimeout=false intendedWas=PlaybackState.playing gen=0
+13:39:06.342 [BASELINE] STATE PlaybackState.idle → PlaybackState.paused gen=0 intended=PlaybackState.paused activityStopped=false
+00:01 +27: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: late metadata does not fail playback and progress refreshes duration
+00:01 +27: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/ios_media_commands_test.dart: iOS session activation retries failures and reactivates after pause
+
+--------------------------------------------------------------------------------
+media_kit: ERROR: MediaKit.ensureInitialized
+This indicates that one or more required dependencies could not be located.
+
+Refer to "Installation" section of the README for further details:
+GitHub  : https://github.com/media-kit/media-kit#installation
+pub.dev : https://pub.dev/packages/media_kit#installation
+
+TIP: Copy-paste required packages from the above link to your pubspec.yaml.
+
+If you recently added the packages, make sure to re-run the project ("hot-restart" & "hot-reload" is not sufficient for native plugins).
+--------------------------------------------------------------------------------
+
+MediaKitPlaybackEngine: MediaKit.ensureInitialized skipped (test env?): Exception: Cannot find libmpv-2.dll in your system %PATH%. One way to deal with this is to ship libmpv-2.dll with your compiled executable or script in the same directory.
+2026-10-05T13:39:06.371658 AUDIO_HANDLER publish playing=true position=0:00:00.000000
+[MediaControls] iOS audio activation failed: PlatformException(interrupted, null, null, null)
+2026-10-05T13:39:06.375163 AUDIO_HANDLER publish playing=true position=0:00:00.000000
+2026-10-05T13:39:06.376167 AUDIO_HANDLER publish playing=true position=0:00:00.000000
+2026-10-05T13:39:06.377167 AUDIO_HANDLER publish playing=false position=0:00:00.000000
+2026-10-05T13:39:06.377167 AUDIO_HANDLER publish playing=true position=0:00:00.000000
+00:01 +28: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: late metadata does not fail playback and progress refreshes duration
+00:01 +28: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: Containment: inactive engine emitting playing gets paused
+13:39:06.383 [PipDebug][ENGINE] Containment: Inactive engine EngineOwner.foreground emitted playing, pausing it.
+00:01 +28: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/ios_media_commands_test.dart: system pause sets paused intent and late renderer events cannot replay
+
+--------------------------------------------------------------------------------
+media_kit: ERROR: MediaKit.ensureInitialized
+This indicates that one or more required dependencies could not be located.
+
+Refer to "Installation" section of the README for further details:
+GitHub  : https://github.com/media-kit/media-kit#installation
+pub.dev : https://pub.dev/packages/media_kit#installation
+
+TIP: Copy-paste required packages from the above link to your pubspec.yaml.
+
+If you recently added the packages, make sure to re-run the project ("hot-restart" & "hot-reload" is not sufficient for native plugins).
+--------------------------------------------------------------------------------
+
+MediaKitPlaybackEngine: MediaKit.ensureInitialized skipped (test env?): Exception: Cannot find libmpv-2.dll in your system %PATH%. One way to deal with this is to ship libmpv-2.dll with your compiled executable or script in the same directory.
+2026-10-05T13:39:06.398782 AUDIO_HANDLER publish playing=true position=0:00:12.000000
+ENGINE: play called for track system-pause-video (startAt: 0:00:00.000000)
+13:39:06.400 [BASELINE] STATE PlaybackState.idle → PlaybackState.preparing gen=1 intended=PlaybackState.playing activityStopped=false
+MediaKitPlaybackEngine: [INIT] Creating YoutubePlayerController (persistent singleton)
+13:39:06.404 [BASELINE] BRIDGE gen=1 iframeState=PlayerState.cued engineState=PlaybackState.preparing intended=PlaybackState.playing activityStopped=false
+13:39:06.404 [BASELINE] STATE PlaybackState.preparing → PlaybackState.paused gen=1 intended=PlaybackState.playing activityStopped=false
+13:39:06.404 [BASELINE] DISPATCH playVideo gen=1 source=cued
+13:39:06.404 [BASELINE] BRIDGE gen=1 iframeState=PlayerState.playing engineState=PlaybackState.paused intended=PlaybackState.playing activityStopped=false
+13:39:06.405 [BASELINE] STATE PlaybackState.paused → PlaybackState.playing gen=1 intended=PlaybackState.playing activityStopped=false
+[MediaControls] iOS remote command=pause source=webKit
+13:39:06.406 [BASELINE] ENGINE pause() caller=user failOnTimeout=false intendedWas=PlaybackState.playing gen=1
+13:39:06.406 [BASELINE] STATE PlaybackState.playing → PlaybackState.paused gen=1 intended=PlaybackState.paused activityStopped=false
+13:39:06.406 [BASELINE] BRIDGE gen=1 iframeState=PlayerState.paused engineState=PlaybackState.paused intended=PlaybackState.paused activityStopped=false
+13:39:06.406 [BASELINE] BRIDGE gen=1 iframeState=PlayerState.playing engineState=PlaybackState.paused intended=PlaybackState.paused activityStopped=false
+13:39:06.406 [BASELINE] BRIDGE SPURIOUS-PLAY: intendedState=paused. [BASELINE] forcing pauseVideo().
+13:39:06.407 [BASELINE] BRIDGE gen=1 iframeState=PlayerState.paused engineState=PlaybackState.paused intended=PlaybackState.paused activityStopped=false
+2026-10-05T13:39:06.407330 AUDIO_HANDLER publish playing=false position=0:00:12.000000
+[MediaControls] iOS remote command=play source=native
+13:39:06.408 [BASELINE] ENGINE resume() iframeMode=true activityStopped=false gen=1
+13:39:06.408 [BASELINE] DISPATCH playVideo gen=1 source=resume
+[MediaControls] iOS remote command=togglePlayPause source=native
+13:39:06.408 [BASELINE] ENGINE pause() caller=user failOnTimeout=false intendedWas=PlaybackState.playing gen=1
+[MediaControls] iOS remote command=next source=native
+[MediaControls] iOS remote command=previous source=native
+[MediaControls] iOS remote command=seek source=native
+00:01 +29: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: late metadata does not fail playback and progress refreshes duration
+00:01 +30: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: late metadata does not fail playback and progress refreshes duration
+00:01 +30: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: Track ended event deduplicated across source and destination
+13:39:06.449 [PipDebug][ENGINE] event=handoff_requested target=EngineOwner.background ownerBefore=EngineOwner.foreground inPip=false pipRequestPending=false activityStopped=true deferred=false gen=2 fg=playing bg=paused pos=0ms
+13:39:06.449 [PipDebug][ENGINE] Containment: Inactive engine EngineOwner.foreground emitted playing, pausing it.
+13:39:06.450 [PipDebug][ENGINE] Handoff: play(startAt: 0:00:00.000000) on EngineOwner.background
+13:39:06.450 [PipDebug][ENGINE] Completion during transfer — advancing generation and passing through.
+13:39:06.451 [PipDebug][ENGINE] Track completed: vid1 (gen: 1)
+00:01 +31: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: late metadata does not fail playback and progress refreshes duration
+00:01 +31: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: PiP request pending → activity restarts before confirmation → pending clears, owner stays foreground, late PiP callback is a no-op
+13:39:06.570 [PipDebug][ENGINE] PiP confirmed active; owner already foreground. gen=1
+00:01 +32: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart: late metadata does not fail playback and progress refreshes duration
+00:01 +32: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: 15. enterPip returns true, PiP callback never arrives → watchdog clears isPipRequestPending → stopped activity can hand off to background
+13:39:06.698 [PipDebug][ENGINE] Background handoff deferred: pipRequestPending=true inPip=false owner=EngineOwner.foreground gen=1
+00:01 +33: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: 15. enterPip returns true, PiP callback never arrives → watchdog clears isPipRequestPending → stopped activity can hand off to background
+00:01 +34: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: 15. enterPip returns true, PiP callback never arrives → watchdog clears isPipRequestPending → stopped activity can hand off to background
+00:01 +35: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: 15. enterPip returns true, PiP callback never arrives → watchdog clears isPipRequestPending → stopped activity can hand off to background
+00:01 +36: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: 15. enterPip returns true, PiP callback never arrives → watchdog clears isPipRequestPending → stopped activity can hand off to background
+13:39:06.757 [PipDebug][HANDLER] event=enterPip_watchdog_timeout activityStopped=true
+00:01 +37: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: 15. enterPip returns true, PiP callback never arrives → watchdog clears isPipRequestPending → stopped activity can hand off to background
+13:39:06.758 [PipDebug][HANDLER] event=notifyPipEntryFailed activityStopped=true
+13:39:06.764 [PipDebug][ENGINE] PiP entry failed. activityStopped=true
+00:01 +38: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: 15. enterPip returns true, PiP callback never arrives → watchdog clears isPipRequestPending → stopped activity can hand off to background
+13:39:06.769 [PipDebug][ENGINE] event=handoff_requested target=EngineOwner.background ownerBefore=EngineOwner.foreground inPip=false pipRequestPending=false activityStopped=true deferred=false gen=2 fg=playing bg=paused pos=0ms
+13:39:06.770 [PipDebug][ENGINE] Handoff: play(startAt: 0:00:00.000000) on EngineOwner.background
+13:39:06.771 [PipDebug][ENGINE] Handoff complete
+00:01 +39: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: 15. enterPip returns true, PiP callback never arrives → watchdog clears isPipRequestPending → stopped activity can hand off to background
+00:01 +40: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: 15. enterPip returns true, PiP callback never arrives → watchdog clears isPipRequestPending → stopped activity can hand off to background
+00:01 +41: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: 16. Watchdog expires, then late onPipModeChanged(true) arrives → PiP state becomes authoritative → safety-net restores foreground ownership
+13:39:06.835 [PipDebug][ENGINE] Background handoff deferred: pipRequestPending=true inPip=false owner=EngineOwner.foreground gen=1
+13:39:06.894 [PipDebug][HANDLER] event=enterPip_watchdog_timeout activityStopped=true
+13:39:06.895 [PipDebug][HANDLER] event=notifyPipEntryFailed activityStopped=true
+13:39:06.895 [PipDebug][ENGINE] PiP entry failed. activityStopped=true
+13:39:06.895 [PipDebug][ENGINE] event=handoff_requested target=EngineOwner.background ownerBefore=EngineOwner.foreground inPip=false pipRequestPending=false activityStopped=true deferred=false gen=2 fg=playing bg=paused pos=0ms
+13:39:06.895 [PipDebug][ENGINE] Handoff: play(startAt: 0:00:00.000000) on EngineOwner.background
+13:39:06.895 [PipDebug][ENGINE] Handoff complete
+13:39:06.956 [PipDebug][ENGINE] SAFETY NET: PiP confirmed active but owner=EngineOwner.background; recovering to foreground. gen=2
+13:39:06.956 [PipDebug][ENGINE] event=handoff_requested target=EngineOwner.foreground ownerBefore=EngineOwner.background inPip=true pipRequestPending=false activityStopped=true deferred=false gen=3 fg=paused bg=playing pos=0ms
+13:39:06.956 [PipDebug][ENGINE] Handoff: play(startAt: 0:00:00.000000) on EngineOwner.foreground
+13:39:06.956 [PipDebug][ENGINE] Handoff complete
+13:39:07.019 [PipDebug][ENGINE] PiP exited while activity stopped; initiating background handoff. gen=3
+13:39:07.019 [PipDebug][ENGINE] event=handoff_requested target=EngineOwner.background ownerBefore=EngineOwner.foreground inPip=false pipRequestPending=false activityStopped=true deferred=false gen=4 fg=playing bg=paused pos=0ms
+13:39:07.020 [PipDebug][ENGINE] Handoff: play(startAt: 0:00:00.000000) on EngineOwner.background
+13:39:07.020 [PipDebug][ENGINE] Handoff complete
+00:02 +42: C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/hybrid_playback_engine_test.dart: 17. setSpeed propagates to both underlying engines
+00:02 +43: All tests passed!

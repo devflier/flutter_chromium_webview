@@ -14,6 +14,26 @@ void main() {
     messenger.setMockMethodCallHandler(channel, null);
     ChromiumWebViewController.resetTestingState();
   });
+  test(
+    'platform-view browser creation is idempotent without texture IDs',
+    () async {
+      var created = 0;
+      messenger.setMockMethodCallHandler(channel, (call) async {
+        if (call.method == 'createBrowser') {
+          created++;
+          return {'browserId': 9, 'textureId': -1, 'popupTextureId': -1};
+        }
+        return null;
+      });
+      final controller = ChromiumWebViewController();
+      await controller.createBrowser();
+      await controller.createBrowser();
+      expect(created, 1);
+      expect(controller.browserId, 9);
+      expect(controller.textureId, isNull);
+      await controller.dispose();
+    },
+  );
 
   test(
     'concurrent creation and disposal wait for native close exactly once',

@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+if [[ -n "${WSL_DISTRO_NAME:-}" && "$root" =~ ^/mnt/[a-z]/ ]]; then
+  echo 'Run WSL validation from a Linux-filesystem checkout to keep Windows and Linux Flutter metadata separate.' >&2
+  exit 1
+fi
 cd "$root/packages/flutter_chromium_webview"
 flutter pub get
 flutter analyze

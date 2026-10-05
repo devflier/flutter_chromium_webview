@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/linux"
+    "cmake.sourceDirectory": "C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/linux",
+    "java.compile.nullAnalysis.mode": "automatic"
 }

@@ -1,0 +1,807 @@
+00:00 +0: loading C:/Users/User/Projects/ppplayer_chromium_preview/integration_test/chromium_playback_test.dart
+Building Windows application...                                    42.5s
+√ Built build\windows\x64\runner\Debug\ppplayer.exe
+00:00 +0: native Chromium facade controls and local fallback
+media_kit: NativeReferenceHolder: Allocated 2899126900704
+ENGINE: play called for track local-fixture (startAt: 0:00:00.000000)
+11:44:54.271 [BASELINE] STATE PlaybackState.idle → PlaybackState.preparing gen=3 intended=PlaybackState.playing activityStopped=false
+MPV_LOG: error - media_kit: error: property not found _setProperty(osc, 1)
+MPV_LOG: v - cplayer: Set property: vo="libmpv" -> 1
+MPV_LOG: v - cplayer: Set property: hwdec="auto" -> 1
+MPV_LOG: v - cplayer: Set property: vid="auto" -> 1
+MPV_LOG: debug - cplayer: Setting option 'video-sync' = "audio" (flags = 0) -> 0
+MPV_LOG: debug - cplayer: Setting option 'video-timing-offset' = "0" (flags = 0) -> 0
+MPV_LOG: v - libmpv_render: GL_VERSION='OpenGL ES 3.0 (ANGLE 2.1.27744 git hash: 591ee1999d95)'
+MPV_LOG: v - libmpv_render: Detected GLES 3.0.
+MPV_LOG: v - libmpv_render: GL_VENDOR='Google Inc. (NVIDIA)'
+MPV_LOG: v - libmpv_render: GL_RENDERER='ANGLE (NVIDIA, NVIDIA GeForce RTX 3050 Laptop GPU (0x000025E2) Direct3D11 vs_5_0 ps_5_0, D3D11-32.0.16.1060)'
+MPV_LOG: v - libmpv_render: GL_SHADING_LANGUAGE_VERSION='OpenGL ES GLSL ES 3.00 (ANGLE 2.1.27744 git hash: 591ee1999d95)'
+MPV_LOG: debug - libmpv_render: Combined OpenGL extensions string:
+MPV_LOG: debug - libmpv_render: GL_AMD_performance_monitor GL_ANGLE_base_vertex_base_instance_shader_builtin GL_ANGLE_blob_cache GL_ANGLE_client_arrays GL_ANGLE_clip_cull_distance GL_ANGLE_copy_texture_3d GL_ANGLE_depth_texture GL_ANGLE_framebuffer_blit GL_ANGLE_framebuffer_multisample GL_ANGLE_get_serialized_context_string GL_ANGLE_get_tex_level_parameter GL_ANGLE_instanced_arrays GL_ANGLE_lossy_etc_decode GL_ANGLE_memory_size GL_ANGLE_multiview_multisample GL_ANGLE_pack_reverse_row_order GL_ANGLE_polygon_mode GL_ANGLE_program_binary_readiness_query GL_ANGLE_program_cache_control GL_ANGLE_provoking_vertex GL_ANGLE_renderability_validation GL_ANGLE_request_extension GL_ANGLE_robust_client_memory GL_ANGLE_shader_pixel_local_storage GL_ANGLE_shader_pixel_local_storage_coherent GL_ANGLE_stencil_texturing GL_ANGLE_texture_compression_dxt3 GL_ANGLE_texture_compression_dxt5 GL_ANGLE_texture_multisample GL_ANGLE_texture_usage GL_ANGLE_translated_shader_source GL_APPLE_clip_distance GL_ARM_rgba8 GL_CHROMIUM_bind_generates_resource GL_CHROMIUM_bind_uniform_location GL_CHROMIUM_copy_compressed_texture GL_CHROMIUM_copy_texture GL_CHROMIUM_lose_context GL_EXT_EGL_image_external_wrap_modes GL_EXT_base_instance GL_EXT_blend_func_extended GL_EXT_blend_minmax GL_EXT_clip_control GL_EXT_clip_cull_distance GL_EXT_color_buffer_float GL_EXT_color_buffer_half_float GL_EXT_conservative_depth GL_EXT_debug_label GL_EXT_debug_marker GL_EXT_depth_clamp GL_EXT_discard_framebuffer GL_EXT_disjoint_timer_query GL_EXT_draw_buffers GL_EXT_draw_buffers_indexed GL_EXT_draw_elements_base_vertex GL_EXT_float_blend GL_EXT_frag_depth GL_EXT_instanced_arrays GL_EXT_map_buffer_range GL_EXT_occlusion_query_boolean GL_EXT_polygon_offset_clamp GL_EXT_read_format_bgra GL_EXT_render_snorm GL_EXT_robustness GL_EXT_sRGB GL_EXT_shader_texture_lod GL_EXT_texture_border_clamp GL_EXT_texture_compression_bptc GL_EXT_texture_compression_dxt1 GL_EXT_texture_compression_rgtc GL_EXT_texture_compression_s3tc_srgb GL_EXT_texture_filter_anisotropic GL_EXT_texture_format_BGRA8888 GL_EXT_texture_mirror_clamp_to_edge GL_EXT_texture_norm16 GL_EXT_texture_rg GL_EXT_texture_storage GL_EXT_texture_type_2_10_10_10_REV GL_EXT_unpack_subimage GL_KHR_debug GL_KHR_parallel_shader_compile GL_KHR_robustness GL_NV_EGL_stream_consumer_external GL_NV_fence GL_NV_framebuffer_blit GL_NV_pack_subimage GL_NV_pixel_buffer_object GL_NV_shader_noperspective_interpolation GL_OES_EGL_image GL_OES_EGL_image_external GL_OES_EGL_image_external_essl3 GL_OES_compressed_EAC_R11_signed_texture GL_OES_compressed_EAC_R11_unsigned_texture GL_OES_compressed_EAC_RG11_signed_texture GL_OES_compressed_EAC_RG11_unsigned_texture GL_OES_compressed_ETC2_RGB8_texture GL_OES_compressed_ETC2_RGBA8_texture GL_OES_compressed_ETC2_punchthroughA_RGBA8_texture GL_OES_compressed_ETC2_punchthroughA_sRGB8_alpha_texture GL_OES_compressed_ETC2_sRGB8_alpha8_texture GL_OES_compressed_ETC2_sRGB8_texture GL_OES_depth24 GL_OES_depth32 GL_OES_draw_buffers_indexed GL_OES_draw_elements_base_vertex GL_OES_element_index_uint GL_OES_fbo_render_mipmap GL_OES_get_program_binary GL_OES_mapbuffer GL_OES_packed_depth_stencil GL_OES_required_internalformat GL_OES_rgb8_rgba8 GL_OES_sample_variables GL_OES_shader_multisample_interpolation GL_OES_standard_derivatives GL_OES_surfaceless_context GL_OES_texture_border_clamp GL_OES_texture_float GL_OES_texture_float_linear GL_OES_texture_half_float GL_OES_texture_half_float_linear GL_OES_texture_npot GL_OES_texture_stencil8 GL_OES_texture_storage_multisample_2d_array GL_OES_vertex_array_object GL_OVR_multiview GL_OVR_multiview2 GL_WEBGL_video_texture
+MPV_LOG: v - libmpv_render: Loaded extension GL_EXT_texture_norm16.
+MPV_LOG: v - libmpv_render: Loaded extension GL_EXT_color_buffer_half_float.
+MPV_LOG: v - libmpv_render: Loaded extension GL_EXT_disjoint_timer_query.
+MPV_LOG: v - libmpv_render: Loaded extension GL_KHR_debug.
+MPV_LOG: v - libmpv_render: Loaded extension GL_ANGLE_translated_shader_source.
+MPV_LOG: v - libmpv_render: GL_*_swap_control extension missing.
+MPV_LOG: debug - libmpv_render: Texture formats:
+MPV_LOG: debug - libmpv_render: NAME       COMP*TYPE SIZE           DEPTH PER COMP.
+MPV_LOG: debug - libmpv_render: r8         1*unorm   1B    LF CR ST {8}
+MPV_LOG: debug - libmpv_render: rg8        2*unorm   2B    LF CR ST {8 8}
+MPV_LOG: debug - libmpv_render: rgb8       3*unorm   3B    LF CR ST {8 8 8}
+MPV_LOG: debug - libmpv_render: rgba8      4*unorm   4B    LF CR ST {8 8 8 8}
+MPV_LOG: debug - libmpv_render: r16        1*unorm   2B    LF CR ST {16}
+MPV_LOG: debug - libmpv_render: rg16       2*unorm   4B    LF CR ST {16 16}
+MPV_LOG: debug - libmpv_render: rgba16     4*unorm   8B    LF CR ST {16 16 16 16}
+MPV_LOG: debug - libmpv_render: rgb16      3*unorm   6B    LF    ST {16 16 16}
+MPV_LOG: debug - libmpv_render: l          1*unorm   1B    LF CR ST {8}
+MPV_LOG: debug - libmpv_render: la         2*unorm   2B LA LF CR ST {8 8}
+MPV_LOG: debug - libmpv_render: r8ui       1*uint    1B       CR ST {8}
+MPV_LOG: debug - libmpv_render: rg8ui      2*uint    2B       CR ST {8 8}
+MPV_LOG: debug - libmpv_render: rgb8ui     3*uint    3B          ST {8 8 8}
+MPV_LOG: debug - libmpv_render: rgba8ui    4*uint    4B       CR ST {8 8 8 8}
+MPV_LOG: debug - libmpv_render: r16ui      1*uint    2B       CR ST {16}
+MPV_LOG: debug - libmpv_render: rg16ui     2*uint    4B       CR ST {16 16}
+MPV_LOG: debug - libmpv_render: rgb16ui    3*uint    6B          ST {16 16 16}
+MPV_LOG: debug - libmpv_render: rgba16ui   4*uint    8B       CR ST {16 16 16 16}
+MPV_LOG: debug - libmpv_render: r16f       1*float   4B    LF CR ST {32/16}
+MPV_LOG: debug - libmpv_render: rg16f      2*float   8B    LF CR ST {32/16 32/16}
+MPV_LOG: debug - libmpv_render: rgb16f     3*float  12B    LF    ST {32/16 32/16 32/16}
+MPV_LOG: debug - libmpv_render: rgba16f    4*float  16B    LF CR ST {32/16 32/16 32/16 32/16}
+MPV_LOG: debug - libmpv_render: r16f       1*float   4B    LF    ST {32/16}
+MPV_LOG: debug - libmpv_render: rg16f      2*float   8B    LF    ST {32/16 32/16}
+MPV_LOG: debug - libmpv_render: rgb16f     3*float  12B    LF    ST {32/16 32/16 32/16}
+MPV_LOG: debug - libmpv_render: rgba16f    4*float  16B    LF    ST {32/16 32/16 32/16 32/16}
+MPV_LOG: debug - libmpv_render: rgb10_a2   4*unorm   4B    LF CR ST {0 0 0 0}
+MPV_LOG: debug - libmpv_render: LA = LUMINANCE_ALPHA hack format
+MPV_LOG: debug - libmpv_render: LF = linear filterable
+MPV_LOG: debug - libmpv_render: CR = can be used for render targets
+MPV_LOG: debug - libmpv_render: ST = can be used for storable images
+MPV_LOG: debug - libmpv_render: Image formats:
+MPV_LOG: debug - libmpv_render: yuv444p => 3 planes 1x1 8/0 [r8/r8/r8] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: yuv420p => 3 planes 2x2 8/0 [r8/r8/r8] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: gray => 1 planes 1x1 8/0 [r8] (r) [unorm]
+MPV_LOG: debug - libmpv_render: gray16 => 1 planes 1x1 16/0 [r16] (r) [unorm]
+MPV_LOG: debug - libmpv_render: uyvy422
+MPV_LOG: debug - libmpv_render: nv12 => 2 planes 2x2 8/0 [r8/rg8] (r/gb) [unorm]
+MPV_LOG: debug - libmpv_render: p010 => 2 planes 2x2 16/6 [r16/rg16] (r/gb) [unorm]
+MPV_LOG: debug - libmpv_render: argb => 1 planes 1x1 8/0 [rgba8] (argb) [unorm]
+MPV_LOG: debug - libmpv_render: bgra => 1 planes 1x1 8/0 [rgba8] (bgra) [unorm]
+MPV_LOG: debug - libmpv_render: abgr => 1 planes 1x1 8/0 [rgba8] (abgr) [unorm]
+MPV_LOG: debug - libmpv_render: rgba => 1 planes 1x1 8/0 [rgba8] (rgba) [unorm]
+MPV_LOG: debug - libmpv_render: bgr24 => 1 planes 1x1 8/0 [rgb8] (bgr) [unorm]
+MPV_LOG: debug - libmpv_render: rgb24 => 1 planes 1x1 8/0 [rgb8] (rgb) [unorm]
+MPV_LOG: debug - libmpv_render: 0rgb => 1 planes 1x1 8/0 [rgba8] (_rgb) [unorm]
+MPV_LOG: debug - libmpv_render: bgr0 => 1 planes 1x1 8/0 [rgba8] (bgr) [unorm]
+MPV_LOG: debug - libmpv_render: 0bgr => 1 planes 1x1 8/0 [rgba8] (_bgr) [unorm]
+MPV_LOG: debug - libmpv_render: rgb0 => 1 planes 1x1 8/0 [rgba8] (rgb) [unorm]
+MPV_LOG: debug - libmpv_render: rgba64 => 1 planes 1x1 16/0 [rgba16] (rgba) [unorm]
+MPV_LOG: debug - libmpv_render: rgb565
+MPV_LOG: debug - libmpv_render: pal8
+MPV_LOG: debug - libmpv_render: vdpau
+MPV_LOG: debug - libmpv_render: d3d11
+MPV_LOG: debug - libmpv_render: dxva2_vld
+MPV_LOG: debug - libmpv_render: mmal
+MPV_LOG: debug - libmpv_render: mediacodec
+MPV_LOG: debug - libmpv_render: cuda
+MPV_LOG: debug - libmpv_render: yap8 => 2 planes 1x1 8/0 [r8/r8] (r/a) [unorm]
+MPV_LOG: debug - libmpv_render: yap16 => 2 planes 1x1 16/0 [r16/r16] (r/a) [unorm]
+MPV_LOG: debug - libmpv_render: grayaf32 => 2 planes 1x1 32/0 [r16f/r16f] (r/a) [float]
+MPV_LOG: debug - libmpv_render: yuv444pf => 3 planes 1x1 32/0 [r16f/r16f/r16f] (r/g/b) [float]
+MPV_LOG: debug - libmpv_render: yuva444pf => 4 planes 1x1 32/0 [r16f/r16f/r16f/r16f] (r/g/b/a) [float]
+MPV_LOG: debug - libmpv_render: yuv420pf => 3 planes 2x2 32/0 [r16f/r16f/r16f] (r/g/b) [float]
+MPV_LOG: debug - libmpv_render: yuva420pf => 4 planes 2x2 32/0 [r16f/r16f/r16f/r16f] (r/g/b/a) [float]
+MPV_LOG: debug - libmpv_render: yuv422pf => 3 planes 2x1 32/0 [r16f/r16f/r16f] (r/g/b) [float]
+MPV_LOG: debug - libmpv_render: yuva422pf => 4 planes 2x1 32/0 [r16f/r16f/r16f/r16f] (r/g/b/a) [float]
+MPV_LOG: debug - libmpv_render: yuv440pf => 3 planes 1x2 32/0 [r16f/r16f/r16f] (r/g/b) [float]
+MPV_LOG: debug - libmpv_render: yuva440pf => 4 planes 1x2 32/0 [r16f/r16f/r16f/r16f] (r/g/b/a) [float]
+MPV_LOG: debug - libmpv_render: yuv410pf => 3 planes 4x4 32/0 [r16f/r16f/r16f] (r/g/b) [float]
+MPV_LOG: debug - libmpv_render: yuva410pf => 4 planes 4x4 32/0 [r16f/r16f/r16f/r16f] (r/g/b/a) [float]
+MPV_LOG: debug - libmpv_render: yuv411pf => 3 planes 4x1 32/0 [r16f/r16f/r16f] (r/g/b) [float]
+MPV_LOG: debug - libmpv_render: yuva411pf => 4 planes 4x1 32/0 [r16f/r16f/r16f/r16f] (r/g/b/a) [float]
+MPV_LOG: debug - libmpv_render: rgb30 => 1 planes 1x1 10/0 [rgb10_a2] (bgr) [unknown]
+MPV_LOG: debug - libmpv_render: y1 => 1 planes 1x1 8/-7 [r8] (r) [unorm]
+MPV_LOG: debug - libmpv_render: gbrp1 => 3 planes 1x1 8/-7 [r8/r8/r8] (g/b/r) [unorm]
+MPV_LOG: debug - libmpv_render: gbrp2 => 3 planes 1x1 8/-6 [r8/r8/r8] (g/b/r) [unorm]
+MPV_LOG: debug - libmpv_render: gbrp3 => 3 planes 1x1 8/-5 [r8/r8/r8] (g/b/r) [unorm]
+MPV_LOG: debug - libmpv_render: gbrp4 => 3 planes 1x1 8/-4 [r8/r8/r8] (g/b/r) [unorm]
+MPV_LOG: debug - libmpv_render: gbrp5 => 3 planes 1x1 8/-3 [r8/r8/r8] (g/b/r) [unorm]
+MPV_LOG: debug - libmpv_render: gbrp6 => 3 planes 1x1 8/-2 [r8/r8/r8] (g/b/r) [unorm]
+MPV_LOG: debug - libmpv_render: vdpau_output
+MPV_LOG: debug - libmpv_render: vaapi
+MPV_LOG: debug - libmpv_render: videotoolbox
+MPV_LOG: debug - libmpv_render: drm_prime
+MPV_LOG: debug - libmpv_render: yuyv422
+MPV_LOG: debug - libmpv_render: yuv422p => 3 planes 2x1 8/0 [r8/r8/r8] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: yuv410p => 3 planes 4x4 8/0 [r8/r8/r8] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: yuv411p => 3 planes 4x1 8/0 [r8/r8/r8] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: monow
+MPV_LOG: debug - libmpv_render: monob
+MPV_LOG: debug - libmpv_render: yuvj422p => 3 planes 2x1 8/0 [r8/r8/r8] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: uyyvyy411
+MPV_LOG: debug - libmpv_render: bgr8
+MPV_LOG: debug - libmpv_render: bgr4
+MPV_LOG: debug - libmpv_render: bgr4_byte
+MPV_LOG: debug - libmpv_render: rgb8
+MPV_LOG: debug - libmpv_render: rgb4
+MPV_LOG: debug - libmpv_render: rgb4_byte
+MPV_LOG: debug - libmpv_render: nv21 => 2 planes 2x2 8/0 [r8/rg8] (r/bg) [unorm]
+MPV_LOG: debug - libmpv_render: gray16be
+MPV_LOG: debug - libmpv_render: yuv440p => 3 planes 1x2 8/0 [r8/r8/r8] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: yuvj440p => 3 planes 1x2 8/0 [r8/r8/r8] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: yuva420p => 4 planes 2x2 8/0 [r8/r8/r8/r8] (r/g/b/a) [unorm]
+MPV_LOG: debug - libmpv_render: rgb48be
+MPV_LOG: debug - libmpv_render: rgb48 => 1 planes 1x1 16/0 [rgb16] (rgb) [unorm]
+MPV_LOG: debug - libmpv_render: rgb565be
+MPV_LOG: debug - libmpv_render: rgb555be
+MPV_LOG: debug - libmpv_render: rgb555
+MPV_LOG: debug - libmpv_render: bgr565be
+MPV_LOG: debug - libmpv_render: bgr565
+MPV_LOG: debug - libmpv_render: bgr555be
+MPV_LOG: debug - libmpv_render: bgr555
+MPV_LOG: debug - libmpv_render: yuv420p16 => 3 planes 2x2 16/0 [r16/r16/r16] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: yuv420p16be
+MPV_LOG: debug - libmpv_render: yuv422p16 => 3 planes 2x1 16/0 [r16/r16/r16] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: yuv422p16be
+MPV_LOG: debug - libmpv_render: yuv444p16 => 3 planes 1x1 16/0 [r16/r16/r16] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: yuv444p16be
+MPV_LOG: debug - libmpv_render: rgb444
+MPV_LOG: debug - libmpv_render: rgb444be
+MPV_LOG: debug - libmpv_render: bgr444
+MPV_LOG: debug - libmpv_render: bgr444be
+MPV_LOG: debug - libmpv_render: ya8 => 1 planes 1x1 8/0 [rg8] (ra) [unorm]
+MPV_LOG: debug - libmpv_render: bgr48be
+MPV_LOG: debug - libmpv_render: bgr48 => 1 planes 1x1 16/0 [rgb16] (bgr) [unorm]
+MPV_LOG: debug - libmpv_render: yuv420p9be
+MPV_LOG: debug - libmpv_render: yuv420p9 => 3 planes 2x2 16/-7 [r16/r16/r16] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: yuv420p10be
+MPV_LOG: debug - libmpv_render: yuv420p10 => 3 planes 2x2 16/-6 [r16/r16/r16] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: yuv422p10be
+MPV_LOG: debug - libmpv_render: yuv422p10 => 3 planes 2x1 16/-6 [r16/r16/r16] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: yuv444p9be
+MPV_LOG: debug - libmpv_render: yuv444p9 => 3 planes 1x1 16/-7 [r16/r16/r16] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: yuv444p10be
+MPV_LOG: debug - libmpv_render: yuv444p10 => 3 planes 1x1 16/-6 [r16/r16/r16] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: yuv422p9be
+MPV_LOG: debug - libmpv_render: yuv422p9 => 3 planes 2x1 16/-7 [r16/r16/r16] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: gbrp => 3 planes 1x1 8/0 [r8/r8/r8] (g/b/r) [unorm]
+MPV_LOG: debug - libmpv_render: gbrp9be
+MPV_LOG: debug - libmpv_render: gbrp9 => 3 planes 1x1 16/-7 [r16/r16/r16] (g/b/r) [unorm]
+MPV_LOG: debug - libmpv_render: gbrp10be
+MPV_LOG: debug - libmpv_render: gbrp10 => 3 planes 1x1 16/-6 [r16/r16/r16] (g/b/r) [unorm]
+MPV_LOG: debug - libmpv_render: gbrp16be
+MPV_LOG: debug - libmpv_render: gbrp16 => 3 planes 1x1 16/0 [r16/r16/r16] (g/b/r) [unorm]
+MPV_LOG: debug - libmpv_render: yuva422p => 4 planes 2x1 8/0 [r8/r8/r8/r8] (r/g/b/a) [unorm]
+MPV_LOG: debug - libmpv_render: yuva444p => 4 planes 1x1 8/0 [r8/r8/r8/r8] (r/g/b/a) [unorm]
+MPV_LOG: debug - libmpv_render: yuva420p9be
+MPV_LOG: debug - libmpv_render: yuva420p9 => 4 planes 2x2 16/-7 [r16/r16/r16/r16] (r/g/b/a) [unorm]
+MPV_LOG: debug - libmpv_render: yuva422p9be
+MPV_LOG: debug - libmpv_render: yuva422p9 => 4 planes 2x1 16/-7 [r16/r16/r16/r16] (r/g/b/a) [unorm]
+MPV_LOG: debug - libmpv_render: yuva444p9be
+MPV_LOG: debug - libmpv_render: yuva444p9 => 4 planes 1x1 16/-7 [r16/r16/r16/r16] (r/g/b/a) [unorm]
+MPV_LOG: debug - libmpv_render: yuva420p10be
+MPV_LOG: debug - libmpv_render: yuva420p10 => 4 planes 2x2 16/-6 [r16/r16/r16/r16] (r/g/b/a) [unorm]
+MPV_LOG: debug - libmpv_render: yuva422p10be
+MPV_LOG: debug - libmpv_render: yuva422p10 => 4 planes 2x1 16/-6 [r16/r16/r16/r16] (r/g/b/a) [unorm]
+MPV_LOG: debug - libmpv_render: yuva444p10be
+MPV_LOG: debug - libmpv_render: yuva444p10 => 4 planes 1x1 16/-6 [r16/r16/r16/r16] (r/g/b/a) [unorm]
+MPV_LOG: debug - libmpv_render: yuva420p16be
+MPV_LOG: debug - libmpv_render: yuva420p16 => 4 planes 2x2 16/0 [r16/r16/r16/r16] (r/g/b/a) [unorm]
+MPV_LOG: debug - libmpv_render: yuva422p16be
+MPV_LOG: debug - libmpv_render: yuva422p16 => 4 planes 2x1 16/0 [r16/r16/r16/r16] (r/g/b/a) [unorm]
+MPV_LOG: debug - libmpv_render: yuva444p16be
+MPV_LOG: debug - libmpv_render: yuva444p16 => 4 planes 1x1 16/0 [r16/r16/r16/r16] (r/g/b/a) [unorm]
+MPV_LOG: debug - libmpv_render: xyz12 => 1 planes 1x1 16/4 [rgb16] (rgb) [unorm]
+MPV_LOG: debug - libmpv_render: xyz12be
+MPV_LOG: debug - libmpv_render: nv16 => 2 planes 2x1 8/0 [r8/rg8] (r/gb) [unorm]
+MPV_LOG: debug - libmpv_render: nv20 => 2 planes 2x1 16/-6 [r16/rg16] (r/gb) [unorm]
+MPV_LOG: debug - libmpv_render: nv20be
+MPV_LOG: debug - libmpv_render: rgba64be
+MPV_LOG: debug - libmpv_render: bgra64be
+MPV_LOG: debug - libmpv_render: bgra64 => 1 planes 1x1 16/0 [rgba16] (bgra) [unorm]
+MPV_LOG: debug - libmpv_render: yvyu422
+MPV_LOG: debug - libmpv_render: ya16be
+MPV_LOG: debug - libmpv_render: ya16 => 1 planes 1x1 16/0 [rg16] (ra) [unorm]
+MPV_LOG: debug - libmpv_render: gbrap => 4 planes 1x1 8/0 [r8/r8/r8/r8] (g/b/r/a) [unorm]
+MPV_LOG: debug - libmpv_render: gbrap16be
+MPV_LOG: debug - libmpv_render: gbrap16 => 4 planes 1x1 16/0 [r16/r16/r16/r16] (g/b/r/a) [unorm]
+MPV_LOG: debug - libmpv_render: qsv
+MPV_LOG: debug - libmpv_render: d3d11va_vld
+MPV_LOG: debug - libmpv_render: yuv420p12be
+MPV_LOG: debug - libmpv_render: yuv420p12 => 3 planes 2x2 16/-4 [r16/r16/r16] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: yuv420p14be
+MPV_LOG: debug - libmpv_render: yuv420p14 => 3 planes 2x2 16/-2 [r16/r16/r16] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: yuv422p12be
+MPV_LOG: debug - libmpv_render: yuv422p12 => 3 planes 2x1 16/-4 [r16/r16/r16] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: yuv422p14be
+MPV_LOG: debug - libmpv_render: yuv422p14 => 3 planes 2x1 16/-2 [r16/r16/r16] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: yuv444p12be
+MPV_LOG: debug - libmpv_render: yuv444p12 => 3 planes 1x1 16/-4 [r16/r16/r16] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: yuv444p14be
+MPV_LOG: debug - libmpv_render: yuv444p14 => 3 planes 1x1 16/-2 [r16/r16/r16] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: gbrp12be
+MPV_LOG: debug - libmpv_render: gbrp12 => 3 planes 1x1 16/-4 [r16/r16/r16] (g/b/r) [unorm]
+MPV_LOG: debug - libmpv_render: gbrp14be
+MPV_LOG: debug - libmpv_render: gbrp14 => 3 planes 1x1 16/-2 [r16/r16/r16] (g/b/r) [unorm]
+MPV_LOG: debug - libmpv_render: yuvj411p => 3 planes 4x1 8/0 [r8/r8/r8] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: bayer_bggr8
+MPV_LOG: debug - libmpv_render: bayer_rggb8
+MPV_LOG: debug - libmpv_render: bayer_gbrg8
+MPV_LOG: debug - libmpv_render: bayer_grbg8
+MPV_LOG: debug - libmpv_render: bayer_bggr16
+MPV_LOG: debug - libmpv_render: bayer_bggr16be
+MPV_LOG: debug - libmpv_render: bayer_rggb16
+MPV_LOG: debug - libmpv_render: bayer_rggb16be
+MPV_LOG: debug - libmpv_render: bayer_gbrg16
+MPV_LOG: debug - libmpv_render: bayer_gbrg16be
+MPV_LOG: debug - libmpv_render: bayer_grbg16
+MPV_LOG: debug - libmpv_render: bayer_grbg16be
+MPV_LOG: debug - libmpv_render: xvmc
+MPV_LOG: debug - libmpv_render: yuv440p10 => 3 planes 1x2 16/-6 [r16/r16/r16] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: yuv440p10be
+MPV_LOG: debug - libmpv_render: yuv440p12 => 3 planes 1x2 16/-4 [r16/r16/r16] (r/g/b) [unorm]
+MPV_LOG: debug - libmpv_render: yuv440p12be
+MPV_LOG: debug - libmpv_render: ayuv64 => 1 planes 1x1 16/0 [rgba16] (argb) [unorm]
+MPV_LOG: debug - libmpv_render: ayuv64be
+MPV_LOG: debug - libmpv_render: p010be
+MPV_LOG: debug - libmpv_render: gbrap12be
+MPV_LOG: debug - libmpv_render: gbrap12 => 4 planes 1x1 16/-4 [r16/r16/r16/r16] (g/b/r/a) [unorm]
+MPV_LOG: debug - libmpv_render: gbrap10be
+MPV_LOG: debug - libmpv_render: gbrap10 => 4 planes 1x1 16/-6 [r16/r16/r16/r16] (g/b/r/a) [unorm]
+MPV_LOG: debug - libmpv_render: gray12be
+MPV_LOG: debug - libmpv_render: gray12 => 1 planes 1x1 16/-4 [r16] (r) [unorm]
+MPV_LOG: debug - libmpv_render: gray10be
+MPV_LOG: debug - libmpv_render: gray10 => 1 planes 1x1 16/-6 [r16] (r) [unorm]
+MPV_LOG: debug - libmpv_render: p016 => 2 planes 2x2 16/0 [r16/rg16] (r/gb) [unorm]
+MPV_LOG: debug - libmpv_render: p016be
+MPV_LOG: debug - libmpv_render: gray9be
+MPV_LOG: debug - libmpv_render: gray9 => 1 planes 1x1 16/-7 [r16] (r) [unorm]
+MPV_LOG: debug - libmpv_render: gbrpf32be
+MPV_LOG: debug - libmpv_render: gbrpf32 => 3 planes 1x1 32/0 [r16f/r16f/r16f] (g/b/r) [float]
+MPV_LOG: debug - libmpv_render: gbrapf32be
+MPV_LOG: debug - libmpv_render: gbrapf32 => 4 planes 1x1 32/0 [r16f/r16f/r16f/r16f] (g/b/r/a) [float]
+MPV_LOG: debug - libmpv_render: opencl
+MPV_LOG: debug - libmpv_render: gray14be
+MPV_LOG: debug - libmpv_render: gray14 => 1 planes 1x1 16/-2 [r16] (r) [unorm]
+MPV_LOG: debug - libmpv_render: grayf32be
+MPV_LOG: debug - libmpv_render: grayf32 => 1 planes 1x1 32/0 [r16f] (r) [float]
+MPV_LOG: debug - libmpv_render: yuva422p12be
+MPV_LOG: debug - libmpv_render: yuva422p12 => 4 planes 2x1 16/-4 [r16/r16/r16/r16] (r/g/b/a) [unorm]
+MPV_LOG: debug - libmpv_render: yuva444p12be
+MPV_LOG: debug - libmpv_render: yuva444p12 => 4 planes 1x1 16/-4 [r16/r16/r16/r16] (r/g/b/a) [unorm]
+MPV_LOG: debug - libmpv_render: nv24 => 2 planes 1x1 8/0 [r8/rg8] (r/gb) [unorm]
+MPV_LOG: debug - libmpv_render: nv42 => 2 planes 1x1 8/0 [r8/rg8] (r/bg) [unorm]
+MPV_LOG: debug - libmpv_render: vulkan
+MPV_LOG: debug - libmpv_render: y210be
+MPV_LOG: debug - libmpv_render: y210
+MPV_LOG: debug - libmpv_render: x2rgb10be
+MPV_LOG: debug - libmpv_render: x2bgr10
+MPV_LOG: debug - libmpv_render: x2bgr10be
+MPV_LOG: debug - libmpv_render: p210be
+MPV_LOG: debug - libmpv_render: p210 => 2 planes 2x1 16/6 [r16/rg16] (r/gb) [unorm]
+MPV_LOG: debug - libmpv_render: p410be
+MPV_LOG: debug - libmpv_render: p410 => 2 planes 1x1 16/6 [r16/rg16] (r/gb) [unorm]
+MPV_LOG: debug - libmpv_render: p216be
+MPV_LOG: debug - libmpv_render: p216 => 2 planes 2x1 16/0 [r16/rg16] (r/gb) [unorm]
+MPV_LOG: debug - libmpv_render: p416be
+MPV_LOG: debug - libmpv_render: p416 => 2 planes 1x1 16/0 [r16/rg16] (r/gb) [unorm]
+MPV_LOG: debug - libmpv_render: vuya => 1 planes 1x1 8/0 [rgba8] (bgra) [unorm]
+MPV_LOG: debug - libmpv_render: rgbaf16be
+MPV_LOG: debug - libmpv_render: rgbaf16
+MPV_LOG: debug - libmpv_render: vuyx => 1 planes 1x1 8/0 [rgba8] (bgr) [unorm]
+MPV_LOG: debug - libmpv_render: p012 => 2 planes 2x2 16/4 [r16/rg16] (r/gb) [unorm]
+MPV_LOG: debug - libmpv_render: p012be
+MPV_LOG: debug - libmpv_render: y212be
+MPV_LOG: debug - libmpv_render: y212
+MPV_LOG: debug - libmpv_render: xv30be
+MPV_LOG: debug - libmpv_render: xv30
+MPV_LOG: debug - libmpv_render: xv36be
+MPV_LOG: debug - libmpv_render: xv36 => 1 planes 1x1 16/4 [rgba16] (grb) [unorm]
+MPV_LOG: debug - libmpv_render: rgbf32be
+MPV_LOG: debug - libmpv_render: rgbf32
+MPV_LOG: debug - libmpv_render: rgbaf32be
+MPV_LOG: debug - libmpv_render: rgbaf32
+MPV_LOG: v - libmpv_render: Testing FBO format rgba16f
+MPV_LOG: debug - libmpv_render: Resizing texture: 16x16
+MPV_LOG: v - libmpv_render: Using FBO format rgba16f.
+MPV_LOG: v - libmpv_render: No advanced processing required. Enabling dumb mode.
+MPV_LOG: v - libmpv_render: Loading hwdec driver 'd3d11-egl'
+MPV_LOG: v - libmpv_render: Loading failed.
+MPV_LOG: v - libmpv_render: Loading hwdec driver 'dxva2-egl'
+MPV_LOG: error - libmpv_render/dxva2-egl: Failed to create EGL surface
+MPV_LOG: v - libmpv_render: Loading failed.
+MPV_LOG: v - libmpv_render: Loading hwdec driver 'd3d11va'
+MPV_LOG: v - libmpv_render: Loading failed.
+MPV_LOG: v - libmpv_render: Loading hwdec driver 'dxva2-dxgi'
+MPV_LOG: v - libmpv_render: Loading failed.
+MPV_LOG: v - libmpv_render: Loading hwdec driver 'dxva2-dxinterop'
+MPV_LOG: v - libmpv_render: Loading failed.
+MPV_LOG: v - libmpv_render: Loading hwdec driver 'cuda'
+MPV_LOG: v - libmpv_render/cuda: cu->cuGLGetDevices(&device_count, &display_dev, 1, CU_GL_DEVICE_LIST_ALL) failed -> CUDA_ERROR_OPERATING_SYSTEM: OS call failed or operation not supported on this OS
+MPV_LOG: v - libmpv_render/cuda: CUDA hwdec only works with OpenGL or Vulkan backends.
+MPV_LOG: v - libmpv_render: Loading failed.
+VideoOutput.Resize
+{handle: 2899140642624, id: 2899138266960, rect: {height: 0, left: 0, top: 0, width: 0}}
+NativeVideoController: Texture ID: 2899138266960
+MPV_LOG: v - cplayer: Set property: stream-lavf-o="reconnect=1,reconnect_streamed=1,reconnect_delay_max=5,reconnect_on_network_error=1,reconnect_on_http_error=5xx" -> 1
+MPV_LOG: v - cplayer: Set property: cache-secs="100" -> 1
+MPV_LOG: v - cplayer: Set property: hr-seek="no" -> 1
+MPV_LOG: v - cplayer: Set property: demuxer-max-bytes="150000000" -> 1
+MPV_LOG: v - cplayer: Set property: demuxer-max-back-bytes="50000000" -> 1
+MPV_LOG: debug - cplayer: Run command: stop, flags=64, args=[flags=""]
+MPV_LOG: debug - cplayer: Run command: playlist-clear, flags=64, args=[]
+MPV_LOG: debug - cplayer: Run command: playlist-play-index, flags=64, args=[index="none"]
+MPV_LOG: v - cplayer: Set property: pause=true -> 1
+MPV_LOG: debug - cplayer: Run command: loadlist, flags=64, args=[url="C:\\Users\\User\\AppData\\Local\\Temp\\064f5e04-47cb-4183-a546-69b03c3fe647", flags="append"]
+MPV_LOG: v - playlist_parser: Parsing playlist file C:\Users\User\AppData\Local\Temp\064f5e04-47cb-4183-a546-69b03c3fe647...
+MPV_LOG: v - file: Opening C:\Users\User\AppData\Local\Temp\064f5e04-47cb-4183-a546-69b03c3fe647
+MPV_LOG: debug - file: resize stream to 131072 bytes, drop 0 bytes
+MPV_LOG: debug - file: Stream opened successfully.
+MPV_LOG: v - demux: Trying demuxers for level=request.
+MPV_LOG: debug - demux: Trying demuxer: playlist (force-level: request)
+MPV_LOG: warn - playlist: Reading plaintext playlist.
+MPV_LOG: v - playlist: demuxer read all data; closing stream
+MPV_LOG: v - demux: Detected file format: txt (Playlist file)
+11:44:54.921 [BASELINE] STATE PlaybackState.preparing → PlaybackState.buffering gen=3 intended=PlaybackState.playing activityStopped=false
+MPV_LOG: v - playlist_parser: Playlist successfully parsed
+MPV_LOG: debug - global: state path: 'watch_later' -> '-'
+MPV_LOG: v - cplayer: Set property: playlist-pos=0 -> 1
+11:44:54.926 [BASELINE] STATE PlaybackState.buffering → PlaybackState.playing gen=3 intended=PlaybackState.playing activityStopped=false
+MPV_LOG: debug - global: state path: 'watch_later' -> '-'
+MPV_LOG: v - cplayer: Running hook: main/on_load
+MPV_LOG: v - cplayer: Set property: volume=35.000000 -> 1
+MPV_LOG: v - file: Opening \\?\C:\Users\User\Projects\ppplayer_chromium_preview\build\windows\x64\runner\Debug\data\flutter_assets\assets\test_fixtures\test_video.mp4
+MPV_LOG: debug - file: resize stream to 131072 bytes, drop 0 bytes
+MPV_LOG: debug - file: Stream opened successfully.
+MPV_LOG: v - demux: Trying demuxers for level=normal.
+MPV_LOG: debug - demux: Trying demuxer: disc (force-level: normal)
+MPV_LOG: debug - demux: Trying demuxer: edl (force-level: normal)
+MPV_LOG: v - cplayer: Set property: speed=1.000000 -> 1
+MPV_LOG: debug - demux: Trying demuxer: cue (force-level: normal)
+MPV_LOG: debug - demux: Trying demuxer: rawaudio (force-level: normal)
+MPV_LOG: debug - demux: Trying demuxer: rawvideo (force-level: normal)
+MPV_LOG: debug - demux: Trying demuxer: mkv (force-level: normal)
+MPV_LOG: debug - demux: Trying demuxer: libarchive (force-level: normal)
+MPV_LOG: v - cplayer: Set property: pause=false -> 1
+MPV_LOG: debug - demux: Trying demuxer: lavf (force-level: normal)
+MPV_LOG: v - lavf: Found 'mov,mp4,m4a,3gp,3g2,mj2' at score=100 size=2048.
+MPV_LOG: v - lavf: Could not set AVOption seg_max_retry='5'
+MPV_LOG: v - lavf: Could not set AVOption allowed_extensions='ALL'
+MPV_LOG: v - demux: Detected file format: mov,mp4,m4a,3gp,3g2,mj2 (libavformat)
+MPV_LOG: debug - global: cache path: '' -> '-'
+MPV_LOG: error - lavf: Failed to create file cache.
+MPV_LOG: v - cplayer: Opening done: \\?\C:\Users\User\Projects\ppplayer_chromium_preview\build\windows\x64\runner\Debug\data\flutter_assets\assets\test_fixtures\test_video.mp4
+MPV_LOG: v - find_files: Loading external files in \\?\C:\Users\User\Projects\ppplayer_chromium_preview\build\windows\x64\runner\Debug\data\flutter_assets\assets\test_fixtures\
+MPV_LOG: v - lavf: select track 0
+MPV_LOG: v - lavf: select track 1
+MPV_LOG: info - cplayer: (+) Video --vid=1 (*) (h264 640x480 30.000fps)
+MPV_LOG: info - cplayer: (+) Audio --aid=1 (*) (aac 1ch 44100Hz)
+MPV_LOG: v - vd: Container reported FPS: 30.000000
+MPV_LOG: v - vd: Codec list:
+MPV_LOG: v - vd: h264 - (null)
+MPV_LOG: v - vd: h264_qsv (h264) - (null)
+MPV_LOG: v - vd: h264_cuvid (h264) - (null)
+MPV_LOG: v - vd: Opening decoder h264
+MPV_LOG: v - vd: Looking at hwdec h264-d3d11va...
+MPV_LOG: v - vd: Could not create device.
+MPV_LOG: v - vd: Looking at hwdec h264-dxva2...
+MPV_LOG: v - vd: Could not create device.
+MPV_LOG: v - vd: Looking at hwdec h264-nvdec...
+MPV_LOG: v - vd: Could not create device.
+MPV_LOG: v - vd: Looking at hwdec h264-d3d11va-copy...
+MPV_LOG: v - vd: Trying hardware decoding via h264-d3d11va-copy.
+MPV_LOG: v - vd: Selected codec: h264 ((null))
+MPV_LOG: v - vf: User filter list:
+MPV_LOG: v - vf: (empty)
+MPV_LOG: v - ad: Codec list:
+MPV_LOG: v - ad: aac - (null)
+MPV_LOG: v - ad: aac_fixed (aac) - (null)
+MPV_LOG: v - ad: Opening decoder aac
+MPV_LOG: v - ad: Requesting 1 threads for decoding.
+MPV_LOG: v - ad: Selected codec: aac ((null))
+MPV_LOG: v - af: User filter list:
+MPV_LOG: v - af: (empty)
+MPV_LOG: v - cplayer: Starting playback...
+MPV_LOG: debug - lavf: stream 1: resize index to 128
+MPV_LOG: v - vd: Pixel formats supported by decoder: cuda yuv444p
+MPV_LOG: v - vd: Codec profile: unknown (0xf4)
+MPV_LOG: v - vd: Requesting pixfmt 'yuv444p' from decoder.
+MPV_LOG: debug - ffmpeg/video: h264: Reinit context to 640x480, pix_fmt: yuv444p
+MPV_LOG: debug - lavf: stream 0: resize index to 128
+MPV_LOG: v - lavf: EOF reached.
+MPV_LOG: v - vd: Attempting next decoding method after failure of h264-d3d11va-copy.
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264-d3d11va
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264-dxva2
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264-nvdec
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264-d3d11va-copy
+MPV_LOG: v - vd: Looking at hwdec h264-dxva2-copy...
+MPV_LOG: v - vd: Trying hardware decoding via h264-dxva2-copy.
+MPV_LOG: v - vd: Pixel formats supported by decoder: cuda yuv444p
+MPV_LOG: v - vd: Codec profile: unknown (0xf4)
+MPV_LOG: v - vd: Requesting pixfmt 'yuv444p' from decoder.
+MPV_LOG: debug - ffmpeg/video: h264: Reinit context to 640x480, pix_fmt: yuv444p
+MPV_LOG: v - vd: Attempting next decoding method after failure of h264-dxva2-copy.
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264-d3d11va
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264-dxva2
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264-nvdec
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264-d3d11va-copy
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264-dxva2-copy
+MPV_LOG: v - vd: Looking at hwdec h264-nvdec-copy...
+MPV_LOG: v - vd: Trying hardware decoding via h264-nvdec-copy.
+MPV_LOG: v - af: [in] 44100Hz mono 1ch floatp
+MPV_LOG: v - af: [userspeed] 44100Hz mono 1ch floatp
+MPV_LOG: v - af: [userspeed] (disabled)
+MPV_LOG: v - af: [convert] 44100Hz mono 1ch floatp
+MPV_LOG: v - vd: Pixel formats supported by decoder: cuda yuv444p
+MPV_LOG: v - vd: Codec profile: unknown (0xf4)
+MPV_LOG: v - vd: Requesting pixfmt 'cuda' from decoder.
+MPV_LOG: debug - ffmpeg/video: h264: NVDEC capabilities:
+MPV_LOG: debug - ffmpeg/video: h264: format supported: no, max_mb_count: 0
+MPV_LOG: debug - ffmpeg/video: h264: min_width: 0, max_width: 0
+MPV_LOG: debug - ffmpeg/video: h264: min_height: 0, max_height: 0
+MPV_LOG: error - ffmpeg/video: h264: Hardware is lacking required capabilities
+MPV_LOG: error - ffmpeg/video: h264: Failed setup for format cuda: hwaccel initialisation returned error.
+MPV_LOG: v - vd: Pixel formats supported by decoder: yuv444p yuv444p
+MPV_LOG: v - vd: Codec profile: unknown (0xf4)
+MPV_LOG: v - vd: Requesting pixfmt 'yuv444p' from decoder.
+MPV_LOG: debug - ffmpeg/video: h264: Reinit context to 640x480, pix_fmt: yuv444p
+MPV_LOG: v - vd: Attempting next decoding method after failure of h264-nvdec-copy.
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264-d3d11va
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264-dxva2
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264-nvdec
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264-d3d11va-copy
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264-dxva2-copy
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264-nvdec-copy
+MPV_LOG: v - vd: Looking at hwdec h264_qsv-qsv...
+MPV_LOG: v - vd: Could not create device.
+MPV_LOG: v - vd: Looking at hwdec h264_cuvid-cuda...
+MPV_LOG: v - vd: Could not create device.
+MPV_LOG: v - vd: Looking at hwdec h264_qsv-qsv-copy...
+MPV_LOG: debug - ffmpeg: AVHWDeviceContext: Defaulting child_device_type to AV_HWDEVICE_TYPE_D3D11VA for oneVPL.Please explicitly set child device type via "-init_hw_device" option if needed.
+MPV_LOG: debug - ffmpeg: AVHWDeviceContext: Use Intel(R) oneVPL to create MFX session, API version is 2.9, the required implementation version is 1.3
+MPV_LOG: error - ffmpeg: AVHWDeviceContext: Error creating a MFX session: -9.
+MPV_LOG: v - vd: Could not create device.
+MPV_LOG: v - vd: Looking at hwdec h264_cuvid-cuda-copy...
+MPV_LOG: v - vd: Trying hardware decoding via h264_cuvid-cuda-copy.
+MPV_LOG: v - vd: Using underlying hw-decoder 'h264_cuvid'
+MPV_LOG: v - vd: Pixel formats supported by decoder: cuda nv12
+MPV_LOG: v - vd: Codec profile: unknown (0xffffff9d)
+MPV_LOG: v - vd: Requesting pixfmt 'cuda' from decoder.
+MPV_LOG: debug - ffmpeg/video: h264_cuvid: CUVID capabilities for h264_cuvid:
+MPV_LOG: debug - ffmpeg/video: h264_cuvid: 8 bit: supported: 1, min_width: 48, max_width: 4096, min_height: 16, max_height: 4096
+MPV_LOG: debug - ffmpeg/video: h264_cuvid: 10 bit: supported: 0, min_width: 0, max_width: 0, min_height: 0, max_height: 0
+MPV_LOG: debug - ffmpeg/video: h264_cuvid: 12 bit: supported: 0, min_width: 0, max_width: 0, min_height: 0, max_height: 0
+MPV_LOG: v - ao: Trying audio driver 'wasapi'
+MPV_LOG: v - ao/wasapi: requested format: 44100 Hz, mono channels, floatp
+MPV_LOG: debug - ao/wasapi: Init wasapi
+MPV_LOG: debug - ao/wasapi: Find device ''
+MPV_LOG: v - ao/wasapi: No device specified. Selecting default.
+MPV_LOG: v - ao/wasapi: Selecting device '{2b27a5a4-3457-42d8-abae-b04c5f1afa60}' (Speakers (2- Realtek(R) Audio))
+MPV_LOG: v - ao/wasapi: Monitoring changes in device {0.0.0.00000000}.{2b27a5a4-3457-42d8-abae-b04c5f1afa60}
+MPV_LOG: debug - ao/wasapi: Init wasapi thread
+MPV_LOG: debug - ao/wasapi: Activating pAudioClient interface
+MPV_LOG: debug - ao/wasapi: Probing formats
+MPV_LOG: v - ao/wasapi: Trying mono float (32/32 bits) @ 48000hz (shared) -> close
+MPV_LOG: v - ao/wasapi: Closest match is stereo float (32/32 bits) @ 48000hz
+MPV_LOG: v - ao/wasapi: Accepted as stereo float @ 48000hz -> stereo float (32/32 bits) @ 48000hz (shared)
+MPV_LOG: debug - ao/wasapi: Fixing format
+MPV_LOG: debug - ao/wasapi: IAudioClient::GetDevicePeriod
+MPV_LOG: v - ao/wasapi: Device period: 10 ms
+MPV_LOG: debug - ao/wasapi: IAudioClient::Initialize
+MPV_LOG: debug - ao/wasapi: IAudioClient::Initialize pRenderClient
+MPV_LOG: debug - ao/wasapi: IAudioClient::Initialize IAudioClient_SetEventHandle
+MPV_LOG: debug - ao/wasapi: IAudioClient::Initialize IAudioClient_GetBufferSize
+MPV_LOG: v - ao/wasapi: Buffer frame count: 2400 (50 ms)
+MPV_LOG: v - ao/wasapi: IAudioClock::GetFrequency gave a frequency of 384000.
+MPV_LOG: debug - ao/wasapi: IAudioClient::Initialize pAudioVolume
+MPV_LOG: debug - ao/wasapi: Entering dispatch loop
+MPV_LOG: debug - ao/wasapi: Init wasapi done
+MPV_LOG: v - ao/wasapi: device buffer: 2400 samples.
+MPV_LOG: v - ao/wasapi: using soft-buffer of 9600 samples.
+MPV_LOG: info - cplayer: AO: [wasapi] 48000Hz stereo 2ch float
+MPV_LOG: v - cplayer: AO: Description: Windows WASAPI audio output (event mode)
+MPV_LOG: v - autoconvert: inserting resampler
+MPV_LOG: v - swresample: format change, reinitializing resampler
+MPV_LOG: v - swresample: 44100Hz mono floatp -> 48000Hz stereo float
+MPV_LOG: v - swresample: Remix: mono -> stereo
+MPV_LOG: v - af: [out] 48000Hz stereo 2ch float
+MPV_LOG: v - vd: Pixel formats supported by decoder: cuda yuv444p
+MPV_LOG: v - vd: Codec profile: unknown (0xffffff9d)
+MPV_LOG: v - vd: Requesting pixfmt 'cuda' from decoder.
+MPV_LOG: debug - ffmpeg/video: h264_cuvid: Formats: Original: cuda | HW: cuda | SW: yuv444p
+MPV_LOG: error - ffmpeg/video: h264_cuvid: ctx->cvdl->cuvidCreateDecoder(&ctx->cudecoder, &cuinfo) failed -> CUDA_ERROR_NOT_SUPPORTED: operation not supported
+MPV_LOG: error - ffmpeg/video: h264_cuvid: cuvid decode callback error
+MPV_LOG: warn - vd: Error while decoding frame (hardware decoding)!
+MPV_LOG: error - ffmpeg/video: h264_cuvid: cuvid decode callback error
+MPV_LOG: warn - vd: Error while decoding frame (hardware decoding)!
+MPV_LOG: error - ffmpeg/video: h264_cuvid: cuvid decode callback error
+MPV_LOG: warn - vd: Error while decoding frame (hardware decoding)!
+MPV_LOG: v - vd: Attempting next decoding method after failure of h264_cuvid-cuda-copy.
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264-d3d11va
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264-dxva2
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264-nvdec
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264-d3d11va-copy
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264-dxva2-copy
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264-nvdec-copy
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264_qsv-qsv
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264_cuvid-cuda
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264_qsv-qsv-copy
+MPV_LOG: debug - vd: Skipping previously attempted hwdec: h264_cuvid-cuda-copy
+MPV_LOG: v - vd: Using software decoding.
+MPV_LOG: v - vd: Detected 16 logical cores.
+MPV_LOG: v - vd: Requesting 16 threads for decoding.
+MPV_LOG: debug - ffmpeg/video: h264: Reinit context to 640x480, pix_fmt: yuv444p
+MPV_LOG: debug - vd: DR parameter change to 640x482 yuv444p align=64
+MPV_LOG: debug - vd: Allocating new (host-cached) DR image...
+MPV_LOG: debug - vd: ...failed..
+MPV_LOG: v - vd: DR failed - disabling.
+MPV_LOG: v - vd: Using software decoding.
+MPV_LOG: v - vd: Decoder format: 640x480 yuv444p auto/auto/auto/auto/auto CL=mpeg2/4/h264 crop=640x480+0+0
+MPV_LOG: v - vd: Using container aspect ratio.
+MPV_LOG: v - vf: [in] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+MPV_LOG: v - vf: [userdeint] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+MPV_LOG: v - vf: [userdeint] (disabled)
+MPV_LOG: v - vf: [autorotate] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+MPV_LOG: v - vf: [autorotate] (disabled)
+MPV_LOG: v - vf: [convert] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+MPV_LOG: v - vf: [convert] (disabled)
+MPV_LOG: v - vf: [out] 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+MPV_LOG: info - cplayer: VO: [libmpv] 640x480 yuv444p
+MPV_LOG: v - cplayer: VO: Description: render API for libmpv
+MPV_LOG: v - vo/libmpv: reconfig to 640x480 yuv444p bt.601/bt.601-525/bt.1886/limited/display SP=1.000000 CL=mpeg2/4/h264 crop=640x480+0+0
+MPV_LOG: v - vo/libmpv: mpv_render_context_render() not being called or stuck.
+MPV_LOG: v - cplayer: first video frame after restart shown
+MPV_LOG: v - cplayer: audio ready
+MPV_LOG: debug - cplayer: starting video playback
+MPV_LOG: v - cplayer: starting audio playback
+MPV_LOG: v - cplayer: playback restart complete @ 0.000000, audio=playing, video=playing
+MPV_LOG: debug - ao/wasapi: Thread Resume
+MPV_LOG: debug - ao/wasapi: Thread Reset
+MPV_LOG: v - libmpv_render: Window size: 640x480 (Borders: l=0 t=0 r=0 b=0)
+MPV_LOG: v - libmpv_render: Video source: 640x480 (1:1)
+MPV_LOG: v - libmpv_render: Video display: (0, 0) 640x480 -> (0, 0) 640x480
+MPV_LOG: v - libmpv_render: Video scale: 1.000000/1.000000
+MPV_LOG: v - libmpv_render: OSD borders: l=0 t=0 r=0 b=0
+MPV_LOG: v - libmpv_render: Video borders: l=0 t=0 r=0 b=0
+MPV_LOG: v - libmpv_render: Texture for plane 0: 640x480
+MPV_LOG: v - libmpv_render: Texture for plane 1: 640x480
+MPV_LOG: v - libmpv_render: Texture for plane 2: 640x480
+MPV_LOG: v - libmpv_render: Testing FBO format rgba16f
+MPV_LOG: debug - libmpv_render: Resizing texture: 16x16
+MPV_LOG: v - libmpv_render: Using FBO format rgba16f.
+MPV_LOG: v - libmpv_render: No advanced processing required. Enabling dumb mode.
+VideoOutput.Resize
+{handle: 2899140642624, id: 2899247252816, rect: {height: 480, left: 0, top: 0, width: 640}}
+MPV_LOG: debug - libmpv_render: vertex shader source:
+MPV_LOG: debug - libmpv_render: [  1] #version 300 es
+MPV_LOG: debug - libmpv_render: [  2] #ifdef GL_FRAGMENT_PRECISION_HIGH
+MPV_LOG: debug - libmpv_render: [  3] precision highp float;
+MPV_LOG: debug - libmpv_render: [  4] #else
+MPV_LOG: debug - libmpv_render: [  5] precision mediump float;
+MPV_LOG: debug - libmpv_render: [  6] #endif
+MPV_LOG: debug - libmpv_render: [  7] precision mediump sampler2D;
+MPV_LOG: debug - libmpv_render: [  8] precision mediump sampler3D;
+MPV_LOG: debug - libmpv_render: [  9] #define tex1D texture
+MPV_LOG: debug - libmpv_render: [ 10] #define tex3D texture
+MPV_LOG: debug - libmpv_render: [ 11] #define LUT_POS(x, lut_size) mix(0.5 / (lut_size), 1.0 - 0.5 / (lut_size), (x))
+MPV_LOG: debug - libmpv_render: [ 12] in vec2 vertex_position;
+MPV_LOG: debug - libmpv_render: [ 13] in vec2 vertex_texcoord0;
+MPV_LOG: debug - libmpv_render: [ 14] out vec2 texcoord0;
+MPV_LOG: debug - libmpv_render: [ 15] in vec2 vertex_texcoord1;
+MPV_LOG: debug - libmpv_render: [ 16] out vec2 texcoord1;
+MPV_LOG: debug - libmpv_render: [ 17] in vec2 vertex_texcoord2;
+MPV_LOG: debug - libmpv_render: [ 18] out vec2 texcoord2;
+MPV_LOG: debug - libmpv_render: [ 19] void main() {
+MPV_LOG: debug - libmpv_render: [ 20] gl_Position = vec4(vertex_position, 1.0, 1.0);
+MPV_LOG: debug - libmpv_render: [ 21] texcoord0 = vertex_texcoord0;
+MPV_LOG: debug - libmpv_render: [ 22] texcoord1 = vertex_texcoord1;
+MPV_LOG: debug - libmpv_render: [ 23] texcoord2 = vertex_texcoord2;
+MPV_LOG: debug - libmpv_render: [ 24] }
+MPV_LOG: debug - libmpv_render: Translated shader:
+MPV_LOG: debug - libmpv_render: [  1] // INITIAL HLSL BEGIN
+MPV_LOG: debug - libmpv_render: [  2]
+MPV_LOG: debug - libmpv_render: [  3] #pragma warning( disable: 3556 3571 )
+MPV_LOG: debug - libmpv_render: [  4] float4 vec4_ctor(float2 x0, float x1, float x2)
+MPV_LOG: debug - libmpv_render: [  5] {
+MPV_LOG: debug - libmpv_render: [  6]     return float4(x0, x1, x2);
+MPV_LOG: debug - libmpv_render: [  7] }
+MPV_LOG: debug - libmpv_render: [  8] #ifdef ANGLE_ENABLE_LOOP_FLATTEN
+MPV_LOG: debug - libmpv_render: [  9] #define LOOP [loop]
+MPV_LOG: debug - libmpv_render: [ 10] #define FLATTEN [flatten]
+MPV_LOG: debug - libmpv_render: [ 11] #else
+MPV_LOG: debug - libmpv_render: [ 12] #define LOOP
+MPV_LOG: debug - libmpv_render: [ 13] #define FLATTEN
+MPV_LOG: debug - libmpv_render: [ 14] #endif
+MPV_LOG: debug - libmpv_render: [ 15] // Attributes
+MPV_LOG: debug - libmpv_render: [ 16] static float2 _vertex_position = {0, 0};
+MPV_LOG: debug - libmpv_render: [ 17] static float2 _vertex_texcoord0 = {0, 0};
+MPV_LOG: debug - libmpv_render: [ 18] static float2 _vertex_texcoord1 = {0, 0};
+MPV_LOG: debug - libmpv_render: [ 19] static float2 _vertex_texcoord2 = {0, 0};
+MPV_LOG: debug - libmpv_render: [ 20]
+MPV_LOG: debug - libmpv_render: [ 21] static float4 gl_Position = float4(0, 0, 0, 0);
+MPV_LOG: debug - libmpv_render: [ 22]
+MPV_LOG: debug - libmpv_render: [ 23] // Varyings
+MPV_LOG: debug - libmpv_render: [ 24] static  float2 _texcoord0 = {0, 0};
+MPV_LOG: debug - libmpv_render: [ 25] static  float2 _texcoord1 = {0, 0};
+MPV_LOG: debug - libmpv_render: [ 26] static  float2 _texcoord2 = {0, 0};
+MPV_LOG: debug - libmpv_render: [ 27]
+MPV_LOG: debug - libmpv_render: [ 28] cbuffer DriverConstants : register(b1)
+MPV_LOG: debug - libmpv_render: [ 29] {
+MPV_LOG: debug - libmpv_render: [ 30]     float4 dx_ViewAdjust : packoffset(c1);
+MPV_LOG: debug - libmpv_render: [ 31]     float2 dx_ViewCoords : packoffset(c2);
+MPV_LOG: debug - libmpv_render: [ 32]     float2 dx_ViewScale  : packoffset(c3);
+MPV_LOG: debug - libmpv_render: [ 33]     float clipControlOrigin : packoffset(c3.z);
+MPV_LOG: debug - libmpv_render: [ 34]     float clipControlZeroToOne : packoffset(c3.w);
+MPV_LOG: debug - libmpv_render: [ 35] };
+MPV_LOG: debug - libmpv_render: [ 36]
+MPV_LOG: debug - libmpv_render: [ 37] @@ VERTEX ATTRIBUTES @@
+MPV_LOG: debug - libmpv_render: [ 38]
+MPV_LOG: debug - libmpv_render: [ 39] @@ VERTEX OUTPUT @@
+MPV_LOG: debug - libmpv_render: [ 40]
+MPV_LOG: debug - libmpv_render: [ 41] VS_OUTPUT main(VS_INPUT input){
+MPV_LOG: debug - libmpv_render: [ 42] @@ MAIN PROLOGUE @@
+MPV_LOG: debug - libmpv_render: [ 43] (gl_Position = vec4_ctor(_vertex_position, 1.0, 1.0));
+MPV_LOG: debug - libmpv_render: [ 44] (_texcoord0 = _vertex_texcoord0);
+MPV_LOG: debug - libmpv_render: [ 45] (_texcoord1 = _vertex_texcoord1);
+MPV_LOG: debug - libmpv_render: [ 46] (_texcoord2 = _vertex_texcoord2);
+MPV_LOG: debug - libmpv_render: [ 47] return generateOutput(input);
+MPV_LOG: debug - libmpv_render: [ 48] }
+MPV_LOG: debug - libmpv_render: [ 49]
+MPV_LOG: debug - libmpv_render: [ 50] // INITIAL HLSL END
+MPV_LOG: debug - libmpv_render: [ 51]
+MPV_LOG: debug - libmpv_render: [ 52]
+MPV_LOG: debug - libmpv_render: [ 53]
+MPV_LOG: debug - libmpv_render: [ 54] // VERTEX SHADER END
+MPV_LOG: debug - libmpv_render: fragment shader source:
+MPV_LOG: debug - libmpv_render: [  1] #version 300 es
+MPV_LOG: debug - libmpv_render: [  2] #ifdef GL_FRAGMENT_PRECISION_HIGH
+MPV_LOG: debug - libmpv_render: [  3] precision highp float;
+MPV_LOG: debug - libmpv_render: [  4] #else
+MPV_LOG: debug - libmpv_render: [  5] precision mediump float;
+MPV_LOG: debug - libmpv_render: [  6] #endif
+MPV_LOG: debug - libmpv_render: [  7] precision mediump sampler2D;
+MPV_LOG: debug - libmpv_render: [  8] precision mediump sampler3D;
+MPV_LOG: debug - libmpv_render: [  9] #define tex1D texture
+MPV_LOG: debug - libmpv_render: [ 10] #define tex3D texture
+MPV_LOG: debug - libmpv_render: [ 11] #define LUT_POS(x, lut_size) mix(0.5 / (lut_size), 1.0 - 0.5 / (lut_size), (x))
+MPV_LOG: debug - libmpv_render: [ 12] out vec4 out_color;
+MPV_LOG: debug - libmpv_render: [ 13] in vec2 texcoord0;
+MPV_LOG: debug - libmpv_render: [ 14] in vec2 texcoord1;
+MPV_LOG: debug - libmpv_render: [ 15] in vec2 texcoord2;
+MPV_LOG: debug - libmpv_render: [ 16] uniform mat3 colormatrix;
+MPV_LOG: debug - libmpv_render: [ 17] uniform vec3 colormatrix_c;
+MPV_LOG: debug - libmpv_render: [ 18] uniform vec3 src_luma;
+MPV_LOG: debug - libmpv_render: [ 19] uniform vec3 dst_luma;
+MPV_LOG: debug - libmpv_render: [ 20] uniform sampler2D texture0;
+MPV_LOG: debug - libmpv_render: [ 21] uniform vec2 texture_size0;
+MPV_LOG: debug - libmpv_render: [ 22] uniform mat2 texture_rot0;
+MPV_LOG: debug - libmpv_render: [ 23] uniform vec2 texture_off0;
+MPV_LOG: debug - libmpv_render: [ 24] uniform vec2 pixel_size0;
+MPV_LOG: debug - libmpv_render: [ 25] uniform sampler2D texture1;
+MPV_LOG: debug - libmpv_render: [ 26] uniform vec2 texture_size1;
+MPV_LOG: debug - libmpv_render: [ 27] uniform mat2 texture_rot1;
+MPV_LOG: debug - libmpv_render: [ 28] uniform vec2 texture_off1;
+MPV_LOG: debug - libmpv_render: [ 29] uniform vec2 pixel_size1;
+MPV_LOG: debug - libmpv_render: [ 30] uniform sampler2D texture2;
+MPV_LOG: debug - libmpv_render: [ 31] uniform vec2 texture_size2;
+MPV_LOG: debug - libmpv_render: [ 32] uniform mat2 texture_rot2;
+MPV_LOG: debug - libmpv_render: [ 33] uniform vec2 texture_off2;
+MPV_LOG: debug - libmpv_render: [ 34] uniform vec2 pixel_size2;
+MPV_LOG: debug - libmpv_render: [ 35] void main() {
+MPV_LOG: debug - libmpv_render: [ 36] vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
+MPV_LOG: debug - libmpv_render: [ 37] color.r = 1.000000 * vec4(texture(texture0, texcoord0)).r;
+MPV_LOG: debug - libmpv_render: [ 38] color.g = 1.000000 * vec4(texture(texture1, texcoord1)).r;
+MPV_LOG: debug - libmpv_render: [ 39] color.b = 1.000000 * vec4(texture(texture2, texcoord2)).r;
+MPV_LOG: debug - libmpv_render: [ 40] color = color.rgbr;
+MPV_LOG: debug - libmpv_render: [ 41] color.rgb = mat3(colormatrix) * color.rgb + colormatrix_c;
+MPV_LOG: debug - libmpv_render: [ 42] color.a = 1.0;
+MPV_LOG: debug - libmpv_render: [ 43] // color mapping
+MPV_LOG: debug - libmpv_render: [ 44] color.rgb *= vec3(1.000000);
+MPV_LOG: debug - libmpv_render: [ 45] color.rgb *= vec3(1.000000);
+MPV_LOG: debug - libmpv_render: [ 46] out_color = color;
+MPV_LOG: debug - libmpv_render: [ 47] }
+MPV_LOG: debug - libmpv_render: Translated shader:
+MPV_LOG: debug - libmpv_render: [  1] // INITIAL HLSL BEGIN
+MPV_LOG: debug - libmpv_render: [  2]
+MPV_LOG: debug - libmpv_render: [  3] #pragma warning( disable: 3556 3571 )
+MPV_LOG: debug - libmpv_render: [  4] float3x3 mat3_ctor(float3x3 x0)
+MPV_LOG: debug - libmpv_render: [  5] {
+MPV_LOG: debug - libmpv_render: [  6]     return float3x3(x0[0][0], x0[0][1], x0[0][2], x0[1][0], x0[1][1], x0[1][2], x0[2][0], x0[2][1], x0[2][2]);
+MPV_LOG: debug - libmpv_render: [  7] }
+MPV_LOG: debug - libmpv_render: [  8] float4 vec4_ctor_float4(float4 x0)
+MPV_LOG: debug - libmpv_render: [  9] {
+MPV_LOG: debug - libmpv_render: [ 10]     return float4(x0);
+MPV_LOG: debug - libmpv_render: [ 11] }
+MPV_LOG: debug - libmpv_render: [ 12] // Uniforms
+MPV_LOG: debug - libmpv_render: [ 13]
+MPV_LOG: debug - libmpv_render: [ 14] uniform float3x3 _colormatrix : register(c0);
+MPV_LOG: debug - libmpv_render: [ 15] uniform float3 _colormatrix_c : register(c3);
+MPV_LOG: debug - libmpv_render: [ 16] static const uint _texture0 = 0;
+MPV_LOG: debug - libmpv_render: [ 17] static const uint _texture1 = 1;
+MPV_LOG: debug - libmpv_render: [ 18] static const uint _texture2 = 2;
+MPV_LOG: debug - libmpv_render: [ 19] uniform Texture2D<float4> textures2D[3] : register(t0);
+MPV_LOG: debug - libmpv_render: [ 20] uniform SamplerState samplers2D[3] : register(s0);
+MPV_LOG: debug - libmpv_render: [ 21] #ifdef ANGLE_ENABLE_LOOP_FLATTEN
+MPV_LOG: debug - libmpv_render: [ 22] #define LOOP [loop]
+MPV_LOG: debug - libmpv_render: [ 23] #define FLATTEN [flatten]
+MPV_LOG: debug - libmpv_render: [ 24] #else
+MPV_LOG: debug - libmpv_render: [ 25] #define LOOP
+MPV_LOG: debug - libmpv_render: [ 26] #define FLATTEN
+MPV_LOG: debug - libmpv_render: [ 27] #endif
+MPV_LOG: debug - libmpv_render: [ 28] // Varyings
+MPV_LOG: debug - libmpv_render: [ 29] static  float2 _texcoord0 = {0, 0};
+MPV_LOG: debug - libmpv_render: [ 30] static  float2 _texcoord1 = {0, 0};
+MPV_LOG: debug - libmpv_render: [ 31] static  float2 _texcoord2 = {0, 0};
+MPV_LOG: debug - libmpv_render: [ 32]
+MPV_LOG: debug - libmpv_render: [ 33] static float4 out_out_color = {0, 0, 0, 0};
+MPV_LOG: debug - libmpv_render: [ 34]
+MPV_LOG: debug - libmpv_render: [ 35] cbuffer DriverConstants : register(b1)
+MPV_LOG: debug - libmpv_render: [ 36] {
+MPV_LOG: debug - libmpv_render: [ 37]     uint dx_Misc : packoffset(c2.w);
+MPV_LOG: debug - libmpv_render: [ 38]     struct SamplerMetadata
+MPV_LOG: debug - libmpv_render: [ 39]     {
+MPV_LOG: debug - libmpv_render: [ 40]         int baseLevel;
+MPV_LOG: debug - libmpv_render: [ 41]         int wrapModes;
+MPV_LOG: debug - libmpv_render: [ 42]         int2 padding;
+MPV_LOG: debug - libmpv_render: [ 43]         int4 intBorderColor;
+MPV_LOG: debug - libmpv_render: [ 44]     };
+MPV_LOG: debug - libmpv_render: [ 45]     SamplerMetadata samplerMetadata[3] : packoffset(c4);
+MPV_LOG: debug - libmpv_render: [ 46] };
+MPV_LOG: debug - libmpv_render: [ 47]
+MPV_LOG: debug - libmpv_render: [ 48] float4 gl_texture2D(uint samplerIndex, float2 t)
+MPV_LOG: debug - libmpv_render: [ 49] {
+MPV_LOG: debug - libmpv_render: [ 50]     return textures2D[samplerIndex].Sample(samplers2D[samplerIndex], float2(t.x, t.y));
+MPV_LOG: debug - libmpv_render: [ 51] }
+MPV_LOG: debug - libmpv_render: [ 52]
+MPV_LOG: debug - libmpv_render: [ 53] @@ PIXEL OUTPUT @@
+MPV_LOG: debug - libmpv_render: [ 54]
+MPV_LOG: debug - libmpv_render: [ 55] PS_OUTPUT main(@@ PIXEL MAIN PARAMETERS @@){
+MPV_LOG: debug - libmpv_render: [ 56] @@ MAIN PROLOGUE @@
+MPV_LOG: debug - libmpv_render: [ 57] float4 _color3025 = {0.0, 0.0, 0.0, 1.0};
+MPV_LOG: debug - libmpv_render: [ 58] (_color3025.x = (1.0 * vec4_ctor_float4(gl_texture2D(_texture0, _texcoord0)).x));
+MPV_LOG: debug - libmpv_render: [ 59] (_color3025.y = (1.0 * vec4_ctor_float4(gl_texture2D(_texture1, _texcoord1)).x));
+MPV_LOG: debug - libmpv_render: [ 60] (_color3025.z = (1.0 * vec4_ctor_float4(gl_texture2D(_texture2, _texcoord2)).x));
+MPV_LOG: debug - libmpv_render: [ 61] (_color3025 = _color3025.xyzx);
+MPV_LOG: debug - libmpv_render: [ 62] (_color3025.xyz = (mul(transpose(mat3_ctor(_colormatrix)), _color3025.xyz) + _colormatrix_c));
+MPV_LOG: debug - libmpv_render: [ 63] (_color3025.w = 1.0);
+MPV_LOG: debug - libmpv_render: [ 64] (_color3025.xyz *= float3(1.0, 1.0, 1.0));
+MPV_LOG: debug - libmpv_render: [ 65] (_color3025.xyz *= float3(1.0, 1.0, 1.0));
+MPV_LOG: debug - libmpv_render: [ 66] (out_out_color = _color3025);
+MPV_LOG: debug - libmpv_render: [ 67] return generateOutput();
+MPV_LOG: debug - libmpv_render: [ 68] }
+MPV_LOG: debug - libmpv_render: [ 69]
+MPV_LOG: debug - libmpv_render: [ 70] // INITIAL HLSL END
+MPV_LOG: debug - libmpv_render: [ 71]
+MPV_LOG: debug - libmpv_render: [ 72]
+MPV_LOG: debug - libmpv_render: [ 73]
+MPV_LOG: debug - libmpv_render: [ 74] // FRAGMENT SHADER END
+MPV_LOG: debug - libmpv_render: shader link log (status=1):
+11:44:56.666 [BASELINE] ENGINE pause() caller=user failOnTimeout=false intendedWas=PlaybackState.playing gen=3
+11:44:56.667 [BASELINE] STATE PlaybackState.playing → PlaybackState.paused gen=3 intended=PlaybackState.paused activityStopped=false
+MPV_LOG: debug - ao/wasapi: Thread Reset
+MPV_LOG: v - cplayer: Set property: pause=true -> 1
+11:44:56.753 [BASELINE] STATE PlaybackState.paused → PlaybackState.idle gen=4 intended=PlaybackState.paused activityStopped=false
+MPV_LOG: debug - cplayer: Run command: stop, flags=64, args=[flags=""]
+MPV_LOG: v - cplayer: EOF code: 4
+MPV_LOG: debug - ao/wasapi: Thread Reset
+MPV_LOG: v - cplayer: Running hook: main/on_unload
+MPV_LOG: debug - cplayer: Run command: playlist-clear, flags=64, args=[]
+MPV_LOG: v - cplayer: Set property: http-header-fields=null -> -2
+MPV_LOG: v - cplayer: Set property: start="none" -> 1
+MPV_LOG: v - cplayer: Set property: end="none" -> 1
+MPV_LOG: debug - cplayer: Run command: playlist-play-index, flags=64, args=[index="none"]
+MPV_LOG: debug - ad: Uninit decoder.
+MPV_LOG: debug - vd: Uninit decoder.
+MPV_LOG: v - cplayer: finished playback, success (reason 2)
+MPV_LOG: info - cplayer:
+MPV_LOG: debug - ao/wasapi: Uninit wasapi
+MPV_LOG: debug - ao/wasapi: Thread Reset
+MPV_LOG: debug - ao/wasapi: Thread shutdown
+MPV_LOG: debug - ao/wasapi: Thread uninit done
+MPV_LOG: debug - ao/wasapi: Thread return
+MPV_LOG: debug - ao/wasapi: Uninit wasapi done
+MPV_LOG: debug - cplayer: Run command: stop, flags=64, args=[flags=""]
+MPV_LOG: debug - cplayer: Run command: playlist-clear, flags=64, args=[]
+MPV_LOG: debug - cplayer: Run command: playlist-play-index, flags=64, args=[index="none"]
+00:11 +1: (tearDownAll)
+00:11 +1: All tests passed!

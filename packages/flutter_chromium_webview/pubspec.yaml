@@ -1,5 +1,5 @@
 name: flutter_chromium_webview
-description: Experimental desktop CEF webview with Flutter textures, browser events, and native input integration.
+description: Chromium webview for Windows and Linux using CEF textures, and Android using the system WebView, with browser events and origin-restricted channels.
 version: 0.2.1
 repository: https://github.com/devflier/flutter_chromium_webview/tree/main/packages/flutter_chromium_webview
 issue_tracker: https://github.com/devflier/flutter_chromium_webview/issues
@@ -43,6 +43,9 @@ flutter:
   # adding or updating assets for this project.
   plugin:
     platforms:
+      android:
+        package: dev.devflier.flutter_chromium_webview
+        pluginClass: FlutterChromiumWebviewPlugin
       linux:
         pluginClass: FlutterChromiumWebviewPlugin
       windows:

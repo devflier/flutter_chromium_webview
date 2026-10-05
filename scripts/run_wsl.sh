@@ -2,6 +2,10 @@
 set -euo pipefail
 
 project_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+if [[ -n "${WSL_DISTRO_NAME:-}" && "$project_root" =~ ^/mnt/[a-z]/ ]]; then
+  echo 'Run from a Linux-filesystem checkout; see docs/wslg.md for synchronization instructions.' >&2
+  exit 1
+fi
 cd "$project_root/packages/flutter_chromium_webview/example"
 
 if [[ "${1:-}" != "--no-build" ]]; then

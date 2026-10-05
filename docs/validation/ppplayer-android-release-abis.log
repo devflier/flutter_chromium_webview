@@ -1,0 +1,11 @@
+
+FullName                           Length
+--------                           ------
+lib/arm64-v8a/libapp.so          12583816
+lib/arm64-v8a/libflutter.so      11747864
+lib/arm64-v8a/libmetadata_god.so  1903864
+lib/x86_64/libapp.so             12845960
+lib/x86_64/libflutter.so         13051424
+lib/x86_64/libmetadata_god.so     2104560
+
+

@@ -2,8 +2,9 @@
 
 The optional `chromium_youtube_player.dart` library implements the first playback
 adapter against ppplayer's patched YouTube controller contract, inspected at
-app commit `93c4af527b238d237c2da3b9fab4d639f84177a9`. ppplayer itself has not been
-modified. This is a controller prototype, not a replacement WebViewPlatform or
+app commit `93c4af527b238d237c2da3b9fab4d639f84177a9`. An isolated ppplayer preview
+now maps the adapter into its playback facade; see [the roadmap](ppplayer-roadmap.md).
+This is a controller prototype, not a replacement WebViewPlatform or
 the complete youtube_player_iframe API.
 
 ## Host integration
@@ -36,8 +37,10 @@ with the actual ppplayer document URL before adoption. YouTube documents error
 153 for missing referrer/client identification in its
 [IFrame API reference](https://developers.google.com/youtube/iframe_api_reference).
 
-Autoplay is enabled in a fresh private CEF context. Cookies/storage are neither
-shared nor persisted. No custom user-agent is needed for the live tests; a host
+On desktop, autoplay is enabled in a fresh private CEF context. Cookies/storage
+are neither shared nor persisted. Android uses a separate disk-backed WebView
+profile with deferred cleanup; see [Android storage details](../packages/flutter_chromium_webview/ANDROID.md).
+No custom user-agent is needed for the live tests; a host
 can supply one through the constructor when necessary.
 
 ## Supported contract
@@ -68,6 +71,21 @@ commands submitted through this adapter; iframe controls can independently chang
 observed player state. Use the event stream for observed playback.
 
 ## Reproduce
+
+Android uses the system Chromium WebView. The audio-only probe passes on the
+installed emulator, including progress, pause, seek and volume. Foreground
+playback with an Android view also passes those operations, but removing that
+view pauses playback: the ordinary detach-progress probe fails. Keep these
+results separate from desktop widget-detachment support. See
+`validation/android-youtube-headless-live.json` and
+`validation/android-youtube-live.json`. Neither establishes Android app-background
+playback or physical speaker output.
+
+```powershell
+./scripts/validate_android.ps1 -HeadlessYoutube
+# Full visible-to-detached probe; currently exposes the Android limitation:
+./scripts/validate_android.ps1 -LiveYoutube
+```
 
 Run from `packages/flutter_chromium_webview/example`:
 

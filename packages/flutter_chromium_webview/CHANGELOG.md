@@ -1,3 +1,10 @@
+## Unreleased
+
+* Add Android API 24+ support through the system Chromium WebView and a native Flutter platform view.
+* Preserve browser identity when attaching a view without a desktop texture.
+* Add emulator validation for browser lifecycle, origin-restricted channels, HTML and playback settings.
+* Keep WSL validation in a separate Linux checkout to protect Windows build metadata.
+
 ## 0.2.1
 
 * Fix Windows packaging, stabilize integration tests and update version status.

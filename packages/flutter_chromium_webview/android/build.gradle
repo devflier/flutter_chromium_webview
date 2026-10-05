@@ -1,0 +1,17 @@
+group = 'dev.devflier.flutter_chromium_webview'
+version = '1.0-SNAPSHOT'
+
+apply plugin: 'com.android.library'
+
+android {
+    namespace = 'dev.devflier.flutter_chromium_webview'
+    compileSdk = 36
+    defaultConfig { minSdk = 24 }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
+repositories { google(); mavenCentral() }
+dependencies { implementation 'androidx.webkit:webkit:1.16.0' }

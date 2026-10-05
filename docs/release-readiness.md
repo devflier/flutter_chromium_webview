@@ -1,6 +1,7 @@
-# Desktop v0.1.0 stabilization — open
+# Windows, Linux and Android readiness
 
-Updated: 2026-10-05. This is a release candidate audit, not a published release.
+Updated: 2026-10-05. Desktop 0.2.1 has been published by the repository owner.
+Android support in this checkout is an unreleased addition.
 Do not infer runtime verification from the existence of an implementation.
 
 ## Environment
@@ -9,6 +10,10 @@ Ubuntu 26.04.1 LTS, WSL2 kernel 6.6.87.2, x86-64; Flutter 3.47.5 stable,
 Dart 3.13.4; CMake 4.2.3. CEF 149.0.4 / Chromium 149.0.7827.156.
 Only WSLg is available here. Native Linux desktop compatibility is unverified.
 Windows validation uses Flutter 3.47.4 and the Visual Studio CMake toolchain.
+Android validation uses the installed Pixel_9_Pro emulator (Android 16 x86-64),
+system Chromium WebView 133.0.6943.137, AndroidX WebKit 1.16.0 and Java 17.
+Android uses the system WebView rather than CEF. Windows and WSL use separate
+checkouts to keep generated Flutter metadata independent.
 The software baseline uses `LIBGL_ALWAYS_SOFTWARE=1`,
 `GALLIUM_DRIVER=llvmpipe`, `GDK_BACKEND=x11`. CEF uses CPU off-screen rendering.
 
@@ -52,22 +57,28 @@ The software baseline uses `LIBGL_ALWAYS_SOFTWARE=1`,
 | Lifecycle/session reset, focus, resize/wheel and native dialog/menu/dropdown suites | Passed Windows and WSLg; see current logs in `docs/validation` |
 | Windows native Unicode input (`aé😀`) and browser blur | Passed using real child HWND messages |
 | Native frame/callback regression suite | Passed Linux CTest and Windows frame lease/concurrent paint regressions |
-| Current Dart unit/widget tests and analyzer | Passed: 32 package tests, 2 example tests; analyzers clean |
+| Current Dart unit/widget tests and analyzer | Passed: 63 package tests, 2 example tests; analyzers clean |
 | Sandbox-enabled debug/release startup | Passed on Windows and WSLg; confinement review still required |
 | Release bundle outside checkout and normal close | Passed Windows and WSLg software/default graphics; shutdown complete and no surviving CEF subprocesses |
 | Default host graphics | WSLg startup/close passed with DRI3 warnings; hardware acceleration not established |
-| Native Linux desktop | Unavailable; release blocker |
+| Native Linux desktop | Unavailable; physical desktop validation still needed; WSLg passes |
 | HTML dropdown bounds/input outside widget | Widget hit tests passed at DPR 1 and 2; native popup selection passed; physical edge/multi-monitor checks remain |
 | Dialog/menu disposal and navigation cancellation | Native integration and per-browser route/widget tests passed; manual clipboard/IME checks remain |
 | Advanced IME and candidate positioning | Not verified / unsupported positioning |
-| Publication dry run | Scaffold/build exclusions verified; 2 warnings remain: uncommitted tree and missing repository/homepage |
-| CI | Workflow added for Dart and Windows; remote run unavailable because no repository remote is configured |
-| macOS | Initial backend and example runner implemented; compilation/runtime unverified on this Windows host |
+| Publication dry run | Android Java/Gradle/manifest included; build/cache/local properties excluded; 1 uncommitted-tree warning and 1 local-dependency-override hint. Local interface library files match the published 0.1.1 source |
+| CI | Dart/Linux/Windows workflows retained; Android emulator workflow added; remote execution not verified |
+| macOS | Unverified work in progress, excluded from plugin registration and publication by the current repository configuration |
 | JavaScript bridge | Shared desktop implementation; Windows/WSLg renderer tests pass for browser/channel/origin isolation, Unicode, navigation and disposal; macOS validation pending |
 | HTML loading | Explicit HTTP(S) document URL/origin, relative assets, reload, replacement, empty documents and browser isolation pass on Windows/WSLg; macOS validation pending |
 | Browser settings | Browser-specific HTTP/JavaScript user-agents, isolated autoplay contexts and unmuted WAV progress pass on Windows/WSLg; audible output remains unverified |
 | YouTube adapter | Ordered commands, events, getters, reload, timeouts and disposal tested; real CEF fixture and live playback/pause/seek/volume/widget-detachment checks pass on Windows/WSLg; see `youtube-adapter.md` |
-| ppplayer macOS adoption | Initial adapter and shared desktop prerequisites implemented; app facade integration, storage requirements, native Mac validation and distribution-model decision remain; see package `MACOS.md` |
+| Android browser | Native touch/view lifecycle, HTML, secure bridge, user-agent/autoplay profile isolation and adapter fixture suites pass. Full validation script and release APK build pass; see `validation/android-current-validation.log` and package `ANDROID.md` |
+| Android release input/UI | Release startup, native ASCII keyboard input and JavaScript alert acceptance pass with hybrid composition; see `validation/android-release-smoke.log`. Emulator keyboard setup screens must be dismissed first |
+| Android live playback | Foreground play/pause/seek/volume pass. Audio-only headless probe passes; an attached native view pauses on removal, so the full detach-progress probe fails. The ppplayer audio-only service integration passes separately below |
+| ppplayer adoption | Isolated preview shares the main app commit; 43 playback/media-command regression tests and analysis pass. Native fixture and live PlayerScreen controls pass on Windows/WSLg, including pause/resume, seek and confirmed volume. Prior full app debug/release builds pass; see `ppplayer-roadmap.md` |
+| ppplayer Android Chromium | Opt-in audio-only integration passes on the emulator with the real media handler, AudioService and lazy hybrid fallback. Home leaves the activity stopped while playback advances; system media pause/play and restoration pass. Service creates no second WebView. An earlier startup-progress failure is retained; repeatability, physical-device audio, screen-off and visible-video transitions remain gates |
+| ppplayer Android baseline | Existing local-video native integration passes on Pixel_9_Pro emulator, including app APK build/install, video tracks, play/pause/seek and disposal. This is the existing MediaKit path, not Chromium media-service adoption; see `validation/ppplayer-android-native.log` |
+| ppplayer Android release | Opt-in full-app release APK builds for ARM64 and x86_64; archive contains both architectures' Flutter/Dart and metadata libraries. Local build only; production signing and release playback remain unverified. See `validation/ppplayer-android-release.log` |
 
 ## Manual validation required
 
@@ -86,7 +97,11 @@ than disabling security to make a test pass.
 
 ## Release gate
 
-v0.1.0 remains open until the remaining matrix is resolved, native Linux testing is
-performed, sandbox behavior and third-party notices are reviewed, package metadata
-is validated with a publication dry run, and all required checks pass. No package
-publication or Git release is authorized by this audit.
+Before adopting the package in ppplayer, exercise full catalog navigation,
+source/playlist switching and repeated external-service startup; live PlayerScreen
+controls now pass on Windows/WSLg. On Android, audio-only playback with the
+existing media service passes emulator Home/media-command checks; address visible-view removal
+before enabling video-view transitions. Confirm physical-device audio, keyboard
+and background/foreground behavior; emulator playback progress alone does not
+establish those outcomes. Choose a new package version for the Android addition
+and run CI before publishing. This work has not published a package or Git release.
