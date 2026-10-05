@@ -12,14 +12,14 @@ delivered to native code, copied into a pixel buffer and shown in Flutter
 through a **Flutter `Texture`**. This lets the web view behave like any other
 widget: it can be clipped, transformed, stacked and overlaid.
 
-> **Status: experimental `0.1.0`.** Only **Linux (x64)** is supported.
+> **Status: `0.2.0`.** **Linux (x64)** and **Windows (x64)** are supported.
 
 ## Platform support
 
 | Platform | Status |
 | --- | --- |
-| Linux x64 | Supported (experimental), validated on Ubuntu / WSLg |
-| Windows | Not supported yet (work in progress in the repository) |
+| Linux x64 | Supported, validated on Ubuntu / WSLg |
+| Windows x64 | Supported, sandboxed CEF implementation |
 | macOS | Not supported yet (work in progress in the repository) |
 | Android, iOS, Web | Not planned |
 
@@ -27,7 +27,7 @@ widget: it can be clipped, transformed, stacked and overlaid.
 
 ```yaml
 dependencies:
-  flutter_chromium_webview: ^0.1.0
+  flutter_chromium_webview: ^0.2.0
 ```
 
 ### Requirements (Linux)
@@ -102,7 +102,7 @@ flutter run -d linux
 
 ## Limitations
 
-- Linux x64 only; Windows and macOS are not supported yet.
+- macOS is not supported yet.
 - Rendering uses the CPU (software compositing). GPU acceleration is disabled.
 - Standard CEF builds have no proprietary codecs (for example H.264).
 - Native drag and drop and IME candidate-window positioning are unfinished.

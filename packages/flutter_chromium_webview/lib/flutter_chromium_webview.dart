@@ -13,7 +13,7 @@
 /// );
 /// ```
 ///
-/// Only Linux x64 is supported in this release.
+/// Linux (x64) and Windows (x64) are supported.
 // ignore: unnecessary_library_name
 library flutter_chromium_webview;
 

@@ -1,3 +1,12 @@
+## 0.2.0
+
+* Add Windows (x64) backend support.
+* Provide full integration with CEF sandboxed runner for Windows.
+
+## 0.1.1
+
+* Fix platform interface class exports for pub release.
+
 ## 0.1.0
 
 * Initial release.
