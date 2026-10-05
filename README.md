@@ -94,3 +94,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details on setting up the local devel
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 Note: The Chromium Embedded Framework (CEF) and Chromium itself are subject to their own respective licenses (primarily BSD). When distributing an application using this plugin, you must adhere to the CEF licensing requirements.
+
