@@ -1,20 +1,32 @@
+# .pubignore replaces .gitignore for `dart pub publish`, so generated/local
+# artifacts must be listed here explicitly.
+
 # Unused generated scaffold retained locally, excluded from the package.
 example/dummy_plugin/
-# Native build artifacts and tool state.
+
+# Native build artifacts, downloaded CEF distributions and tool state.
+# CEF is never shipped: both DownloadCEF.cmake files fetch a pinned,
+# SHA-256 verified archive into the CMake binary directory (build/) at build time.
 **/build/
 **/.dart_tool/
 **/ephemeral/
-**/*.iml
-macos/cef/
+**/doc/api/
 **/__pycache__/
+**/*.pyc
+**/*.log
+**/*.iml
+**/.idea/
+**/.flutter-plugins-dependencies
+**/third_party/
+**/cef_download/
+**/cef_binary_*
+macos/cef/
 
 # Monorepo-only local overrides.
 pubspec_overrides.yaml
 
-# Platforms that are not supported yet stay in the repository only.
-windows/
+# macOS is not supported yet: the work-in-progress backend stays in the
+# repository only and is not declared in pubspec.yaml.
 macos/
-WINDOWS.md
 MACOS.md
-example/windows/
 example/macos/

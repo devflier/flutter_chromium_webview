@@ -25,6 +25,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_chromium_webview_platform_interface/flutter_chromium_webview_platform_interface.dart';
 
+export 'package:flutter_chromium_webview_platform_interface/flutter_chromium_webview_platform_interface.dart'
+    show PointerInputType;
+
 /// Represents a request from the browser to open a new window or tab.
 class NewWindowRequest {
   const NewWindowRequest({
@@ -271,16 +274,83 @@ class ChromiumWebViewController extends ChangeNotifier {
     });
   }
 
+  static int? _asInt(Object? value) => value is int
+      ? value
+      : (value is double && value.isFinite ? value.toInt() : null);
+
+  static const int _maxMenuDepth = 8;
+  static const int _maxMenuItems = 512;
+
+  /// Parses a native context-menu item list. Returns null if the payload is
+  /// malformed at any level, so a bad menu is dismissed rather than shown
+  /// half-populated.
+  static List<ContextMenuItem>? _parseMenuItems(Object? raw, [int depth = 0]) {
+    if (raw is! List || depth > _maxMenuDepth || raw.length > _maxMenuItems) {
+      return null;
+    }
+    final items = <ContextMenuItem>[];
+    for (final item in raw) {
+      if (item is! Map) return null;
+      final commandId = _asInt(item['commandId']);
+      final label = item['label'];
+      final type = _asInt(item['type']);
+      final isEnabled = item['isEnabled'];
+      final isChecked = item['isChecked'];
+      if (commandId == null ||
+          label is! String ||
+          type == null ||
+          isEnabled is! bool ||
+          isChecked is! bool) {
+        return null;
+      }
+      final rawSub = item['subMenu'];
+      List<ContextMenuItem>? subMenu;
+      if (rawSub != null) {
+        subMenu = _parseMenuItems(rawSub, depth + 1);
+        if (subMenu == null) return null;
+      }
+      items.add(
+        ContextMenuItem(
+          commandId: commandId,
+          label: label,
+          type: type,
+          isEnabled: isEnabled,
+          isChecked: isChecked,
+          subMenu: subMenu,
+        ),
+      );
+    }
+    return items;
+  }
+
+  /// Decodes and dispatches a native event. Malformed or incomplete payloads
+  /// are dropped; exceptions thrown by application callbacks are reported via
+  /// [FlutterError.reportError] and never propagate into the event stream.
   void _handleEvent(BrowserEvent browserEvent) {
     if (_isDisposed) return;
-    final event = browserEvent.name;
+    try {
+      _dispatchEvent(browserEvent);
+    } catch (error, stack) {
+      FlutterError.reportError(
+        FlutterErrorDetails(
+          exception: error,
+          stack: stack,
+          library: 'flutter_chromium_webview',
+          context: ErrorDescription('while handling ${browserEvent.name}'),
+        ),
+      );
+    }
+  }
+
+  void _dispatchEvent(BrowserEvent browserEvent) {
     final eventArgs = browserEvent.arguments;
-    switch (event) {
+    switch (browserEvent.name) {
       case 'javascriptMessage':
         final name = eventArgs['channel'];
         final message = eventArgs['message'];
         final origin = eventArgs['origin'];
-        if (message is! String ||
+        if (name is! String ||
+            message is! String ||
             origin is! String ||
             utf8.encode(message).length > 65536) {
           return;
@@ -295,60 +365,109 @@ class ChromiumWebViewController extends ChangeNotifier {
         }
         break;
       case 'urlChanged':
-        _currentUrl = eventArgs['url'] as String;
+        final url = eventArgs['url'];
+        if (url is! String) return;
+        _currentUrl = url;
         onUrlChanged?.call(_currentUrl);
         if (!_isDisposed) notifyListeners();
         break;
       case 'titleChanged':
-        _pageTitle = eventArgs['title'] as String;
+        final title = eventArgs['title'];
+        if (title is! String) return;
+        _pageTitle = title;
         onTitleChanged?.call(_pageTitle);
         if (!_isDisposed) notifyListeners();
         break;
       case 'loadingStateChanged':
-        _isLoading = eventArgs['isLoading'] as bool;
-        _canGoBack = eventArgs['canGoBack'] as bool;
-        _canGoForward = eventArgs['canGoForward'] as bool;
+        final isLoading = eventArgs['isLoading'];
+        final canGoBack = eventArgs['canGoBack'];
+        final canGoForward = eventArgs['canGoForward'];
+        if (isLoading is! bool || canGoBack is! bool || canGoForward is! bool) {
+          return;
+        }
+        _isLoading = isLoading;
+        _canGoBack = canGoBack;
+        _canGoForward = canGoForward;
         onLoadingStateChanged?.call(_isLoading, _canGoBack, _canGoForward);
         if (!_isDisposed) notifyListeners();
         break;
       case 'loadError':
-        onLoadError?.call(
-          eventArgs['errorCode'] as int,
-          eventArgs['errorText'] as String,
-          eventArgs['failedUrl'] as String,
-        );
+        final errorCode = _asInt(eventArgs['errorCode']);
+        final errorText = eventArgs['errorText'];
+        final failedUrl = eventArgs['failedUrl'];
+        if (errorCode == null || errorText is! String || failedUrl is! String) {
+          return;
+        }
+        onLoadError?.call(errorCode, errorText, failedUrl);
         break;
       case 'newWindowRequested':
+        final url = eventArgs['url'];
+        final frame = eventArgs['targetFrameName'];
+        final disposition = _asInt(eventArgs['targetDisposition']);
+        final userGesture = eventArgs['userGesture'];
+        if (url is! String ||
+            frame is! String ||
+            disposition == null ||
+            userGesture is! bool) {
+          return;
+        }
         onNewWindowRequested?.call(
           NewWindowRequest(
-            url: eventArgs['url'] as String,
-            targetFrameName: eventArgs['targetFrameName'] as String,
-            targetDisposition: eventArgs['targetDisposition'] as int,
-            userGesture: eventArgs['userGesture'] as bool,
+            url: url,
+            targetFrameName: frame,
+            targetDisposition: disposition,
+            userGesture: userGesture,
             sourceBrowserId: browserEvent.browserId,
           ),
         );
         break;
       case 'popupShow':
-        _isPopupShowing = eventArgs['show'] as bool;
+        final show = eventArgs['show'];
+        if (show is! bool) return;
+        _isPopupShowing = show;
         notifyListeners();
         break;
       case 'popupSize':
+        final x = _asInt(eventArgs['x']);
+        final y = _asInt(eventArgs['y']);
+        final width = _asInt(eventArgs['width']);
+        final height = _asInt(eventArgs['height']);
+        if (x == null ||
+            y == null ||
+            width == null ||
+            height == null ||
+            width < 0 ||
+            height < 0) {
+          return;
+        }
         _popupRect = Rect.fromLTWH(
-          (eventArgs['x'] as int).toDouble(),
-          (eventArgs['y'] as int).toDouble(),
-          (eventArgs['width'] as int).toDouble(),
-          (eventArgs['height'] as int).toDouble(),
+          x.toDouble(),
+          y.toDouble(),
+          width.toDouble(),
+          height.toDouble(),
         );
         notifyListeners();
         break;
       case 'jsDialog':
-        final dialogId = eventArgs['dialogId'] as int;
-        final type = JSDialogType.values[eventArgs['type'] as int];
+        final dialogId = _asInt(eventArgs['dialogId']);
+        final typeIndex = _asInt(eventArgs['type']);
+        final message = eventArgs['message'];
+        final defaultPrompt = eventArgs['defaultPrompt'];
+        if (dialogId == null) return;
+        // The native side is blocked on this dialog; always resolve it, even
+        // when the rest of the payload is unusable.
+        if (typeIndex == null ||
+            typeIndex < 0 ||
+            typeIndex >= JSDialogType.values.length ||
+            message is! String ||
+            defaultPrompt is! String) {
+          _closeDialog(dialogId, false, '');
+          return;
+        }
         final request = JSDialogRequest(
-          type: type,
-          message: eventArgs['message'] as String,
-          defaultPrompt: eventArgs['defaultPrompt'] as String,
+          type: JSDialogType.values[typeIndex],
+          message: message,
+          defaultPrompt: defaultPrompt,
         );
         final callback = onJSDialog;
         if (callback == null) {
@@ -362,37 +481,25 @@ class ChromiumWebViewController extends ChangeNotifier {
         }
         break;
       case 'takeFocus':
-        final next = eventArgs['next'] as bool;
+        final next = eventArgs['next'];
+        if (next is! bool) return;
         onTakeFocus?.call(next);
         break;
       case 'transientUiDismissed':
         _dismissTransientUi();
         break;
       case 'contextMenuRequested':
-        final menuId = eventArgs['menuId'] as int;
-
-        List<ContextMenuItem> parseItems(List rawItems) {
-          return rawItems.map((item) {
-            final map = item as Map;
-            return ContextMenuItem(
-              commandId: map['commandId'] as int,
-              label: map['label'] as String,
-              type: map['type'] as int,
-              isEnabled: map['isEnabled'] as bool,
-              isChecked: map['isChecked'] as bool,
-              subMenu: map['subMenu'] != null
-                  ? parseItems(map['subMenu'] as List)
-                  : null,
-            );
-          }).toList();
+        final menuId = _asInt(eventArgs['menuId']);
+        if (menuId == null) return;
+        final x = _asInt(eventArgs['x']);
+        final y = _asInt(eventArgs['y']);
+        final items = _parseMenuItems(eventArgs['items']);
+        // The native side is waiting for a decision; dismiss malformed menus.
+        if (x == null || y == null || items == null) {
+          _closeMenu(menuId, -1);
+          return;
         }
-
-        final request = ContextMenuRequest(
-          x: eventArgs['x'] as int,
-          y: eventArgs['y'] as int,
-          items: parseItems(eventArgs['items'] as List),
-        );
-
+        final request = ContextMenuRequest(x: x, y: y, items: items);
         final callback = onContextMenuRequested;
         if (callback == null) {
           _closeMenu(menuId, -1);
@@ -684,10 +791,9 @@ class ChromiumWebViewController extends ChangeNotifier {
 
   /// Forwards a pointer event to the native browser.
   ///
-  /// This is handled automatically by the [ChromiumWebView] widget. [type] is
-  /// the index of a [PointerInputType]: down, up, move, wheel, leave.
-  Future<void> sendPointerEvent({
-    required int type,
+  /// This is handled automatically by the [ChromiumWebView] widget.
+  Future<void> sendPointerInput({
+    required PointerInputType type,
     required int x,
     required int y,
     int button = 0,
@@ -698,7 +804,7 @@ class ChromiumWebViewController extends ChangeNotifier {
     (id) => _platform.sendPointerInput(
       id,
       PointerInput(
-        type: PointerInputType.values[type],
+        type: type,
         x: x,
         y: y,
         button: button,
@@ -708,6 +814,37 @@ class ChromiumWebViewController extends ChangeNotifier {
       ),
     ),
   );
+
+  /// Forwards a pointer event to the native browser.
+  ///
+  /// [type] is the index of a [PointerInputType]: down, up, move, wheel,
+  /// leave. Throws [RangeError] for any other value.
+  @Deprecated('Use sendPointerInput with a PointerInputType instead.')
+  Future<void> sendPointerEvent({
+    required int type,
+    required int x,
+    required int y,
+    int button = 0,
+    int deltaX = 0,
+    int deltaY = 0,
+    int modifiers = 0,
+  }) {
+    RangeError.checkValueInInterval(
+      type,
+      0,
+      PointerInputType.values.length - 1,
+      'type',
+    );
+    return sendPointerInput(
+      type: PointerInputType.values[type],
+      x: x,
+      y: y,
+      button: button,
+      deltaX: deltaX,
+      deltaY: deltaY,
+      modifiers: modifiers,
+    );
+  }
 
   /// Closes the native browser and releases resources.
   ///
@@ -899,21 +1036,22 @@ class _ChromiumWebViewState extends State<ChromiumWebView> {
         (buttons & kSecondaryMouseButton != 0 ? 64 : 0);
   }
 
-  void _handlePointerEvent(PointerEvent event, int type) {
+  void _handlePointerEvent(PointerEvent event, PointerInputType type) {
     if (widget.controller.textureId == null) return;
-    if (type == 0) _focus.requestFocus();
+    if (type == PointerInputType.down) _focus.requestFocus();
     final view = _viewKey.currentContext?.findRenderObject() as RenderBox?;
     final position = view?.globalToLocal(event.position) ?? event.localPosition;
 
-    // Pointer cancel (1) or exit (4) forces all buttons to release.
-    final nextButtons = (type == 1 || type == 4) ? 0 : event.buttons;
+    // Pointer cancel (reported as up) or exit (leave) releases all buttons.
+    final releasesAll =
+        type == PointerInputType.up || type == PointerInputType.leave;
+    final nextButtons = releasesAll ? 0 : event.buttons;
     final changedButtons = _buttons ^ nextButtons;
 
     // Move events can also describe an additional button pressed or released.
-    if (type == 0 ||
-        type == 1 ||
-        type == 4 ||
-        (type == 2 && changedButtons != 0)) {
+    if (type == PointerInputType.down ||
+        releasesAll ||
+        (type == PointerInputType.move && changedButtons != 0)) {
       for (final entry in const {
         kPrimaryMouseButton: 1,
         kSecondaryMouseButton: 2,
@@ -921,8 +1059,10 @@ class _ChromiumWebViewState extends State<ChromiumWebView> {
       }.entries) {
         if (changedButtons & entry.key == 0) continue;
         _send(
-          widget.controller.sendPointerEvent(
-            type: (nextButtons & entry.key != 0) ? 0 : 1,
+          widget.controller.sendPointerInput(
+            type: (nextButtons & entry.key != 0)
+                ? PointerInputType.down
+                : PointerInputType.up,
             x: position.dx.round(),
             y: position.dy.round(),
             button: entry.value,
@@ -932,9 +1072,11 @@ class _ChromiumWebViewState extends State<ChromiumWebView> {
       }
     }
     _buttons = nextButtons;
-    if (type == 2 || type == 3 || type == 4) {
+    if (type == PointerInputType.move ||
+        type == PointerInputType.wheel ||
+        type == PointerInputType.leave) {
       _send(
-        widget.controller.sendPointerEvent(
+        widget.controller.sendPointerInput(
           type: type,
           x: position.dx.round(),
           y: position.dy.round(),
@@ -951,19 +1093,23 @@ class _ChromiumWebViewState extends State<ChromiumWebView> {
   }
 
   Widget _pointerSurface(Widget child) => MouseRegion(
-    onExit: (event) => _handlePointerEvent(event, 4),
+    onExit: (event) => _handlePointerEvent(event, PointerInputType.leave),
     child: Listener(
       behavior: HitTestBehavior.opaque,
-      onPointerDown: (event) => _handlePointerEvent(event, 0),
-      onPointerUp: (event) => _handlePointerEvent(event, 1),
-      onPointerCancel: (event) => _handlePointerEvent(event, 1),
-      onPointerMove: (event) => _handlePointerEvent(event, 2),
-      onPointerHover: (event) => _handlePointerEvent(event, 2),
+      onPointerDown: (event) =>
+          _handlePointerEvent(event, PointerInputType.down),
+      onPointerUp: (event) => _handlePointerEvent(event, PointerInputType.up),
+      onPointerCancel: (event) =>
+          _handlePointerEvent(event, PointerInputType.up),
+      onPointerMove: (event) =>
+          _handlePointerEvent(event, PointerInputType.move),
+      onPointerHover: (event) =>
+          _handlePointerEvent(event, PointerInputType.move),
       onPointerSignal: (event) {
         if (event is PointerScrollEvent) {
           GestureBinding.instance.pointerSignalResolver.register(
             event,
-            (event) => _handlePointerEvent(event, 3),
+            (event) => _handlePointerEvent(event, PointerInputType.wheel),
           );
         }
       },

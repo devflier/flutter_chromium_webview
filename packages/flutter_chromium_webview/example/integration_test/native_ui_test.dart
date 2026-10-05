@@ -38,14 +38,19 @@ void main() {
       int y, {
       int button = 1,
     }) async {
-      await controller.sendPointerEvent(
-        type: 0,
+      await controller.sendPointerInput(
+        type: PointerInputType.down,
         x: x,
         y: y,
         button: button,
         modifiers: button == 2 ? 64 : 16,
       );
-      await controller.sendPointerEvent(type: 1, x: x, y: y, button: button);
+      await controller.sendPointerInput(
+        type: PointerInputType.up,
+        x: x,
+        y: y,
+        button: button,
+      );
     }
 
     try {
@@ -123,7 +128,7 @@ void main() {
         document.title = 'select-ready';
       """);
       await until(() => first.pageTitle == 'select-ready');
-      await first.sendPointerEvent(type: 2, x: 60, y: 40);
+      await first.sendPointerInput(type: PointerInputType.move, x: 60, y: 40);
       await click(first, 60, 40);
       await until(() => first.isPopupShowing);
       await first.dispose().timeout(const Duration(seconds: 10));

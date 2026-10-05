@@ -78,14 +78,19 @@ void main() {
                 s['dpr'] == dpr &&
                 s['scroll'] == 0,
           );
-          await controller.sendPointerEvent(
-            type: 0,
+          await controller.sendPointerInput(
+            type: PointerInputType.down,
             x: 50,
             y: 40,
             button: 1,
             modifiers: 16,
           );
-          await controller.sendPointerEvent(type: 1, x: 50, y: 40, button: 1);
+          await controller.sendPointerInput(
+            type: PointerInputType.up,
+            x: 50,
+            y: 40,
+            button: 1,
+          );
           final clicked = await until(
             (s) => (s['point'] as Map)['target'] == 'target',
           );
@@ -94,8 +99,8 @@ void main() {
             'y': 40,
             'target': 'target',
           }, reason: 'Click at DPR $dpr, width $width');
-          await controller.sendPointerEvent(
-            type: 3,
+          await controller.sendPointerInput(
+            type: PointerInputType.wheel,
             x: 250,
             y: 150,
             deltaY: -120,

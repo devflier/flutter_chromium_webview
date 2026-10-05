@@ -53,5 +53,39 @@ int main() {
     Release(frame);
   } while (!done);
   producer.join();
-  std::cout << "Texture ownership, resize, invalid-input and concurrent-paint regressions passed" << std::endl;
+
+  // Resize stress: repeatedly cycle through very different surface sizes while
+  // the "engine" keeps one earlier frame leased across each resize. Every
+  // sampled frame must have the dimensions and pixels of the latest paint, and
+  // a leased frame must stay intact. Frames are reference counted, so memory
+  // is bounded by the frames in flight (latest + leased), not by resize count.
+  {
+    struct Size { int w, h; };
+    const Size cycle[] = {{300, 300}, {1920, 1080}, {3840, 2160}, {640, 480}, {3840, 2160}};
+    FlutterChromiumTexture stress;
+    const FlutterDesktopPixelBuffer* leased = nullptr;
+    uint8_t leased_marker = 0;
+    for (int round = 0; round < 6; ++round) {
+      for (const Size& s : cycle) {
+        const uint8_t marker = static_cast<uint8_t>(10 + (round * 7 + s.w) % 200);
+        std::vector<uint8_t> bgra(static_cast<size_t>(s.w) * s.h * 4, marker);
+        stress.UpdateBuffer(bgra.data(), s.w, s.h);
+        auto* frame = Sample(stress);
+        Require(frame && frame->width == static_cast<size_t>(s.w) &&
+                    frame->height == static_cast<size_t>(s.h),
+                "Stress frame has wrong dimensions");
+        Require(frame->buffer[0] == marker &&
+                    frame->buffer[static_cast<size_t>(s.w) * s.h * 4 - 1] == marker,
+                "Stress frame has wrong pixels");
+        if (leased) {
+          Require(leased->buffer[0] == leased_marker, "Leased frame was overwritten by a resize");
+          Release(leased);
+        }
+        leased = frame;
+        leased_marker = marker;
+      }
+    }
+    Release(leased);
+  }
+  std::cout << "Texture ownership, resize, invalid-input, concurrent-paint and resize-stress regressions passed" << std::endl;
 }
