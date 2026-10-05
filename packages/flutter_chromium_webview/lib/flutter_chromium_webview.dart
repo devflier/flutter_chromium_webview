@@ -1,9 +1,28 @@
+/// A Chromium Embedded Framework (CEF) web view for Flutter desktop.
+///
+/// Create a [ChromiumWebViewController], initialize the runtime once with
+/// [ChromiumWebViewController.initialize], and show the browser with the
+/// [ChromiumWebView] widget:
+///
+/// ```dart
+/// final controller = ChromiumWebViewController();
+///
+/// ChromiumWebView(
+///   controller: controller,
+///   initialUrl: 'https://flutter.dev',
+/// );
+/// ```
+///
+/// Only Linux x64 is supported in this release.
+library flutter_chromium_webview;
+
 import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_chromium_webview_platform_interface/flutter_chromium_webview_platform_interface.dart';
 
 /// Represents a request from the browser to open a new window or tab.
 class NewWindowRequest {
@@ -207,59 +226,59 @@ class ChromiumWebViewController extends ChangeNotifier {
 
   /// The initial URL provided during construction.
   final String initialUrl;
-  static const MethodChannel _channel = MethodChannel(
-    'flutter_chromium_webview',
-  );
+  static ChromiumWebViewPlatform get _platform =>
+      ChromiumWebViewPlatform.instance;
   // Changes on hot restart, but remains stable across repeated initialization
   // calls in the same Dart isolate.
   static final String _sessionId = DateTime.now().microsecondsSinceEpoch
       .toString();
 
   static final Map<int, ChromiumWebViewController> _controllers = {};
-  static final Map<int, List<Map>> _pendingEvents = {};
-  static bool _handlerRegistered = false;
+  static final Map<int, List<BrowserEvent>> _pendingEvents = {};
+  static StreamSubscription<BrowserEvent>? _eventSubscription;
   static int _creatingCount = 0;
 
   @visibleForTesting
   static void resetTestingState() {
     _controllers.clear();
     _pendingEvents.clear();
-    _handlerRegistered = false;
+    _eventSubscription?.cancel();
+    _eventSubscription = null;
     _creatingCount = 0;
   }
 
   static void _ensureHandlerRegistered() {
-    if (_handlerRegistered) return;
-    _handlerRegistered = true;
-    _channel.setMethodCallHandler((call) async {
+    if (_eventSubscription != null) return;
+    _eventSubscription = _platform.events.listen((event) {
       try {
-        if (call.method == 'onBrowserEvent') {
-          final args = call.arguments as Map;
-          final browserId = args['browserId'] as int;
-          final controller = _controllers[browserId];
-          if (controller != null) {
-            controller._handleEvent(args);
-          } else if (_creatingCount > 0 && _pendingEvents.length < 256) {
-            final events = _pendingEvents.putIfAbsent(browserId, () => []);
-            if (events.length < 128) events.add(args);
-          }
+        final controller = _controllers[event.browserId];
+        if (controller != null) {
+          controller._handleEvent(event);
+        } else if (_creatingCount > 0 && _pendingEvents.length < 256) {
+          final events = _pendingEvents.putIfAbsent(event.browserId, () => []);
+          if (events.length < 128) events.add(event);
         }
       } catch (e, stack) {
-        debugPrint('Error in handler: $e\n$stack');
-        rethrow;
+        FlutterError.reportError(
+          FlutterErrorDetails(
+            exception: e,
+            stack: stack,
+            library: 'flutter_chromium_webview',
+          ),
+        );
       }
     });
   }
 
-  void _handleEvent(Map args) {
+  void _handleEvent(BrowserEvent browserEvent) {
     if (_isDisposed) return;
-    final event = args['event'] as String;
-    final eventArgs = args['args'] as Map?;
+    final event = browserEvent.name;
+    final eventArgs = browserEvent.arguments;
     switch (event) {
       case 'javascriptMessage':
-        final name = eventArgs?['channel'];
-        final message = eventArgs?['message'];
-        final origin = eventArgs?['origin'];
+        final name = eventArgs['channel'];
+        final message = eventArgs['message'];
+        final origin = eventArgs['origin'];
         if (message is! String ||
             origin is! String ||
             utf8.encode(message).length > 65536) {
@@ -275,17 +294,17 @@ class ChromiumWebViewController extends ChangeNotifier {
         }
         break;
       case 'urlChanged':
-        _currentUrl = eventArgs!['url'] as String;
+        _currentUrl = eventArgs['url'] as String;
         onUrlChanged?.call(_currentUrl);
         if (!_isDisposed) notifyListeners();
         break;
       case 'titleChanged':
-        _pageTitle = eventArgs!['title'] as String;
+        _pageTitle = eventArgs['title'] as String;
         onTitleChanged?.call(_pageTitle);
         if (!_isDisposed) notifyListeners();
         break;
       case 'loadingStateChanged':
-        _isLoading = eventArgs!['isLoading'] as bool;
+        _isLoading = eventArgs['isLoading'] as bool;
         _canGoBack = eventArgs['canGoBack'] as bool;
         _canGoForward = eventArgs['canGoForward'] as bool;
         onLoadingStateChanged?.call(_isLoading, _canGoBack, _canGoForward);
@@ -293,7 +312,7 @@ class ChromiumWebViewController extends ChangeNotifier {
         break;
       case 'loadError':
         onLoadError?.call(
-          eventArgs!['errorCode'] as int,
+          eventArgs['errorCode'] as int,
           eventArgs['errorText'] as String,
           eventArgs['failedUrl'] as String,
         );
@@ -301,21 +320,21 @@ class ChromiumWebViewController extends ChangeNotifier {
       case 'newWindowRequested':
         onNewWindowRequested?.call(
           NewWindowRequest(
-            url: eventArgs!['url'] as String,
+            url: eventArgs['url'] as String,
             targetFrameName: eventArgs['targetFrameName'] as String,
             targetDisposition: eventArgs['targetDisposition'] as int,
             userGesture: eventArgs['userGesture'] as bool,
-            sourceBrowserId: args['browserId'] as int,
+            sourceBrowserId: browserEvent.browserId,
           ),
         );
         break;
       case 'popupShow':
-        _isPopupShowing = eventArgs!['show'] as bool;
+        _isPopupShowing = eventArgs['show'] as bool;
         notifyListeners();
         break;
       case 'popupSize':
         _popupRect = Rect.fromLTWH(
-          (eventArgs!['x'] as int).toDouble(),
+          (eventArgs['x'] as int).toDouble(),
           (eventArgs['y'] as int).toDouble(),
           (eventArgs['width'] as int).toDouble(),
           (eventArgs['height'] as int).toDouble(),
@@ -323,7 +342,7 @@ class ChromiumWebViewController extends ChangeNotifier {
         notifyListeners();
         break;
       case 'jsDialog':
-        final dialogId = eventArgs!['dialogId'] as int;
+        final dialogId = eventArgs['dialogId'] as int;
         final type = JSDialogType.values[eventArgs['type'] as int];
         final request = JSDialogRequest(
           type: type,
@@ -332,38 +351,24 @@ class ChromiumWebViewController extends ChangeNotifier {
         );
         final callback = onJSDialog;
         if (callback == null) {
-          _invoke('closeJSDialog', {
-            'dialogId': dialogId,
-            'success': false,
-            'userInput': '',
-          });
+          _closeDialog(dialogId, false, '');
         } else {
-          Future<JSDialogResponse>.sync(() => callback(request))
-              .then((response) {
-                return _invoke('closeJSDialog', {
-                  'dialogId': dialogId,
-                  'success': response.success,
-                  'userInput': response.userInput,
-                });
-              })
-              .catchError((_) {
-                return _invoke('closeJSDialog', {
-                  'dialogId': dialogId,
-                  'success': false,
-                  'userInput': '',
-                });
-              });
+          Future<JSDialogResponse>.sync(() => callback(request)).then(
+            (response) =>
+                _closeDialog(dialogId, response.success, response.userInput),
+            onError: (Object _) => _closeDialog(dialogId, false, ''),
+          );
         }
         break;
       case 'takeFocus':
-        final next = eventArgs!['next'] as bool;
+        final next = eventArgs['next'] as bool;
         onTakeFocus?.call(next);
         break;
       case 'transientUiDismissed':
         _dismissTransientUi();
         break;
       case 'contextMenuRequested':
-        final menuId = eventArgs!['menuId'] as int;
+        final menuId = eventArgs['menuId'] as int;
 
         List<ContextMenuItem> parseItems(List rawItems) {
           return rawItems.map((item) {
@@ -389,21 +394,12 @@ class ChromiumWebViewController extends ChangeNotifier {
 
         final callback = onContextMenuRequested;
         if (callback == null) {
-          _invoke('closeContextMenu', {'menuId': menuId, 'commandId': -1});
+          _closeMenu(menuId, -1);
         } else {
-          Future<int?>.sync(() => callback(request))
-              .then((commandId) {
-                return _invoke('closeContextMenu', {
-                  'menuId': menuId,
-                  'commandId': commandId ?? -1,
-                });
-              })
-              .catchError((_) {
-                return _invoke('closeContextMenu', {
-                  'menuId': menuId,
-                  'commandId': -1,
-                });
-              });
+          Future<int?>.sync(() => callback(request)).then(
+            (commandId) => _closeMenu(menuId, commandId ?? -1),
+            onError: (Object _) => _closeMenu(menuId, -1),
+          );
         }
         break;
     }
@@ -524,11 +520,7 @@ class ChromiumWebViewController extends ChangeNotifier {
   ///
   /// Returns true if initialization succeeded.
   static Future<bool> initialize({required String cachePath}) async {
-    return await _channel.invokeMethod<bool>('initialize', {
-          'cachePath': cachePath,
-          'sessionId': _sessionId,
-        }) ??
-        false;
+    return _platform.initialize(cachePath: cachePath, sessionId: _sessionId);
   }
 
   /// Initiates native browser creation.
@@ -545,27 +537,24 @@ class ChromiumWebViewController extends ChangeNotifier {
     _creatingCount++;
     try {
       _ensureHandlerRegistered();
-      final result = await _channel.invokeMethod<Map<Object?, Object?>>(
-        'createBrowser',
-        {
-          'initialUrl': userAgent != null || !mediaPlaybackRequiresUserGesture
+      final result = await _platform.createBrowser(
+        BrowserCreationParams(
+          initialUrl: userAgent != null || !mediaPlaybackRequiresUserGesture
               ? 'about:blank'
               : initialUrl,
-          'mediaPlaybackRequiresUserGesture': mediaPlaybackRequiresUserGesture,
-          'javascriptChannels': jsonEncode({
+          mediaPlaybackRequiresUserGesture: mediaPlaybackRequiresUserGesture,
+          javaScriptChannels: {
             for (final channel in javaScriptChannels)
               channel.name: channel.allowedOrigins.toList(),
-          }),
-        },
+          },
+        ),
       );
-      if (result == null) {
-        throw StateError('Native browser creation returned no texture');
-      }
-      _browserId = result['browserId'] as int;
-      _textureId = result['textureId'] as int;
-      _popupTextureId = result['popupTextureId'] as int;
-      _controllers[_browserId!] = this;
-      final pending = _pendingEvents.remove(_browserId!);
+      final newBrowserId = result.browserId;
+      _browserId = newBrowserId;
+      _textureId = result.textureId;
+      _popupTextureId = result.popupTextureId;
+      _controllers[newBrowserId] = this;
+      final pending = _pendingEvents.remove(newBrowserId);
       if (pending != null) {
         for (final event in pending) {
           _handleEvent(event);
@@ -573,26 +562,19 @@ class ChromiumWebViewController extends ChangeNotifier {
       }
       try {
         if (!_isDisposed && userAgent != null) {
-          await _channel.invokeMethod<void>('setUserAgent', {
-            'browserId': _browserId,
-            'userAgent': userAgent,
-          });
+          await _platform.setUserAgent(newBrowserId, userAgent!);
         }
         if (!_isDisposed &&
             (userAgent != null || !mediaPlaybackRequiresUserGesture)) {
-          await _channel.invokeMethod<void>('loadRequest', {
-            'browserId': _browserId,
-            'url': initialUrl,
-          });
+          await _platform.loadUrl(newBrowserId, initialUrl);
         }
       } catch (_) {
-        final id = _browserId;
-        _controllers.remove(id);
-        _pendingEvents.remove(id);
+        _controllers.remove(newBrowserId);
+        _pendingEvents.remove(newBrowserId);
         _browserId = null;
         _textureId = null;
         _popupTextureId = null;
-        await _channel.invokeMethod<void>('disposeBrowser', {'browserId': id});
+        await _platform.disposeBrowser(newBrowserId);
         rethrow;
       }
     } finally {
@@ -602,17 +584,34 @@ class ChromiumWebViewController extends ChangeNotifier {
     }
   }
 
-  Future<void> _invoke(
-    String method, [
-    Map<String, Object?> args = const {},
-  ]) async {
+  /// Runs [operation] against the native browser once it exists. Does nothing
+  /// when the controller is disposed or no browser could be created.
+  Future<void> _invoke(Future<void> Function(int browserId) operation) async {
     if (_isDisposed) return;
     await _creation;
-    if (_isDisposed || _browserId == null) return;
-    await _channel.invokeMethod<void>(method, {
-      'browserId': _browserId,
-      ...args,
-    });
+    final id = _browserId;
+    if (_isDisposed || id == null) return;
+    await operation(id);
+  }
+
+  void _closeDialog(int dialogId, bool success, String userInput) {
+    unawaited(
+      _invoke(
+        (id) => _platform.closeJavaScriptDialog(
+          id,
+          dialogId,
+          success: success,
+          userInput: userInput,
+        ),
+      ).catchError((Object _) {}),
+    );
+  }
+
+  void _closeMenu(int menuId, int commandId) {
+    unawaited(
+      _invoke((id) => _platform.closeContextMenu(id, menuId, commandId))
+          .catchError((Object _) {}),
+    );
   }
 
   /// Loads the specified [url].
@@ -621,7 +620,7 @@ class ChromiumWebViewController extends ChangeNotifier {
   /// will be sent once the browser is ready.
   Future<void> loadRequest(String url) {
     _dismissTransientUi();
-    return _invoke('loadRequest', {'url': url});
+    return _invoke((id) => _platform.loadUrl(id, url));
   }
 
   /// Loads trusted UTF-8 [html] at the required HTTP(S) [baseUrl].
@@ -654,58 +653,60 @@ class ChromiumWebViewController extends ChangeNotifier {
       );
     }
     _dismissTransientUi();
-    await _invoke('loadHtmlString', {'html': html, 'baseUrl': uri.toString()});
+    await _invoke((id) => _platform.loadHtml(id, html, uri.toString()));
   }
 
   /// Reloads the current page.
-  Future<void> reload() => _invoke('reload');
+  Future<void> reload() => _invoke(_platform.reload);
 
   /// Navigates backwards one step in the browser's session history.
-  Future<void> goBack() => _invoke('goBack');
+  Future<void> goBack() => _invoke(_platform.goBack);
 
   /// Navigates forwards one step in the browser's session history.
-  Future<void> goForward() => _invoke('goForward');
+  Future<void> goForward() => _invoke(_platform.goForward);
 
   /// Executes the provided JavaScript string [js] asynchronously in the main frame.
   Future<void> executeJavaScript(String js) =>
-      _invoke('executeJavaScript', {'js': js});
+      _invoke((id) => _platform.executeJavaScript(id, js));
 
   /// Notifies the native browser of a focus change.
   ///
   /// When [focused] is true, the browser captures keyboard events.
   Future<void> setFocus(bool focused) =>
-      _invoke('setFocus', {'focused': focused});
+      _invoke((id) => _platform.setFocus(id, focused));
 
   /// Updates the native viewport size and device pixel ratio (DPR).
   ///
   /// This is called automatically by the [ChromiumWebView] widget.
   Future<void> updateBrowserSize(double width, double height, double dpr) =>
-      _invoke('updateBrowserSize', {
-        'width': width,
-        'height': height,
-        'dpr': dpr,
-      });
+      _invoke((id) => _platform.resize(id, width, height, dpr));
 
   /// Forwards a pointer event to the native browser.
   ///
-  /// This is handled automatically by the [ChromiumWebView] widget.
+  /// This is handled automatically by the [ChromiumWebView] widget. [type] is
+  /// the index of a [PointerInputType]: down, up, move, wheel, leave.
   Future<void> sendPointerEvent({
-    required int type, // Down, up, move, wheel, leave.
+    required int type,
     required int x,
     required int y,
     int button = 0,
     int deltaX = 0,
     int deltaY = 0,
     int modifiers = 0,
-  }) => _invoke('sendPointerEvent', {
-    'x': x,
-    'y': y,
-    'type': type,
-    'button': button,
-    'deltaX': deltaX,
-    'deltaY': deltaY,
-    'modifiers': modifiers,
-  });
+  }) => _invoke(
+    (id) => _platform.sendPointerInput(
+      id,
+      PointerInput(
+        type: PointerInputType.values[type],
+        x: x,
+        y: y,
+        button: button,
+        deltaX: deltaX,
+        deltaY: deltaY,
+        modifiers: modifiers,
+      ),
+    ),
+  );
 
   /// Closes the native browser and releases resources.
   ///
@@ -734,7 +735,7 @@ class ChromiumWebViewController extends ChangeNotifier {
     if (id != null) {
       _controllers.remove(id);
       _pendingEvents.remove(id);
-      await _channel.invokeMethod<void>('disposeBrowser', {'browserId': id});
+      await _platform.disposeBrowser(id);
     }
   }
 }
@@ -752,6 +753,7 @@ class ChromiumWebView extends StatefulWidget {
   const ChromiumWebView({
     super.key,
     required this.controller,
+    this.initialUrl,
     this.disposeController = true,
     this.autofocus = false,
     this.onError,
@@ -759,6 +761,13 @@ class ChromiumWebView extends StatefulWidget {
 
   /// The controller that drives this browser instance.
   final ChromiumWebViewController controller;
+
+  /// Optional URL to load as soon as the browser is ready.
+  ///
+  /// Equivalent to calling [ChromiumWebViewController.loadRequest] once after
+  /// creation. When null, the controller's own
+  /// [ChromiumWebViewController.initialUrl] is used.
+  final String? initialUrl;
 
   /// Whether the widget should automatically dispose the [controller] when
   /// removed from the tree. Defaults to true.
@@ -827,6 +836,11 @@ class _ChromiumWebViewState extends State<ChromiumWebView> {
     try {
       await controller.createBrowser();
       if (!mounted || controller != widget.controller) return;
+      final url = widget.initialUrl;
+      if (url != null && url != controller.initialUrl) {
+        await controller.loadRequest(url);
+        if (!mounted || controller != widget.controller) return;
+      }
       controller.onTakeFocus ??= _handleTakeFocus;
       setState(() {});
       await controller.setFocus(_focus.hasFocus);

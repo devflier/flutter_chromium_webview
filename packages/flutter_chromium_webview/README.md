@@ -1,97 +1,129 @@
-# Flutter Chromium WebView
+# flutter_chromium_webview
 
-Chromium Embedded Framework (CEF) WebView for Flutter desktop with off-screen rendering and Flutter texture integration.
+A **Chromium Embedded Framework (CEF)** web view for Flutter desktop.
 
-## Overview
+Unlike most webview plugins, `flutter_chromium_webview` does **not** use the
+operating system's web view (WebView2, WebKit, WebKitGTK). It bundles its own
+Chromium engine through [CEF](https://bitbucket.org/chromiumembedded/cef), so
+pages render the same way on every machine.
 
-Unlike standard webview plugins that embed native OS webviews (like Edge WebView2 on Windows or WebKit on macOS), this plugin brings a fully bundled Chromium browser to your Flutter application via the [Chromium Embedded Framework (CEF)](https://bitbucket.org/chromiumembedded/cef).
+Pages are rendered with CEF **off-screen rendering (OSR)**. Each frame is
+delivered to native code, copied into a pixel buffer and shown in Flutter
+through a **Flutter `Texture`**. This lets the web view behave like any other
+widget: it can be clipped, transformed, stacked and overlaid.
 
-It uses **off-screen rendering (OSR)**. The web content is rendered to an off-screen pixel buffer and displayed inside the Flutter widget tree using a Flutter Texture.
+> **Status: experimental `0.1.0`.** Only **Linux (x64)** is supported.
 
-### Features
-* **Seamless Integration**: Because it uses Flutter Texture, the WebView acts like a normal Flutter widget. It supports scrolling, transformations, and overlays.
-* **Consistent Behavior**: The browser engine is identical across platforms, ensuring your web content renders and behaves exactly the same way regardless of the host OS.
-* **Full Desktop Input**: Includes deep integration for keyboard and mouse events natively routed from Flutter to CEF.
+## Platform support
 
-## Current Project Status
-**Experimental / Pre-Release**
+| Platform | Status |
+| --- | --- |
+| Linux x64 | Supported (experimental), validated on Ubuntu / WSLg |
+| Windows | Not supported yet (work in progress in the repository) |
+| macOS | Not supported yet (work in progress in the repository) |
+| Android, iOS, Web | Not planned |
 
-Currently, only **Linux** is actively supported for this experimental 0.1.0 release.
-Windows and macOS support are planned but not fully implemented/tested yet.
+## Installation
 
-## Monorepo Layout
-
-This repository is a monorepo containing multiple packages:
-
-* packages/flutter_chromium_webview: The main plugin package that you depend on in your application.
-* packages/flutter_chromium_webview_platform_interface: The common platform interface used to federate the plugin across different OS implementations.
-
-## Architecture
-
-The plugin architecture bridges Flutter and CEF natively:
-
-1. **CEF Browser**: A headless browser instance processes HTML/JS/CSS.
-2. **OnPaint (OSR)**: CEF calls its OnPaint callback with a raw pixel buffer.
-3. **Pixel Buffer**: The native plugin code transforms the raw BGRA buffer to RGBA.
-4. **Flutter Texture**: The buffer is loaded into a GPU texture registered with Flutter.
-5. **ChromiumWebView Widget**: Displays the Texture and listens to Flutter pointer/keyboard events, forwarding them back to the CEF browser via native channels.
-
-## Quick Start
-
-Add the dependency to your pubspec.yaml:
-
-`yaml
+```yaml
 dependencies:
   flutter_chromium_webview: ^0.1.0
-`
+```
 
-Initialize the global CEF runtime once before using the widget:
+### Requirements (Linux)
 
-`dart
+- Flutter with Linux desktop support enabled.
+- A Linux x64 toolchain: Clang, CMake (3.19+), Ninja, `pkg-config`, GTK 3
+  development files.
+- Network access during the **first build**. The plugin does not ship CEF in
+  the pub.dev package; its CMake build downloads a pinned, SHA-256 verified CEF
+  `minimal` distribution (~100 MB) and builds the CEF wrapper library. Pre-download the
+  archive and point the `CEF_TARBALL` CMake cache variable at it for offline
+  builds.
+- An X11 display (the plugin selects the X11 backend).
+
+## Usage
+
+Initialize the CEF runtime once, before creating any browser:
+
+```dart
+import 'package:flutter/material.dart';
 import 'package:flutter_chromium_webview/flutter_chromium_webview.dart';
+import 'package:path_provider/path_provider.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await ChromiumWebViewController.initialize(cachePath: '/path/to/cache');
-  runApp(MyApp());
+  final cache = await getApplicationSupportDirectory();
+  await ChromiumWebViewController.initialize(cachePath: cache.path);
+  runApp(const MyApp());
 }
-`
+```
 
-Use the ChromiumWebView widget in your app:
+Then place a `ChromiumWebView` in your widget tree:
 
-`dart
-final controller = ChromiumWebViewController(initialUrl: 'https://flutter.dev');
+```dart
+class _MyAppState extends State<MyApp> {
+  final controller = ChromiumWebViewController();
 
-@override
-Widget build(BuildContext context) {
-  return ChromiumWebView(
-    controller: controller,
-  );
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        body: ChromiumWebView(
+          controller: controller,
+          initialUrl: 'https://flutter.dev',
+        ),
+      ),
+    );
+  }
 }
-`
+```
 
-## CEF Requirements
+The widget disposes its controller when removed from the tree. Pass
+`disposeController: false` if you manage the controller's lifetime yourself.
 
-Since this plugin embeds Chromium, it requires downloading the CEF runtime. During the native build process (e.g., via CMake on Linux), the plugin automatically downloads the appropriate pre-compiled CEF binaries from Spotify's public CEF builds.
+The controller offers `loadRequest`, `loadHtmlString`, `reload`, `goBack`,
+`goForward`, `executeJavaScript`, and exposes `currentUrl`, `pageTitle`,
+`isLoading`, `canGoBack` and `canGoForward` (it is a `ChangeNotifier`). It also
+supports origin-restricted JavaScript channels, new-window requests, JavaScript
+dialogs and context menus that you render with Flutter widgets.
 
-Users running the application will need the CEF shared libraries (e.g., libcef.so) bundled with the application executable. The build scripts handle packaging these libraries into your Flutter output bundle.
+You never need to deal with CEF handlers, GTK, native textures or pixel buffers.
+
+## Example
+
+See [`example/`](example) for a small browser with back, forward, reload, an
+address bar, a JavaScript execution button, and layout-driven resizing.
+
+```sh
+cd example
+flutter run -d linux
+```
+
+## Limitations
+
+- Linux x64 only; Windows and macOS are not supported yet.
+- Rendering uses the CPU (software compositing). GPU acceleration is disabled.
+- Standard CEF builds have no proprietary codecs (for example H.264).
+- Native drag and drop and IME candidate-window positioning are unfinished.
+- Once CEF is shut down the process must be restarted to use it again.
+- The binary size of an app grows by the size of Chromium.
+
+## Packages
+
+- [`flutter_chromium_webview`](https://pub.dev/packages/flutter_chromium_webview): this package.
+- [`flutter_chromium_webview_platform_interface`](https://pub.dev/packages/flutter_chromium_webview_platform_interface):
+  the shared platform contract. Not intended for direct use by applications.
 
 ## Roadmap
 
-* **v0.1.x**: Stabilize Linux support, improve testing and pub scores.
-* **v0.2.x**: Implement Windows CEF backend.
-* **v0.3.x**: Implement macOS CEF backend.
-* **v1.0.0**: Stable, multi-platform release.
+- **0.1.x** – stabilize Linux, improve tests and documentation.
+- **0.2.x** – Windows backend.
+- **0.3.x** – macOS backend.
+- **1.0.0** – stable multi-platform release.
 
-## Contributing
+## Contributing & license
 
-We welcome pull requests! Since this relies heavily on native C++ and CEF, you will need a C++ toolchain configured for your platform (e.g., GCC/Clang on Linux, MSVC on Windows).
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for details on setting up the local development environment.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-Note: The Chromium Embedded Framework (CEF) and Chromium itself are subject to their own respective licenses (primarily BSD). When distributing an application using this plugin, you must adhere to the CEF licensing requirements.
-
+See [CONTRIBUTING.md](https://github.com/devflier/flutter_chromium_webview/blob/main/CONTRIBUTING.md).
+Released under the MIT license; CEF and Chromium are covered by their own
+(BSD-style) licenses, which you must honor when distributing an app.

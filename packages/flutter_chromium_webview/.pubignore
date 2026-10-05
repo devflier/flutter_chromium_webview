@@ -7,3 +7,14 @@ example/dummy_plugin/
 **/*.iml
 macos/cef/
 **/__pycache__/
+
+# Monorepo-only local overrides.
+pubspec_overrides.yaml
+
+# Platforms that are not supported yet stay in the repository only.
+windows/
+macos/
+WINDOWS.md
+MACOS.md
+example/windows/
+example/macos/

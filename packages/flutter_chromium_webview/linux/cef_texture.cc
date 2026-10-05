@@ -11,6 +11,11 @@ struct _FlutterChromiumTexture {
   std::vector<std::vector<uint8_t>>* retired_buffers;
   uint32_t width;
   uint32_t height;
+  // True while render_buffer already holds the latest rgba_buffer frame, so
+  // repeated raster samples without a new OnPaint do not copy the frame again.
+  bool snapshot_valid;
+  uint32_t snapshot_width;
+  uint32_t snapshot_height;
 };
 
 G_DEFINE_TYPE(FlutterChromiumTexture, flutter_chromium_texture, fl_pixel_buffer_texture_get_type())
@@ -38,6 +43,15 @@ static gboolean flutter_chromium_texture_copy_pixels(FlPixelBufferTexture* textu
     return TRUE;
   }
 
+  if (self->snapshot_valid && self->snapshot_width == self->width &&
+      self->snapshot_height == self->height) {
+    // No new frame since the last sample: reuse the snapshot, no copy.
+    *buffer = self->render_buffer->data();
+    *width = self->width;
+    *height = self->height;
+    self->mutex->unlock();
+    return TRUE;
+  }
   const size_t bytes = static_cast<size_t>(self->width) * self->height * 4;
   if (bytes > self->render_buffer->capacity()) {
     // Flutter's API requires returned allocations to survive unregistration.
@@ -53,6 +67,9 @@ static gboolean flutter_chromium_texture_copy_pixels(FlPixelBufferTexture* textu
   *buffer = self->render_buffer->data();
   *width = self->width;
   *height = self->height;
+  self->snapshot_valid = true;
+  self->snapshot_width = self->width;
+  self->snapshot_height = self->height;
 
   self->mutex->unlock();
   return TRUE;
@@ -94,6 +111,9 @@ static void flutter_chromium_texture_init(FlutterChromiumTexture* self) {
   self->retired_buffers = new std::vector<std::vector<uint8_t>>();
   self->width = 0;
   self->height = 0;
+  self->snapshot_valid = false;
+  self->snapshot_width = 0;
+  self->snapshot_height = 0;
 }
 
 FlutterChromiumTexture* flutter_chromium_texture_new() {
@@ -119,13 +139,15 @@ void flutter_chromium_texture_update_buffer(FlutterChromiumTexture* self, const 
   if (self->rgba_buffer) {
     const uint8_t* bgra = static_cast<const uint8_t*>(buffer);
     uint8_t* rgba = self->rgba_buffer;
-    
-    // BGRA to RGBA conversion
+
+    // BGRA to RGBA conversion, one 32-bit word at a time (little-endian:
+    // 0xAARRGGBB -> 0xAABBGGRR).
     for (size_t i = 0; i < required_size; i += 4) {
-      rgba[i] = bgra[i + 2];     // R
-      rgba[i + 1] = bgra[i + 1]; // G
-      rgba[i + 2] = bgra[i];     // B
-      rgba[i + 3] = bgra[i + 3]; // A
+      uint32_t v;
+      memcpy(&v, bgra + i, 4);
+      v = (v & 0xFF00FF00u) | ((v & 0xFFu) << 16) | ((v >> 16) & 0xFFu);
+      memcpy(rgba + i, &v, 4);
     }
+    self->snapshot_valid = false;
   }
 }

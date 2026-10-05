@@ -1,4 +1,3 @@
-
 import 'dummy_plugin_platform_interface.dart';
 
 class DummyPlugin {

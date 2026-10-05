@@ -292,6 +292,13 @@ class _BrowserScreenState extends State<BrowserScreen> {
                     icon: const Icon(Icons.refresh),
                     onPressed: () => _controller.reload(),
                   ),
+                  IconButton(
+                    tooltip: 'Run JavaScript',
+                    icon: const Icon(Icons.code),
+                    onPressed: () => _controller.executeJavaScript(
+                      "document.body.style.background = '#fff3c4';",
+                    ),
+                  ),
                   Expanded(
                     child: TextField(
                       controller: _urlController,

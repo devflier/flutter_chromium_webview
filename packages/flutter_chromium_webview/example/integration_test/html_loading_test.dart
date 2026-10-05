@@ -45,7 +45,7 @@ void main() {
             javaScriptChannels: [
               JavaScriptChannel(
                 name: 'player',
-            allowedOrigins: {origin, secureOrigin},
+                allowedOrigins: {origin, secureOrigin},
                 onMessageReceived: (value) {
                   origins.add(value.origin);
                   messages.add(value.message);
@@ -135,19 +135,19 @@ void main() {
         document.body.appendChild(iframe);
       """);
         await waitFor(() => firstMessages.length == 8);
-      expect(firstMessages.last, 'iframe:Network');
-      await first.loadHtmlString(
-        '<script>chromiumPostMessage("player", "secure:" + location.origin)</script>',
-        baseUrl: '$secureOrigin/index.html',
-      );
-      await waitFor(() => firstMessages.length == 9);
-      expect(firstMessages.last, 'secure:$secureOrigin');
-      expect(first.currentUrl, '$secureOrigin/index.html');
+        expect(firstMessages.last, 'iframe:Network');
+        await first.loadHtmlString(
+          '<script>chromiumPostMessage("player", "secure:" + location.origin)</script>',
+          baseUrl: '$secureOrigin/index.html',
+        );
+        await waitFor(() => firstMessages.length == 9);
+        expect(firstMessages.last, 'secure:$secureOrigin');
+        expect(first.currentUrl, '$secureOrigin/index.html');
         await first.dispose();
         await second.reload();
         await waitFor(() => secondMessages.length == 3);
         expect(secondMessages.last, 'asset:Second:$origin');
-      expect(origins.toSet(), {origin, secureOrigin});
+        expect(origins.toSet(), {origin, secureOrigin});
       } finally {
         await first.dispose();
         await second.dispose();
