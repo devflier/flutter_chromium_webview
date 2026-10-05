@@ -6,7 +6,7 @@ on:
 permissions:
   contents: read
 jobs:
-  dart:
+  dart_and_linux:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,17 +15,34 @@ jobs:
           flutter-version: '3.47.4'
           channel: stable
           cache: true
-      - name: Package and example checks
-        working-directory: packages/flutter_chromium_webview
+      
+      - name: Install Linux Dependencies
         run: |
-          python3 -m unittest discover -s macos/test -p 'test_*.py' -v
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libgtk-3-dev xvfb
+          
+      - name: Check Formatting
+        run: dart format --output=none --set-exit-if-changed .
+        
+      - name: Platform Interface Checks
+        working-directory: packages/flutter_chromium_webview_platform_interface
+        run: |
           flutter pub get
           flutter analyze
           flutter test
-          cd example
+          dart pub publish --dry-run
+          
+      - name: Main Package Checks
+        working-directory: packages/flutter_chromium_webview
+        run: |
           flutter pub get
           flutter analyze
-          flutter test test
+          flutter test
+          dart pub publish --dry-run
+          
+      - name: Linux Native, Integration and Release checks
+        run: xvfb-run -a ./scripts/validate_linux.sh
+        
   windows:
     runs-on: windows-latest
     timeout-minutes: 45
