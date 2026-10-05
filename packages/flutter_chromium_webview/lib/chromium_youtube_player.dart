@@ -14,6 +14,7 @@ class ChromiumYoutubePlayerController {
   ChromiumYoutubePlayerController({
     required this.documentUrl,
     String? userAgent,
+    String? profileName,
     this.readyTimeout = const Duration(seconds: 30),
     this.commandTimeout = const Duration(seconds: 5),
     @visibleForTesting this.iframeApiUrl = 'https://www.youtube.com/iframe_api',
@@ -25,6 +26,7 @@ class ChromiumYoutubePlayerController {
     }
     webViewController = ChromiumWebViewController(
       userAgent: userAgent,
+      profileName: profileName,
       mediaPlaybackRequiresUserGesture: false,
       javaScriptChannels: [
         JavaScriptChannel(

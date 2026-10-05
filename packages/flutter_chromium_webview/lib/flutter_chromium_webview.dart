@@ -197,10 +197,14 @@ class ChromiumWebViewController extends ChangeNotifier {
   ChromiumWebViewController({
     this.initialUrl = 'about:blank',
     this.userAgent,
+    this.profileName,
     this.mediaPlaybackRequiresUserGesture = true,
     List<JavaScriptChannel> javaScriptChannels = const [],
   }) : javaScriptChannels = List.unmodifiable(javaScriptChannels) {
     _validateUserAgent(userAgent);
+    if (profileName != null && !RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(profileName!)) {
+      throw ArgumentError('profileName must be alphanumeric/underscores only');
+    }
     if (javaScriptChannels.map((channel) => channel.name).toSet().length !=
         javaScriptChannels.length) {
       throw ArgumentError('JavaScript channel names must be unique');
@@ -213,9 +217,13 @@ class ChromiumWebViewController extends ChangeNotifier {
   /// Optional printable ASCII user-agent override, applied before initial navigation.
   final String? userAgent;
 
+  /// An optional alphanumeric string specifying a persistent storage profile.
+  /// If provided, cookies and storage are persisted to a named disk location.
+  final String? profileName;
+
   /// Keep Chromium's normal autoplay policy when true (the default).
-  /// False enables autoplay in a private, in-memory browser context with no
-  /// cookies/storage shared with other browsers or persisted across disposal.
+  /// False enables autoplay. Unless [profileName] is provided, this creates
+  /// a private, in-memory browser context with no shared cookies/storage.
   final bool mediaPlaybackRequiresUserGesture;
 
   static void _validateUserAgent(String? value) {
@@ -653,10 +661,12 @@ class ChromiumWebViewController extends ChangeNotifier {
       _ensureHandlerRegistered();
       final result = await _platform.createBrowser(
         BrowserCreationParams(
-          initialUrl: userAgent != null || !mediaPlaybackRequiresUserGesture
+          initialUrl: userAgent != null ||
+                  (!mediaPlaybackRequiresUserGesture && profileName == null)
               ? 'about:blank'
               : initialUrl,
           mediaPlaybackRequiresUserGesture: mediaPlaybackRequiresUserGesture,
+          profileName: profileName,
           javaScriptChannels: {
             for (final channel in javaScriptChannels)
               channel.name: channel.allowedOrigins.toList(),
@@ -682,7 +692,7 @@ class ChromiumWebViewController extends ChangeNotifier {
           await _platform.setUserAgent(newBrowserId, userAgent!);
         }
         if (!_isDisposed &&
-            (userAgent != null || !mediaPlaybackRequiresUserGesture)) {
+            (userAgent != null || (!mediaPlaybackRequiresUserGesture && profileName == null))) {
           await _platform.loadUrl(newBrowserId, initialUrl);
         }
       } catch (_) {

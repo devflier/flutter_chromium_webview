@@ -220,10 +220,11 @@ public final class FlutterChromiumWebviewPlugin implements FlutterPlugin, Method
       });
       try {
         boolean gesture = !Boolean.FALSE.equals(call.argument("mediaPlaybackRequiresUserGesture"));
-        if (!gesture) {
+        String explicitProfile = call.argument("profileName");
+        if (explicitProfile != null || !gesture) {
           if (!WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROFILE))
-            throw new UnsupportedOperationException("Isolated autoplay requires WebView MULTI_PROFILE support");
-          profile = PROFILE_PREFIX + UUID.randomUUID().toString().replace("-", "");
+            throw new UnsupportedOperationException("Persistent profiles and isolated autoplay require WebView MULTI_PROFILE support");
+          profile = explicitProfile != null ? explicitProfile : PROFILE_PREFIX + UUID.randomUUID().toString().replace("-", "");
           WebViewCompat.setProfile(web, profile);
         }
         WebSettings settings = web.getSettings();
@@ -332,7 +333,7 @@ public final class FlutterChromiumWebviewPlugin implements FlutterPlugin, Method
       cancelDialogs();
       if (web.getParent() instanceof ViewGroup) ((ViewGroup) web.getParent()).removeView(web);
       web.stopLoading(); web.setWebChromeClient(null); web.setWebViewClient(new WebViewClient()); web.destroy();
-      if (profile != null) {
+      if (profile != null && profile.startsWith(PROFILE_PREFIX)) {
         String retiredProfile = profile; profile = null;
         deleteProfileWhenUnused(retiredProfile, 0);
       }

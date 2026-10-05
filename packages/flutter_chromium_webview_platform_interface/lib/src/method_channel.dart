@@ -82,6 +82,7 @@ class MethodChannelChromiumWebView extends ChromiumWebViewPlatform {
         'initialUrl': params.initialUrl,
         'mediaPlaybackRequiresUserGesture':
             params.mediaPlaybackRequiresUserGesture,
+        'profileName': params.profileName,
         'javascriptChannels': jsonEncode(params.javaScriptChannels),
       },
     );

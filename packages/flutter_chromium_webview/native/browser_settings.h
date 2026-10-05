@@ -15,9 +15,16 @@ inline bool ValidUserAgent(const std::string& value) {
 
 // A custom autoplay policy lives in a fresh in-memory context, never the
 // application's shared persistent context.
-inline CefRefPtr<CefRequestContext> AutoplayContext(bool requires_gesture) {
-  if (requires_gesture) return nullptr;
-  return CefRequestContext::CreateContext(CefRequestContextSettings(), nullptr);
+inline CefRefPtr<CefRequestContext> CustomContext(bool requires_gesture, const std::string& profile_name) {
+  if (requires_gesture && profile_name.empty()) return nullptr;
+  CefRequestContextSettings settings;
+  if (!profile_name.empty()) {
+    std::string base = CefRequestContext::GetGlobalContext()->GetCachePath().ToString();
+    if (!base.empty()) {
+      CefString(&settings.cache_path) = base + "/profiles/" + profile_name;
+    }
+  }
+  return CefRequestContext::CreateContext(settings, nullptr);
 }
 inline bool AllowAutoplay(CefRefPtr<CefBrowser> browser, std::string& error) {
   auto context = browser->GetHost()->GetRequestContext();

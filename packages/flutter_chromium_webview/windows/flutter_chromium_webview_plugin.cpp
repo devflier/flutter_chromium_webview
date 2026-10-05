@@ -210,7 +210,8 @@ void FlutterChromiumWebviewPlugin::HandleMethodCall(
     
     std::string initialUrl = GetValue<std::string>(args, "initialUrl", "about:blank");
     const bool requires_gesture = GetValue<bool>(args, "mediaPlaybackRequiresUserGesture", true);
-    auto context = chromium_settings::AutoplayContext(requires_gesture);
+    std::string profile_name = GetValue<std::string>(args, "profileName", "");
+    auto context = chromium_settings::CustomContext(requires_gesture, profile_name);
     if (!requires_gesture && !context) {
       handler->Close(); result->Error("SETTINGS_FAILED", "Could not create a private autoplay context"); return;
     }

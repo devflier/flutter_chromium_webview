@@ -23,6 +23,7 @@ class BrowserCreationParams {
   const BrowserCreationParams({
     required this.initialUrl,
     this.mediaPlaybackRequiresUserGesture = true,
+    this.profileName,
     this.javaScriptChannels = const <String, List<String>>{},
   });
 
@@ -31,6 +32,9 @@ class BrowserCreationParams {
 
   /// Whether media playback requires a user gesture.
   final bool mediaPlaybackRequiresUserGesture;
+
+  /// Optional alphanumeric string specifying a persistent storage profile.
+  final String? profileName;
 
   /// Allowed origins for each JavaScript message channel, by channel name.
   final Map<String, List<String>> javaScriptChannels;

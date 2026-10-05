@@ -204,7 +204,8 @@ static void handle_method(FlutterChromiumWebviewPlugin* self, FlMethodCall* call
     // GTK and CEF share the UI thread. Returning only after creation means Dart
     // can immediately navigate, resize, or dispose without racing OnAfterCreated.
     const bool requires_gesture = Boolean(args, "mediaPlaybackRequiresUserGesture", true);
-    auto context = chromium_settings::AutoplayContext(requires_gesture);
+    std::string profile_name = String(args, "profileName", "");
+    auto context = chromium_settings::CustomContext(requires_gesture, profile_name);
     if (!requires_gesture && !context) {
       handler->Close(); Error(call, "SETTINGS_FAILED", "Could not create a private autoplay context"); return;
     }
