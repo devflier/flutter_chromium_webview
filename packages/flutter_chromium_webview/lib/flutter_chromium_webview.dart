@@ -14,6 +14,7 @@
 /// ```
 ///
 /// Only Linux x64 is supported in this release.
+// ignore: unnecessary_library_name
 library flutter_chromium_webview;
 
 import 'dart:async';
