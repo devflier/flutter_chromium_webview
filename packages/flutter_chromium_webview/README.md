@@ -1,19 +1,20 @@
 # flutter_chromium_webview
 
-A Chromium web view for Flutter on Windows, Linux and Android.
+A Chromium web view for Flutter on Windows, macOS, Linux, iOS, and Android.
 
-Windows and Linux bundle a pinned Chromium engine through
+Windows, macOS, and Linux bundle a pinned Chromium engine through
 [CEF](https://bitbucket.org/chromiumembedded/cef). Android uses the installed
 system Chromium WebView; its engine version follows the device's WebView updates.
+iOS uses a headless WKWebView implementation to comply with App Store rules.
 
 Desktop pages use CEF **off-screen rendering (OSR)**. Each frame is
 delivered to native code, copied into a pixel buffer and shown in Flutter
 through a **Flutter `Texture`**. This lets the web view behave like any other
 widget: it can be clipped, transformed, stacked and overlaid. Android renders
 through a native Flutter platform view with native touch and keyboard input.
+iOS evaluates JavaScript headlessly in the background.
 
-> Published desktop version: **`0.2.1`**. Android support is an unreleased change
-> in this checkout; use a local path dependency until the next release.
+> Published version: **`0.3.0`**.
 
 ## Platform support
 
@@ -21,9 +22,10 @@ through a native Flutter platform view with native touch and keyboard input.
 | --- | --- |
 | Linux x64 | Supported, validated on Ubuntu / WSLg |
 | Windows x64 | Supported, sandboxed CEF implementation |
+| macOS | Supported, native CEF implementation |
 | Android API 24+ | System Chromium WebView; see [Android requirements](ANDROID.md) |
-| macOS | Not supported yet (work in progress in the repository) |
-| iOS, Web | Not implemented |
+| iOS | Supported, headless WKWebView implementation |
+| Web | Not implemented |
 
 ## Installation
 

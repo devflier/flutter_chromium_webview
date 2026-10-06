@@ -1,5 +1,7 @@
-## Unreleased
+## 0.3.0
 
+* Add macOS support using native CEF framework.
+* Add iOS support using a headless WKWebView implementation.
 * Add Android API 24+ support through the system Chromium WebView and a native Flutter platform view.
 * Preserve browser identity when attaching a view without a desktop texture.
 * Add emulator validation for browser lifecycle, origin-restricted channels, HTML and playback settings.
