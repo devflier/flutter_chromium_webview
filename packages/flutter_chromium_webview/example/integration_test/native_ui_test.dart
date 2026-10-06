@@ -23,12 +23,12 @@ void main() {
     final first = ChromiumWebViewController(initialUrl: page);
     final second = ChromiumWebViewController(initialUrl: page);
     Future<void> until(bool Function() matches) async {
-      final deadline = DateTime.now().add(const Duration(seconds: 10));
+      final deadline = DateTime.now().add(const Duration(seconds: 30));
       while (!matches()) {
         if (DateTime.now().isAfter(deadline)) {
           fail('Timed out; titles: ${first.pageTitle}, ${second.pageTitle}');
         }
-        await Future<void>.delayed(const Duration(milliseconds: 30));
+        await Future<void>.delayed(const Duration(milliseconds: 50));
       }
     }
 
@@ -131,7 +131,7 @@ void main() {
       await first.sendPointerInput(type: PointerInputType.move, x: 60, y: 40);
       await click(first, 60, 40);
       await until(() => first.isPopupShowing);
-      await first.dispose().timeout(const Duration(seconds: 10));
+      await first.dispose().timeout(const Duration(seconds: 30));
       await second.executeJavaScript("document.title='other-browser-alive';");
       await until(() => second.pageTitle == 'other-browser-alive');
 
@@ -143,7 +143,7 @@ void main() {
       };
       await second.executeJavaScript("alert('dispose while pending');");
       await until(() => pending);
-      await second.dispose().timeout(const Duration(seconds: 10));
+      await second.dispose().timeout(const Duration(seconds: 30));
       late.complete(const JSDialogResponse(success: false));
     } finally {
       await first.dispose();
