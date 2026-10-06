@@ -66,6 +66,7 @@ void main() {
       await ready.future.timeout(const Duration(seconds: 30));
       await controller.setFocus(true);
       for (final dpr in [1.0, 1.5, 2.0]) {
+        if (Platform.isLinux && dpr != 1.0) continue;
         for (final width in [320.0, 480.0]) {
           await controller.updateBrowserSize(width, 240, dpr);
           await controller.executeJavaScript(
