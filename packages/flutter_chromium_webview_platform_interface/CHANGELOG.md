@@ -1,6 +1,11 @@
+## 0.1.3
+
+* Prepare a fresh release tag with working automated publication authentication.
+
 ## 0.1.2
 
 * Update metadata to prepare for automated publishing.
+* Add named browser profiles to creation parameters and method-channel requests.
 
 ## 0.1.1
 

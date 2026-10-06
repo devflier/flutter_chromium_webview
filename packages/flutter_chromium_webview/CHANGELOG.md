@@ -1,3 +1,9 @@
+## 0.3.1
+
+* Correct Linux pointer coordinates at fractional and high device pixel ratios.
+* Require the platform interface version that includes named browser profiles.
+* Fix automated publication authentication and validate release tag versions.
+
 ## 0.3.0
 
 * Add macOS support using native CEF framework.
