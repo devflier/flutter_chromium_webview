@@ -17,28 +17,17 @@ In each package's **Admin → Automated publishing** settings, enable GitHub Act
 
 These account settings cannot be verified through the public package API. If an environment is required in those settings, the publishing job must also declare the same GitHub environment.
 
-## Prepared release
+## Interface 0.1.4 release recovery
 
-The next versions are interface **0.1.3** and webview **0.3.1**. Webview requires interface `^0.1.3` because it uses the named-profile API. Publish the interface first.
+The existing `platform_interface-v0.1.3` tag points to commit `bc327be`, where the interface version is still 0.1.2 and the publishing workflow lacks authentication setup. Preserve that tag. Prepare interface **0.1.4** from the corrected workflow instead.
 
-Local preparation checks: workflow YAML parses, both new tags pass the version guard, and the mismatched `v0.4.0` tag is rejected. Publication dry runs inspect both package archives; their only warnings are the uncommitted version/changelog files. The main package also reports the local dependency override, and both packages hint about skipped version numbers. These dry runs have not authenticated to pub.dev or published anything.
+The main **0.3.1** publishing run succeeded on 2026-10-06, and its version endpoint confirms publication. Its `^0.1.3` dependency accepts interface 0.1.4; no main-package version bump or repeat publication is required.
 
-1. Commit and push the prepared package versions, changelogs, tag-check script and publishing workflow. Wait for validation to pass on that commit.
-2. Create and push the interface tag on that validated commit:
+Release the prepared interface version in this order:
 
-   ```sh
-   git tag platform_interface-v0.1.3
-   git push origin platform_interface-v0.1.3
-   ```
+1. Commit the interface version/changelog and these release notes, then push that commit.
+2. Create `platform_interface-v0.1.4` on that commit and push the individual tag. Check the tag's pubspec version before pushing.
+3. Confirm the interface publishing run succeeds and `https://pub.dev/api/packages/flutter_chromium_webview_platform_interface/versions/0.1.4` exists.
+4. Verify a clean consumer can resolve main package 0.3.1 without local overrides.
 
-3. Confirm the interface publishing run succeeds and pub.dev lists 0.1.3.
-4. Create and push the main package tag on the same validated commit:
-
-   ```sh
-   git tag v0.3.1
-   git push origin v0.3.1
-   ```
-
-5. Confirm the main publishing run succeeds and pub.dev lists 0.3.1.
-
-Push the individual tags rather than all local tags. Rerunning an old tag checks out its old workflow and package source; it does not include the new authentication fix. Each later release needs a new package version and a matching new tag.
+Pushing a tag before committing the release files uses the previous package version and workflow. Rerunning an old tag checks out its old workflow and package source; it does not include subsequent fixes. Each later release needs a new package version and a matching new tag.

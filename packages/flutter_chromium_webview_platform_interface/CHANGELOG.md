@@ -1,3 +1,7 @@
+## 0.1.4
+
+* Prepare a fresh release from the corrected automated publishing workflow.
+
 ## 0.1.3
 
 * Prepare a fresh release tag with working automated publication authentication.
