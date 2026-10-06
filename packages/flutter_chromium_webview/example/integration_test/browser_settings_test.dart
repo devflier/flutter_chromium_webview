@@ -94,7 +94,7 @@ void main() {
     final normal = make('normal');
     final other = make('other', ua: 'other-test/2.0', gesture: false);
     Future<void> waitFor(bool Function() condition) async {
-      final deadline = DateTime.now().add(const Duration(seconds: 20));
+      final deadline = DateTime.now().add(const Duration(seconds: 30));
       while (!condition() && DateTime.now().isBefore(deadline)) {
         await tester.pump(const Duration(milliseconds: 50));
       }

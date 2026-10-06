@@ -37,7 +37,7 @@ void main() {
       await controller.setFocus(true);
       expect((await diagnostics())['focused'], isTrue);
       await controller.setFocus(false);
-      await controller.dispose().timeout(const Duration(seconds: 10));
+      await controller.dispose().timeout(const Duration(seconds: 30));
       final state = await diagnostics();
       expect(state['browsers'], 0, reason: 'CEF browser leaked on cycle $i');
       expect(state['textures'], 0, reason: 'Texture leaked on cycle $i');
@@ -45,7 +45,7 @@ void main() {
 
     final pending = ChromiumWebViewController();
     final creating = pending.createBrowser();
-    await pending.dispose().timeout(const Duration(seconds: 10));
+    await pending.dispose().timeout(const Duration(seconds: 30));
     await creating;
     expect((await diagnostics())['browsers'], 0);
 

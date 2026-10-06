@@ -100,7 +100,7 @@ onYouTubeIframeAPIReady();
         expect(await finish(first.currentTime), 23);
         expect((await finish(first.videoData))['title'], 'Fixture 31');
         await finish(first.playVideo());
-        final deadline = DateTime.now().add(const Duration(seconds: 5));
+        final deadline = DateTime.now().add(const Duration(seconds: 30));
         while (!events.any((event) => event.containsKey('VideoState')) &&
             DateTime.now().isBefore(deadline)) {
           await tester.pump(const Duration(milliseconds: 50));

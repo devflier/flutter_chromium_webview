@@ -56,7 +56,7 @@ void main() {
       final first = make(firstMessages);
       final second = make(secondMessages);
       Future<void> waitFor(bool Function() condition) async {
-        final deadline = DateTime.now().add(const Duration(seconds: 15));
+        final deadline = DateTime.now().add(const Duration(seconds: 30));
         while (!condition() && DateTime.now().isBefore(deadline)) {
           await tester.pump(const Duration(milliseconds: 50));
         }

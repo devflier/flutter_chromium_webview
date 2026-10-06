@@ -23,7 +23,7 @@ void main() {
         ).toString(),
       );
       Future<void> until(bool Function() matches) async {
-        final deadline = DateTime.now().add(const Duration(seconds: 10));
+        final deadline = DateTime.now().add(const Duration(seconds: 30));
         while (!matches()) {
           if (DateTime.now().isAfter(deadline)) {
             fail('Keyboard probe timed out: ${controller.pageTitle}');

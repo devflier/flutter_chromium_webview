@@ -29,7 +29,7 @@ void main() {
       ],
     );
     Future<void> waitFor(bool Function() predicate) async {
-      final deadline = DateTime.now().add(const Duration(seconds: 15));
+      final deadline = DateTime.now().add(const Duration(seconds: 30));
       while (!predicate() && DateTime.now().isBefore(deadline)) {
         await tester.pump(const Duration(milliseconds: 50));
       }

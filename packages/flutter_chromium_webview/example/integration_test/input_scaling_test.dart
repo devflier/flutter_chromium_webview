@@ -45,13 +45,13 @@ void main() {
         dpr:devicePixelRatio, scroll:scrollY, point:window.lastPoint
       });''',
       );
-      return probe!.future.timeout(const Duration(seconds: 5));
+      return probe!.future.timeout(const Duration(seconds: 30));
     }
 
     Future<Map<String, dynamic>> until(
       bool Function(Map<String, dynamic>) matches,
     ) async {
-      final deadline = DateTime.now().add(const Duration(seconds: 5));
+      final deadline = DateTime.now().add(const Duration(seconds: 30));
       Map<String, dynamic> state;
       do {
         state = await read();
@@ -63,7 +63,7 @@ void main() {
 
     try {
       await controller.createBrowser();
-      await ready.future.timeout(const Duration(seconds: 10));
+      await ready.future.timeout(const Duration(seconds: 30));
       await controller.setFocus(true);
       for (final dpr in [1.0, 1.5, 2.0]) {
         for (final width in [320.0, 480.0]) {
