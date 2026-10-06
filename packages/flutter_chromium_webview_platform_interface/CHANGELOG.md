@@ -1,3 +1,7 @@
+## 0.1.2
+
+* Update metadata to prepare for automated publishing.
+
 ## 0.1.1
 
 * Fix platform interface class exports for pub release.

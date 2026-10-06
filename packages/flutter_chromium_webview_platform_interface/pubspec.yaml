@@ -1,6 +1,6 @@
 name: flutter_chromium_webview_platform_interface
 description: A common platform interface for the flutter_chromium_webview plugin.
-version: 0.1.1
+version: 0.1.2
 repository: https://github.com/devflier/flutter_chromium_webview/tree/main/packages/flutter_chromium_webview_platform_interface
 issue_tracker: https://github.com/devflier/flutter_chromium_webview/issues
 homepage: https://github.com/devflier/flutter_chromium_webview
