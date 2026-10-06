@@ -19,7 +19,7 @@ jobs:
       - name: Install Linux Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y ninja-build libgtk-3-dev xvfb
+          sudo apt-get install -y ninja-build libgtk-3-dev xvfb pulseaudio pulseaudio-utils
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
           
       - name: Check Formatting
@@ -42,7 +42,16 @@ jobs:
           dart pub publish --dry-run
           
       - name: Linux Native, Integration and Release checks
-        run: xvfb-run -a ./scripts/validate_linux.sh
+        run: |
+          pulseaudio --start --exit-idle-time=-1
+          pactl load-module module-null-sink sink_name=validation
+          pactl set-default-sink validation
+          xvfb-run -a ./scripts/validate_linux.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: linux-native-logs
+          path: docs/validation/linux-native.log
         
   windows:
     runs-on: windows-latest

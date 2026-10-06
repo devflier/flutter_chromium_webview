@@ -1,0 +1,169 @@
+Resolving dependencies...
+Downloading packages...
+  cli_util 0.4.2 (0.6.0 available)
+! flutter_chromium_webview_platform_interface 0.1.2 from path ../flutter_chromium_webview_platform_interface (overridden in ./pubspec_overrides.yaml)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  test_api 0.7.12 (0.7.14 available)
+  vector_math 2.4.0 (2.4.3 available)
+Got dependencies!
+4 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Resolving dependencies in `./example`...
+Downloading packages...
+Got dependencies in `./example`.
+Analyzing flutter_chromium_webview...                           
+No issues found! (ran in 1.5s)
+00:00 +0: loading /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/flutter_chromium_webview_test.dart
+00:00 +0: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/browser_settings_test.dart: rejects invalid user-agent strings before browser creation
+00:00 +1: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/flutter_chromium_webview_test.dart: host transient UI is dismissed on native cancellation, navigation and disposal
+00:00 +2: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/flutter_chromium_webview_test.dart: host transient UI is dismissed on native cancellation, navigation and disposal
+00:00 +3: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/flutter_chromium_webview_test.dart: host transient UI is dismissed on native cancellation, navigation and disposal
+00:00 +4: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/flutter_chromium_webview_test.dart: host transient UI is dismissed on native cancellation, navigation and disposal
+00:00 +5: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.0
+00:00 +6: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.0
+00:00 +7: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.0
+00:00 +8: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.0
+00:00 +9: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.0
+00:00 +10: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.0
+00:00 +11: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.0
+00:00 +12: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.0
+00:00 +13: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.0
+00:00 +14: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.0
+00:00 +15: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.0
+00:00 +16: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.0
+00:00 +17: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/controller_lifecycle_test.dart: platform-view browser creation is idempotent without texture IDs
+00:00 +18: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.5
+00:00 +19: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 1.5
+00:00 +20: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/input_coordinates_test.dart: logical pointer coordinates remain stable at DPR 2.0
+00:00 +21: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/event_decoding_test.dart: well-formed events update state and invoke callbacks
+00:00 +22: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/event_decoding_test.dart: well-formed events popup show and size update popup state
+00:00 +23: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/event_decoding_test.dart: well-formed events context menu items, including sub menus, are decoded
+00:00 +24: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/event_decoding_test.dart: malformed events never crash and never change state urlChanged
+00:00 +25: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/event_decoding_test.dart: malformed events never crash and never change state titleChanged
+00:00 +26: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/event_decoding_test.dart: malformed events never crash and never change state loadingStateChanged
+00:00 +27: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/event_decoding_test.dart: malformed events never crash and never change state loadError
+00:00 +28: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/event_decoding_test.dart: malformed events never crash and never change state newWindowRequested
+00:00 +29: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/event_decoding_test.dart: malformed events never crash and never change state popupShow
+00:00 +30: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/event_decoding_test.dart: malformed events never crash and never change state popupSize
+00:00 +31: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/event_decoding_test.dart: malformed events never crash and never change state takeFocus
+00:00 +32: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/event_decoding_test.dart: malformed events never crash and never change state javascriptMessage
+00:00 +33: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/event_decoding_test.dart: malformed events never crash and never change state non-map event arguments are ignored
+00:00 +34: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/event_decoding_test.dart: malformed events never crash and never change state malformed jsDialog is still resolved natively
+00:00 +35: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/event_decoding_test.dart: malformed events never crash and never change state malformed context menus are dismissed with -1
+00:00 +36: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/event_decoding_test.dart: malformed events never crash and never change state excessively nested context menus are rejected
+00:00 +37: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/event_decoding_test.dart: malformed events never crash and never change state exceptions thrown by user callbacks are reported, not thrown
+00:00 +38: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/event_decoding_test.dart: JavaScript messages deliver only for allowed channel and origin
+00:00 +39: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/event_decoding_test.dart: multiple controllers events are routed per browser and disposal is independent
+00:00 +40: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/event_decoding_test.dart: multiple controllers random disposal order disposes every browser exactly once
+00:00 +41: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/event_decoding_test.dart: multiple controllers events that arrive before creation returns are replayed
+00:00 +42: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:00 +43: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:00 +44: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:00 +45: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:00 +46: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:00 +47: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:00 +48: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:01 +49: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:01 +50: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:01 +51: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:01 +52: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:01 +53: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:01 +54: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:01 +55: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:01 +56: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:01 +57: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:01 +58: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:01 +59: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:01 +60: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:01 +61: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 1.0 and follows its view
+00:01 +62: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/test/popup_overlay_test.dart: popup outside viewport receives input at DPR 2.0 and follows its view
+00:01 +63: All tests passed!
+Resolving dependencies...
+Downloading packages...
+  code_assets 1.2.1 (2.1.0 available)
+  cupertino_icons 1.0.9 (2.0.0 available)
+! flutter_chromium_webview_platform_interface 0.1.2 from path ../../flutter_chromium_webview_platform_interface (overridden in ./pubspec_overrides.yaml)
+  hooks 2.0.2 (2.2.0 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  meta 1.18.3 (1.19.0 available)
+  objective_c 9.5.0 (9.6.2 available)
+  record_use 0.6.0 (1.1.1 available)
+  test_api 0.7.12 (0.7.14 available)
+  vector_math 2.4.0 (2.4.3 available)
+Got dependencies!
+9 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Analyzing example...                                            
+No issues found! (ran in 0.5s)
+00:00 +0: loading /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/example/test/widget_test.dart
+00:00 +0: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/example/test/widget_test.dart: BrowserScreen widget test
+00:00 +1: /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/example/test/widget_test.dart: BrowserScreen widget test
+00:00 +2: All tests passed!
+00:00 +0: loading /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/plugin_integration_test.dart
+Building Linux application...                                   
+✓ Built build/linux/x64/debug/bundle/flutter_chromium_webview_example
+00:00 +0: native lifecycle, focus, and hot-restart session cleanup
+00:01 +1: (tearDownAll)
+00:01 +1: All tests passed!
+00:00 +0: loading /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/input_scaling_test.dart
+Building Linux application...                                   
+✓ Built build/linux/x64/debug/bundle/flutter_chromium_webview_example
+00:00 +0: native click, resize, and wheel coordinates at multiple DPRs
+00:04 +1: (tearDownAll)
+00:04 +1: All tests passed!
+00:00 +0: loading /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/native_ui_test.dart
+Building Linux application...                                   
+✓ Built build/linux/x64/debug/bundle/flutter_chromium_webview_example
+00:00 +0: dialogs, menus, dropdown disposal, and browser isolation
+00:01 +1: (tearDownAll)
+00:01 +1: All tests passed!
+00:00 +0: loading /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/javascript_bridge_test.dart
+Building Linux application...                                   
+✓ Built build/linux/x64/debug/bundle/flutter_chromium_webview_example
+00:00 +0: real renderer bridge isolates browsers, origins, navigation and lifetime
+00:01 +1: (tearDownAll)
+00:01 +1: All tests passed!
+00:00 +0: loading /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/html_loading_test.dart
+Building Linux application...                                   
+✓ Built build/linux/x64/debug/bundle/flutter_chromium_webview_example
+00:00 +0: HTML origin, relative resources, reload, replacement and browser isolation
+00:01 +1: (tearDownAll)
+00:01 +1: All tests passed!
+00:00 +0: loading /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/browser_settings_test.dart
+Building Linux application...                                   
+✓ Built build/linux/x64/debug/bundle/flutter_chromium_webview_example
+00:00 +0: browser user-agent and autoplay settings stay isolated
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: 'playing'
+  Actual: 'stalled'
+   Which: is different.
+          Expected: playing
+            Actual: stalled
+                    ^
+           Differ at offset 0
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///home/user/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/browser_settings_test.dart:115:7)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///home/user/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/browser_settings_test.dart line 115
+The test description was:
+  browser user-agent and autoplay settings stay isolated
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:14 +0 -1: browser user-agent and autoplay settings stay isolated [E]
+  Test failed. See exception logs above.
+  The test description was: browser user-agent and autoplay settings stay isolated
+  
+00:14 +0 -1: (tearDownAll)
+00:14 +0 -1: Some tests failed.
+
+Failing tests:
+  /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/browser_settings_test.dart: browser user-agent and autoplay settings stay isolated

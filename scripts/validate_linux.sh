@@ -5,16 +5,18 @@ if [[ -n "${WSL_DISTRO_NAME:-}" && "$root" =~ ^/mnt/[a-z]/ ]]; then
   echo 'Run WSL validation from a Linux-filesystem checkout to keep Windows and Linux Flutter metadata separate.' >&2
   exit 1
 fi
+mkdir -p "$root/docs/validation"
+exec > >(tee "$root/docs/validation/linux-native.log") 2>&1
 cd "$root/packages/flutter_chromium_webview"
 flutter pub get
 flutter analyze
-flutter test
+flutter test --reporter expanded
 cd example
 flutter pub get
 flutter analyze
-flutter test test
+flutter test test --reporter expanded
 # Use a fresh desktop log reader for each process, see validate_windows.ps1.
 for suite in plugin_integration_test input_scaling_test native_ui_test javascript_bridge_test html_loading_test browser_settings_test youtube_adapter_test; do
-  flutter test "integration_test/$suite.dart" -d linux --no-pub
+  flutter test "integration_test/$suite.dart" -d linux --no-pub --reporter expanded
 done
 flutter build linux --release --no-pub
