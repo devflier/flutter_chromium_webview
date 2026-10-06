@@ -1,0 +1,42 @@
+name: Publish to pub.dev
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
+      - 'platform_interface-v[0-9]+.[0-9]+.[0-9]+*'
+
+jobs:
+  publish_webview:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      - name: Install dependencies
+        working-directory: packages/flutter_chromium_webview
+        run: flutter pub get
+      - name: Publish flutter_chromium_webview
+        working-directory: packages/flutter_chromium_webview
+        run: dart pub publish --force
+
+  publish_interface:
+    if: startsWith(github.ref, 'refs/tags/platform_interface-v')
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      - name: Install dependencies
+        working-directory: packages/flutter_chromium_webview_platform_interface
+        run: flutter pub get
+      - name: Publish platform_interface
+        working-directory: packages/flutter_chromium_webview_platform_interface
+        run: dart pub publish --force
