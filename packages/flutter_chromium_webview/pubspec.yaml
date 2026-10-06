@@ -18,8 +18,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_chromium_webview_platform_interface:
-    path: ../flutter_chromium_webview_platform_interface
+  flutter_chromium_webview_platform_interface: ^0.1.1
 
 dev_dependencies:
   flutter_test:
