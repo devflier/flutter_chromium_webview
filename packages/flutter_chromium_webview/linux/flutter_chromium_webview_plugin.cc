@@ -302,12 +302,13 @@ static void handle_method(FlutterChromiumWebviewPlugin* self, FlMethodCall* call
     handler->SetSize(std::lround(width), std::lround(height));
   } else if (strcmp(method, "sendPointerEvent") == 0) {
     CefMouseEvent event;
-    event.x = Integer(args, "x");
-    event.y = Integer(args, "y");
+    float dpr = handler->GetDevicePixelRatio();
+    event.x = std::lround(Integer(args, "x") * dpr);
+    event.y = std::lround(Integer(args, "y") * dpr);
     event.modifiers = Integer(args, "modifiers");
     int type = Integer(args, "type");
     if (type == 3) {
-      host->SendMouseWheelEvent(event, Integer(args, "deltaX"), Integer(args, "deltaY"));
+      host->SendMouseWheelEvent(event, std::lround(Integer(args, "deltaX") * dpr), std::lround(Integer(args, "deltaY") * dpr));
     } else if (type == 2 || type == 4) {
       host->SendMouseMoveEvent(event, type == 4);
     } else {

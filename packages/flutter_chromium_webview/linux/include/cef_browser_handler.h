@@ -84,6 +84,7 @@ class CefBrowserHandler : public CefClient,
   CefRefPtr<CefBrowser> GetBrowser() const { return closing_ ? nullptr : browser_; }
   FlTexture* GetTexture() const { return FL_TEXTURE(texture_); }
   FlTexture* GetPopupTexture() const { return FL_TEXTURE(popup_texture_); }
+  float GetDevicePixelRatio() const { return dpr_; }
 
  private:
   FlTextureRegistrar* registrar_;
