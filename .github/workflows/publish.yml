@@ -1,42 +1,103 @@
-name: Publish to pub.dev
+name: Auto Tag and Publish to pub.dev
 
 on:
   push:
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+*'
-      - 'platform_interface-v[0-9]+.[0-9]+.[0-9]+*'
+    branches:
+      - main
+
+permissions:
+  contents: write
+  id-token: write
 
 jobs:
-  publish_webview:
-    if: startsWith(github.ref, 'refs/tags/v')
+  auto_tag_and_publish_webview:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
     steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
-      - name: Install dependencies
-        working-directory: packages/flutter_chromium_webview
-        run: flutter pub get
-      - name: Publish flutter_chromium_webview
-        working-directory: packages/flutter_chromium_webview
-        run: dart pub publish --force
+          fetch-depth: 0
+      
+      - name: Get current version
+        id: get_version
+        run: |
+          VERSION=$(grep '^version: ' packages/flutter_chromium_webview/pubspec.yaml | awk '{print $2}' | tr -d '\r')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          TAG="v$VERSION"
+          echo "TAG=$TAG" >> $GITHUB_ENV
 
-  publish_interface:
-    if: startsWith(github.ref, 'refs/tags/platform_interface-v')
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-    steps:
-      - uses: actions/checkout@v4
+      - name: Check if tag exists
+        id: check_tag
+        run: |
+          if git ls-remote --tags origin | grep -q "refs/tags/$TAG$"; then
+            echo "Tag $TAG already exists. Skipping publish."
+            echo "SHOULD_PUBLISH=false" >> $GITHUB_ENV
+          else
+            echo "Tag $TAG does not exist. Creating tag and publishing!"
+            echo "SHOULD_PUBLISH=true" >> $GITHUB_ENV
+          fi
+
+      - name: Create and Push Tag
+        if: env.SHOULD_PUBLISH == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag $TAG
+          git push origin $TAG
+
       - uses: subosito/flutter-action@v2
+        if: env.SHOULD_PUBLISH == 'true'
         with:
           channel: 'stable'
-      - name: Install dependencies
-        working-directory: packages/flutter_chromium_webview_platform_interface
-        run: flutter pub get
+
+      - name: Publish flutter_chromium_webview
+        if: env.SHOULD_PUBLISH == 'true'
+        working-directory: packages/flutter_chromium_webview
+        run: |
+          flutter pub get
+          dart pub publish --force
+
+  auto_tag_and_publish_interface:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Get current version
+        id: get_version
+        run: |
+          VERSION=$(grep '^version: ' packages/flutter_chromium_webview_platform_interface/pubspec.yaml | awk '{print $2}' | tr -d '\r')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          TAG="platform_interface-v$VERSION"
+          echo "TAG=$TAG" >> $GITHUB_ENV
+
+      - name: Check if tag exists
+        id: check_tag
+        run: |
+          if git ls-remote --tags origin | grep -q "refs/tags/$TAG$"; then
+            echo "Tag $TAG already exists. Skipping publish."
+            echo "SHOULD_PUBLISH=false" >> $GITHUB_ENV
+          else
+            echo "Tag $TAG does not exist. Creating tag and publishing!"
+            echo "SHOULD_PUBLISH=true" >> $GITHUB_ENV
+          fi
+
+      - name: Create and Push Tag
+        if: env.SHOULD_PUBLISH == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag $TAG
+          git push origin $TAG
+
+      - uses: subosito/flutter-action@v2
+        if: env.SHOULD_PUBLISH == 'true'
+        with:
+          channel: 'stable'
+
       - name: Publish platform_interface
+        if: env.SHOULD_PUBLISH == 'true'
         working-directory: packages/flutter_chromium_webview_platform_interface
-        run: dart pub publish --force
+        run: |
+          flutter pub get
+          dart pub publish --force
