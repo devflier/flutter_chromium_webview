@@ -24,3 +24,19 @@ ChromiumWebViewPlatform.instance = MyPlatform();
 ```
 
 Implementations must `extend` `ChromiumWebViewPlatform`; `implements` is rejected by token verification.
+
+## Runnable example
+
+The [example](example/lib/main.dart) registers an in-memory backend, listens to
+browser events, and demonstrates creating, navigating and disposing a browser.
+It uses no native plugin and does not render web pages. For a real web view,
+use the main package's example instead.
+
+```sh
+cd example
+flutter pub get
+flutter run -d chrome
+```
+
+The backend restores the previous platform instance and closes its event stream
+when the demo is removed.

@@ -1,3 +1,8 @@
+## 0.1.5
+
+* Add a runnable Flutter example for registering a backend and handling browser lifecycle events.
+* Document the default method-channel backend constructor.
+
 ## 0.1.4
 
 * Prepare a fresh release from the corrected automated publishing workflow.

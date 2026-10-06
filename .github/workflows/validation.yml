@@ -40,6 +40,14 @@ jobs:
           flutter analyze
           flutter test
           dart pub publish --dry-run
+
+      - name: Platform Interface Example Checks
+        working-directory: packages/flutter_chromium_webview_platform_interface/example
+        run: |
+          flutter pub get
+          flutter analyze
+          flutter test
+          flutter build web
           
       - name: Linux Native, Integration and Release checks
         run: |

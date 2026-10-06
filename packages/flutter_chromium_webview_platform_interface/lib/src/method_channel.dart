@@ -13,6 +13,9 @@ import 'types.dart';
 /// Native code reports browser events by invoking `onBrowserEvent` on the same
 /// channel with `browserId`, `event` and `args` arguments.
 class MethodChannelChromiumWebView extends ChromiumWebViewPlatform {
+  /// Creates the default backend that forwards calls to the native plugin.
+  MethodChannelChromiumWebView();
+
   /// The method channel used to interact with the native platform.
   @visibleForTesting
   final MethodChannel methodChannel = const MethodChannel(

@@ -31,3 +31,14 @@ Release the prepared interface version in this order:
 4. Verify a clean consumer can resolve main package 0.3.1 without local overrides.
 
 Pushing a tag before committing the release files uses the previous package version and workflow. Rerunning an old tag checks out its old workflow and package source; it does not include subsequent fixes. Each later release needs a new package version and a matching new tag.
+
+## Example release 0.1.5
+
+Interface 0.1.5 adds a runnable in-memory backend example and documents the
+method-channel constructor. The example has its own Flutter package, web entry
+point and lifecycle smoke test. CI analyzes, tests and builds it. The main
+package's `^0.1.3` constraint accepts 0.1.5 without a main-package release.
+
+Publish this change using a fresh `platform_interface-v0.1.5` tag on the commit
+containing the example and version update. Pub.dev's documentation/example score
+will be recalculated after publication; a particular score is not guaranteed.
