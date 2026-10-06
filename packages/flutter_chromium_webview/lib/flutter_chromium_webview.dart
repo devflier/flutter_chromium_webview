@@ -202,7 +202,8 @@ class ChromiumWebViewController extends ChangeNotifier {
     List<JavaScriptChannel> javaScriptChannels = const [],
   }) : javaScriptChannels = List.unmodifiable(javaScriptChannels) {
     _validateUserAgent(userAgent);
-    if (profileName != null && !RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(profileName!)) {
+    if (profileName != null &&
+        !RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(profileName!)) {
       throw ArgumentError('profileName must be alphanumeric/underscores only');
     }
     if (javaScriptChannels.map((channel) => channel.name).toSet().length !=
@@ -661,7 +662,8 @@ class ChromiumWebViewController extends ChangeNotifier {
       _ensureHandlerRegistered();
       final result = await _platform.createBrowser(
         BrowserCreationParams(
-          initialUrl: userAgent != null ||
+          initialUrl:
+              userAgent != null ||
                   (!mediaPlaybackRequiresUserGesture && profileName == null)
               ? 'about:blank'
               : initialUrl,
@@ -692,7 +694,8 @@ class ChromiumWebViewController extends ChangeNotifier {
           await _platform.setUserAgent(newBrowserId, userAgent!);
         }
         if (!_isDisposed &&
-            (userAgent != null || (!mediaPlaybackRequiresUserGesture && profileName == null))) {
+            (userAgent != null ||
+                (!mediaPlaybackRequiresUserGesture && profileName == null))) {
           await _platform.loadUrl(newBrowserId, initialUrl);
         }
       } catch (_) {
