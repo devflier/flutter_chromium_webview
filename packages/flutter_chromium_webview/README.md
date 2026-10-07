@@ -124,6 +124,7 @@ flutter run -d linux
 - **0.1.x** – stabilize Linux, improve tests and documentation.
 - **0.2.x** – Windows backend.
 - **0.3.x** – macOS backend.
+- **Next Release** – SPM (Swift Package Manager) support for macOS.
 - **1.0.0** – stable multi-platform release.
 
 ## Contributing & license

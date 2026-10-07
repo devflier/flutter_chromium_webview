@@ -71,13 +71,12 @@ CEF cache reuse are deliberately rejected; use separate checkouts for ARM/Intel.
    python3 "$PROJECT_DIR/Flutter/ephemeral/.symlinks/plugins/flutter_chromium_webview/macos/scripts/embed_cef.py"
    ```
 
-6. This initial backend targets **direct distribution**, outside Apple's App
-   Sandbox. The embedding script refuses an App Sandbox entitlement rather than
-   changing host entitlements. Chromium's helper sandbox remains enabled.
-   Decide the host's distribution/security model explicitly before changing its
-   Apple entitlements. The example uses this direct-distribution configuration.
-   Hardened release signing needs JIT permission for Flutter where applicable and
-   for the renderer helper. Distribution/notarization must still be verified.
+6. **Disable App Sandbox**: This initial backend targets **direct distribution**, outside Apple's App
+   Sandbox. The `embed_cef.py` script intentionally halts the build if it detects that Apple's "App Sandbox" is enabled. 
+   This happens because `flutter_chromium_webview` uses its own robust Chromium sandbox architecture, and running it inside Apple's App Sandbox requires very specific entitlements and configuration that this CEF backend doesn't automatically manage yet.
+   
+   To fix this, update both `macos/Runner/DebugProfile.entitlements` and `macos/Runner/Release.entitlements` to change:
+   `<key>com.apple.security.app-sandbox</key>` to `<false/>`.
 
 Run on a Mac from the repository root:
 
