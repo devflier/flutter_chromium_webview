@@ -62,6 +62,8 @@ class ChromiumYoutubePlayerController {
   int _nextRequest = 0;
   int _queued = 0;
   String? _videoId;
+  String? _playlistId;
+  int _playlistIndex = 0;
   double _position = 0;
   double? _end;
   int _volume = 100;
@@ -183,18 +185,24 @@ class ChromiumYoutubePlayerController {
     } else if (state == 1) {
       _error = null;
     }
-    final progress = decoded['VideoState'];
-    if (progress is String) {
-      try {
-        final value = jsonDecode(progress);
-        if (value is Map && value['currentTime'] is num) {
+  final progress = decoded['VideoState'];
+  if (progress is String) {
+    try {
+      final value = jsonDecode(progress);
+      if (value is Map) {
+        if (value['currentTime'] is num) {
           final time = (value['currentTime'] as num).toDouble();
           if (time.isFinite && time >= 0) _position = time;
         }
-      } on FormatException {
-        return;
+        if (value['playlistIndex'] is num) {
+          final index = (value['playlistIndex'] as num).toInt();
+          if (index >= 0) _playlistIndex = index;
+        }
       }
+    } on FormatException {
+      return;
     }
+  }
     _events.add(Map<String, Object?>.unmodifiable(decoded));
   }
 
@@ -232,6 +240,7 @@ class ChromiumYoutubePlayerController {
     }
     return _enqueue(() async {
       _videoId = video;
+      _playlistId = null;
       _position = start;
       _end = end;
       _playing = play;
@@ -240,6 +249,70 @@ class ChromiumYoutubePlayerController {
       ]);
     });
   }
+
+  Future<void> loadPlaylist({
+    required String playlistId,
+    int index = 0,
+    double startSeconds = 0,
+  }) => _selectPlaylist(playlistId, index, startSeconds, true);
+
+  Future<void> cuePlaylist({
+    required String playlistId,
+    int index = 0,
+    double startSeconds = 0,
+  }) => _selectPlaylist(playlistId, index, startSeconds, false);
+
+  Future<void> _selectPlaylist(
+    String playlistId,
+    int index,
+    double start,
+    bool play,
+  ) {
+    if (playlistId.isEmpty) {
+      throw ArgumentError.value(playlistId, 'playlistId', 'Cannot be empty');
+    }
+    _time(start);
+    if (index < 0) throw ArgumentError.value(index, 'index', 'Cannot be negative');
+
+    return _enqueue(() async {
+      _videoId = null;
+      _playlistId = playlistId;
+      _playlistIndex = index;
+      _position = start;
+      _end = null;
+      _playing = play;
+      await _request(play ? 'loadPlaylist' : 'cuePlaylist', [
+        {'list': playlistId, 'listType': 'playlist', 'index': index, 'startSeconds': start},
+      ]);
+    });
+  }
+
+  Future<void> nextVideo() => _enqueue(() async {
+    await _request('nextVideo', []);
+  });
+
+  Future<void> previousVideo() => _enqueue(() async {
+    await _request('previousVideo', []);
+  });
+
+  Future<void> playVideoAt(int index) {
+    if (index < 0) throw ArgumentError.value(index, 'index', 'Cannot be negative');
+    return _enqueue(() async {
+      await _request('playVideoAt', [index]);
+    });
+  }
+
+  Future<List<String>> getPlaylist() => _enqueue(() async {
+    final value = await _request('getPlaylist', []);
+    if (value is! List) throw StateError('Invalid playlist result');
+    return value.cast<String>();
+  });
+
+  Future<int> getPlaylistIndex() => _enqueue(() async {
+    final value = await _request('getPlaylistIndex', []);
+    if (value is! num) throw StateError('Invalid playlist index result');
+    return value.toInt();
+  });
 
   Future<void> playVideo() => _enqueue(() async {
     _playing = true;
@@ -296,6 +369,15 @@ class ChromiumYoutubePlayerController {
           if (_end != null) 'endSeconds': _end,
         },
       ]);
+    } else if (_playlistId != null) {
+      await _request(_playing ? 'loadPlaylist' : 'cuePlaylist', [
+        {
+          'list': _playlistId,
+          'listType': 'playlist',
+          'index': _playlistIndex,
+          'startSeconds': _position,
+        },
+      ]);
     }
   });
 
@@ -335,7 +417,7 @@ let player, timer;
 function send(key,value){try{chromiumPostMessage(config.playerId,JSON.stringify({playerId:config.playerId,generation:config.generation,[key]:value}));}catch(_){}}
 const media=document.createElement('video');
 send('MediaCapabilities',{userAgent:navigator.userAgent,vp9:media.canPlayType('video/webm; codecs="vp9"'),av1:media.canPlayType('video/mp4; codecs="av01.0.05M.08"'),h264:media.canPlayType('video/mp4; codecs="avc1.42E01E"'),aac:media.canPlayType('audio/mp4; codecs="mp4a.40.2"'),opus:media.canPlayType('audio/webm; codecs="opus"')});
-const methods=new Set(['loadVideoById','cueVideoById','playVideo','pauseVideo','seekTo','setVolume','getVolume','getCurrentTime','getDuration','getVideoData']);
+const methods=new Set(['loadVideoById','cueVideoById','loadPlaylist','cuePlaylist','nextVideo','previousVideo','playVideoAt','getPlaylist','getPlaylistIndex','playVideo','pauseVideo','seekTo','setVolume','getVolume','getCurrentTime','getDuration','getVideoData']);
 window.__chromiumYoutubeDispatch=function(request){
  if(request.generation!==config.generation)return;
  try{
@@ -347,7 +429,7 @@ window.__chromiumYoutubeDispatch=function(request){
 window.onYouTubeIframeAPIReady=function(){
  player=new YT.Player('player',{host:'https://www.youtube.com',playerVars:{enablejsapi:1,playsinline:1,origin:config.origin,widget_referrer:config.referrer},events:{
  onReady:()=>send('Ready',true),
- onStateChange:event=>{clearInterval(timer);send('StateChange',event.data);if(event.data===1)timer=setInterval(()=>send('VideoState',JSON.stringify({currentTime:player.getCurrentTime(),loadedFraction:player.getVideoLoadedFraction()})),250);},
+ onStateChange:event=>{clearInterval(timer);send('StateChange',event.data);if(event.data===1)timer=setInterval(()=>send('VideoState',JSON.stringify({currentTime:player.getCurrentTime(),loadedFraction:player.getVideoLoadedFraction(),playlistIndex:player.getPlaylistIndex()})),250);},
  onError:event=>send('PlayerError',event.data),
  onPlaybackRateChange:event=>send('PlaybackRateChange',event.data),
  onPlaybackQualityChange:event=>send('PlaybackQualityChange',event.data),

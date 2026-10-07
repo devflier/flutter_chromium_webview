@@ -48,6 +48,8 @@ flutter:
         pluginClass: FlutterChromiumWebviewPlugin
       linux:
         pluginClass: FlutterChromiumWebviewPlugin
+      macos:
+        pluginClass: FlutterChromiumWebviewPlugin
       windows:
         pluginClass: FlutterChromiumWebviewPluginCApi
 
