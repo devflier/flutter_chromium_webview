@@ -1,3 +1,10 @@
+## 0.5.0
+
+* Add macOS CEF and YouTube playlist support.
+* Fix macOS architecture configuration and linking issues.
+* Require the latest platform interface version.
+
+
 ## 0.3.1
 
 * Correct Linux pointer coordinates at fractional and high device pixel ratios.

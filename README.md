@@ -14,10 +14,10 @@ It uses **off-screen rendering (OSR)**. The web content is rendered to an off-sc
 * **Full Desktop Input**: Includes deep integration for keyboard and mouse events natively routed from Flutter to CEF.
 
 ## Current Project Status
-**Status: `0.2.1`.**
+**Status: `0.4.0`.**
 
 **Linux (x64)** and **Windows (x64)** are supported.
-macOS support is planned but not fully implemented/tested yet.
+**macOS** is implemented, validation pending.
 
 ## Monorepo Layout
 

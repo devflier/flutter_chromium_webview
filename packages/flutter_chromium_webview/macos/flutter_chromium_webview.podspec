@@ -24,6 +24,6 @@ Pod::Spec.new do |s|
     'CLANG_CXX_LANGUAGE_STANDARD' => 'c++20',
     'HEADER_SEARCH_PATHS' => '$(inherited) "${PODS_TARGET_SRCROOT}/cef/root"',
     'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) CEF_USE_SANDBOX',
-    'OTHER_LDFLAGS' => '$(inherited) -ObjC',
+    'OTHER_LDFLAGS' => '$(inherited) -ObjC -framework "Chromium Embedded Framework" -framework "FlutterMacOS" -F"${PODS_TARGET_SRCROOT}/cef/root/Release"',
   }
 end

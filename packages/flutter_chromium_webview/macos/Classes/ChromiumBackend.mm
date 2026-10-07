@@ -370,7 +370,7 @@ void Core::Handle(FlutterMethodCall* call, FlutterResult result) {
     info.SetAsWindowless((__bridge CefWindowHandle)view_);
     CefBrowserSettings settings; settings.windowless_frame_rate = 60;
     const bool requires_gesture = Number(args, @"mediaPlaybackRequiresUserGesture", 1) != 0;
-    auto context = chromium_settings::AutoplayContext(requires_gesture);
+    auto context = chromium_settings::CustomContext(requires_gesture, "");
     if (!requires_gesture && !context) {
       handler->Close(); result(Error(@"SETTINGS_FAILED", @"Could not create a private autoplay context")); return;
     }

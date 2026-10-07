@@ -2,7 +2,7 @@ name: chromium_platform_interface_example
 description: Demonstrates registering and using an in-memory Chromium backend.
 publish_to: none
 environment:
-  sdk: ^3.13.3
+  sdk: ">=3.12.0 <4.0.0"
 dependencies:
   flutter:
     sdk: flutter

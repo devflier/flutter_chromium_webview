@@ -16,7 +16,7 @@ set(USE_SANDBOX ON CACHE BOOL "CEF helper sandbox" FORCE)
 find_package(CEF REQUIRED)
 add_subdirectory("${CEF_LIBCEF_DLL_WRAPPER_PATH}" libcef_dll_wrapper)
 set_target_properties(libcef_dll_wrapper PROPERTIES
-  PREFIX "lib" ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+  PREFIX "" ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 add_executable(chromium_webview_helper Helpers/main.cc)
 target_include_directories(chromium_webview_helper PRIVATE "${CEF_ROOT}")
 target_compile_definitions(chromium_webview_helper PRIVATE CEF_USE_SANDBOX)

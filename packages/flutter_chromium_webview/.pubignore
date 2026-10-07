@@ -31,13 +31,7 @@ example/dummy_plugin/
 **/third_party/
 **/cef_download/
 **/cef_binary_*
-macos/cef/
 
 # Monorepo-only local overrides.
 pubspec_overrides.yaml
 
-# macOS is not supported yet: the work-in-progress backend stays in the
-# repository only and is not declared in pubspec.yaml.
-macos/
-MACOS.md
-example/macos/
