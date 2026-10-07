@@ -1,0 +1,22 @@
+PODS:
+  - flutter_chromium_webview (0.1.0):
+    - FlutterMacOS
+  - FlutterMacOS (1.0.0)
+
+DEPENDENCIES:
+  - flutter_chromium_webview (from `Flutter/ephemeral/.symlinks/plugins/flutter_chromium_webview/macos`)
+  - FlutterMacOS (from `Flutter/ephemeral`)
+
+EXTERNAL SOURCES:
+  flutter_chromium_webview:
+    :path: Flutter/ephemeral/.symlinks/plugins/flutter_chromium_webview/macos
+  FlutterMacOS:
+    :path: Flutter/ephemeral
+
+SPEC CHECKSUMS:
+  flutter_chromium_webview: e33e3dea32083d945bddda605e831bcd92de455b
+  FlutterMacOS: d0db08ddef1a9af05a5ec4b724367152bb0500b1
+
+PODFILE CHECKSUM: f28eec317035c2596b11b1725405ddf10693a123
+
+COCOAPODS: 1.16.2

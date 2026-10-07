@@ -172,6 +172,9 @@ class ChromiumYoutubePlayerController {
       }
       return;
     }
+    if (decoded['DebugHeartbeat'] != null) {
+      print('[ChromiumBG] JS Heartbeat -> ' + decoded['DebugHeartbeat'].toString());
+    }
     if (decoded['Ready'] == true && _ready?.isCompleted == false) {
       _ready!.complete();
     }
@@ -428,7 +431,23 @@ window.__chromiumYoutubeDispatch=function(request){
 };
 window.onYouTubeIframeAPIReady=function(){
  player=new YT.Player('player',{host:'https://www.youtube.com',playerVars:{enablejsapi:1,playsinline:1,origin:config.origin,widget_referrer:config.referrer},events:{
- onReady:()=>send('Ready',true),
+ onReady:()=>{
+   send('Ready',true);
+   // Phase B: Debug Heartbeat
+   setInterval(()=>{
+     const state = player && player.getPlayerState ? player.getPlayerState() : null;
+     const time = player && player.getCurrentTime ? player.getCurrentTime() : null;
+     const idx = player && player.getPlaylistIndex ? player.getPlaylistIndex() : null;
+     send('DebugHeartbeat', JSON.stringify({
+       perfTimestamp: performance.now(),
+       state: state,
+       currentTime: time,
+       playlistIndex: idx,
+       hidden: document.hidden,
+       visibility: document.visibilityState
+     }));
+   }, 1000);
+ },
  onStateChange:event=>{clearInterval(timer);send('StateChange',event.data);if(event.data===1)timer=setInterval(()=>send('VideoState',JSON.stringify({currentTime:player.getCurrentTime(),loadedFraction:player.getVideoLoadedFraction(),playlistIndex:player.getPlaylistIndex()})),250);},
  onError:event=>send('PlayerError',event.data),
  onPlaybackRateChange:event=>send('PlaybackRateChange',event.data),
