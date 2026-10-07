@@ -40,7 +40,7 @@ NSArray* Menu(CefRefPtr<CefMenuModel> model) {
 class App : public CefApp {
  public:
   void OnBeforeCommandLineProcessing(const CefString&, CefRefPtr<CefCommandLine> command) override {
-    command->AppendSwitch("disable-gpu");
+    command->AppendSwitch("disable-gpu"); command->AppendSwitch("use-mock-keychain"); command->AppendSwitch("password-store=basic");
     command->AppendSwitch("disable-gpu-compositing");
   }
  private:
@@ -266,7 +266,7 @@ bool Runtime::Initialize(NSString* cache, NSString** error) {
   CefString(&settings.browser_subprocess_path) = CefText(helper);
   CefString(&settings.framework_dir_path) = CefText(framework);
   CefString(&settings.main_bundle_path) = CefText(NSBundle.mainBundle.bundlePath);
-  CefString(&settings.log_file) = CefText([cache stringByAppendingPathComponent:@"cef.log"]);
+  CefString(&settings.log_file) = CefText([cache stringByAppendingPathComponent:@"cef.log"]); settings.log_severity = LOGSEVERITY_VERBOSE;
   std::cerr << "[CEF] Initializing macOS runtime" << std::endl;
   ready_ = CefInitialize(main_args, settings, new App, nullptr);
   if (!ready_) {

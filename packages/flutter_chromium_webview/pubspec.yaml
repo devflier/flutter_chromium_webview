@@ -50,7 +50,6 @@ flutter:
         pluginClass: FlutterChromiumWebviewPlugin
       macos:
         pluginClass: FlutterChromiumWebviewPlugin
-        default_package: flutter_chromium_webview
       windows:
         pluginClass: FlutterChromiumWebviewPluginCApi
 
