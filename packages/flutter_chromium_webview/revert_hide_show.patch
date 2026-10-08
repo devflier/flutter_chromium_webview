@@ -1,0 +1,29 @@
+--- macos/Host/HostBrowserClient.mm
++++ macos/Host/HostBrowserClient.mm
+@@ -269,8 +269,6 @@
+ 
+ void HostBrowserClient::ResizeBrowser(int64_t browser_id, int width, int height, double scale_factor) {
+     CEF_REQUIRE_UI_THREAD();
+-    FILE* log_file = fopen("/tmp/cef_host.log", "a");
+-    if (log_file) { fprintf(log_file, "ResizeBrowser called: w=%d h=%d\n", width, height); fclose(log_file); }
+     NSLog(@"[CEFHost] ResizeBrowser called for %lld, width=%d, height=%d, scale=%f", browser_id, width, height, scale_factor);
+     auto it = _sessions.find(browser_id);
+     if (it != _sessions.end()) {
+@@ -281,8 +279,6 @@
+             
+             // The size hasn't changed. Do not recreate IOSurfaces.
+             // Just force a repaint in case the Flutter side needs a fresh frame.
+-            FILE* log_file2 = fopen("/tmp/cef_host.log", "a");
+-            if (log_file2) { fprintf(log_file2, "ResizeBrowser short-circuit\n"); fclose(log_file2); }
+             if (it->second.browser) {
+                 it->second.browser->GetHost()->Invalidate(PET_VIEW);
+             }
+@@ -457,8 +453,6 @@
+                                            const RectList& dirtyRects,
+                                            const CefAcceleratedPaintInfo& info) {
+     if (type == PET_POPUP) return;
+-    FILE* log_file = fopen("/tmp/cef_host.log", "a");
+-    if (log_file) { fprintf(log_file, "OnAcceleratedPaint called\n"); fclose(log_file); }
+     NSLog(@"[CEFHost] OnAcceleratedPaint called for %d x %d", IOSurfaceGetWidth((IOSurfaceRef)info.shared_texture_io_surface), IOSurfaceGetHeight((IOSurfaceRef)info.shared_texture_io_surface));
+     
+     int64_t b_id = GetBrowserId(browser);
