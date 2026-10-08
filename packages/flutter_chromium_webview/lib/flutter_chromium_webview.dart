@@ -132,9 +132,16 @@ class ContextMenuRequest {
 
 /// A string sent by an allowed main-frame document.
 class JavaScriptMessage {
-  const JavaScriptMessage({required this.message, required this.origin});
+  const JavaScriptMessage({
+    required this.message,
+    required this.origin,
+    this.channel,
+  });
   final String message;
   final String origin;
+
+  /// The configured channel that delivered this message.
+  final String? channel;
 }
 
 /// A main-frame message channel with an explicit HTTP(S) origin allowlist.
@@ -146,8 +153,9 @@ class JavaScriptChannel {
   JavaScriptChannel({
     required this.name,
     required Set<String> allowedOrigins,
-    required this.onMessageReceived,
-  }) : allowedOrigins = Set.unmodifiable(allowedOrigins.map(_origin)) {
+    void Function(JavaScriptMessage message)? onMessageReceived,
+  }) : onMessageReceived = onMessageReceived ?? _ignoreMessage,
+       allowedOrigins = Set.unmodifiable(allowedOrigins.map(_origin)) {
     if (!RegExp(r'^[A-Za-z_$][A-Za-z0-9_$]{0,127}$').hasMatch(name)) {
       throw ArgumentError.value(
         name,
@@ -168,6 +176,8 @@ class JavaScriptChannel {
   final Set<String> allowedOrigins;
   final void Function(JavaScriptMessage message) onMessageReceived;
 
+  static void _ignoreMessage(JavaScriptMessage message) {}
+
   static String _origin(String value) {
     final uri = Uri.tryParse(value);
     if (uri == null ||
@@ -184,6 +194,43 @@ class JavaScriptChannel {
       );
     }
     return uri.origin;
+  }
+}
+
+/// A structured failure from evaluating JavaScript or its document lifecycle.
+class JavaScriptException implements Exception {
+  const JavaScriptException(this.code, this.message, {this.name, this.stack});
+  final String code;
+  final String message;
+  final String? name;
+  final String? stack;
+  @override
+  String toString() => 'JavaScriptException($code): $message';
+}
+
+/// Cancels an evaluation's wait and discards its eventual response.
+/// Cancellation cannot undo side effects already performed by JavaScript.
+class JavaScriptCancellationToken {
+  bool _cancelled = false;
+  final Set<void Function()> _listeners = {};
+  bool get isCancelled => _cancelled;
+  void cancel() {
+    if (_cancelled) return;
+    _cancelled = true;
+    final listeners = List.of(_listeners);
+    _listeners.clear();
+    for (final listener in listeners) {
+      listener();
+    }
+  }
+
+  void Function() _listen(void Function() callback) {
+    if (_cancelled) {
+      callback();
+    } else {
+      _listeners.add(callback);
+    }
+    return () => _listeners.remove(callback);
   }
 }
 
@@ -214,6 +261,12 @@ class ChromiumWebViewController extends ChangeNotifier {
   }
 
   final List<JavaScriptChannel> javaScriptChannels;
+  final StreamController<JavaScriptMessage> _messages =
+      StreamController.broadcast();
+
+  /// Messages accepted by this browser's configured channel/origin policy.
+  Stream<JavaScriptMessage> get onMessage => _messages.stream;
+  static int _nextJavaScriptOperation = 0;
 
   /// Optional printable ASCII user-agent override, applied before initial navigation.
   final String? userAgent;
@@ -369,9 +422,13 @@ class ChromiumWebViewController extends ChangeNotifier {
         }
         for (final channel in javaScriptChannels) {
           if (channel.name == name && channel.allowedOrigins.contains(origin)) {
-            channel.onMessageReceived(
-              JavaScriptMessage(message: message, origin: origin),
+            final value = JavaScriptMessage(
+              message: message,
+              origin: origin,
+              channel: name,
             );
+            _messages.add(value);
+            channel.onMessageReceived(value);
             break;
           }
         }
@@ -739,8 +796,9 @@ class ChromiumWebViewController extends ChangeNotifier {
 
   void _closeMenu(int menuId, int commandId) {
     unawaited(
-      _invoke((id) => _platform.closeContextMenu(id, menuId, commandId))
-          .catchError((Object _) {}),
+      _invoke(
+        (id) => _platform.closeContextMenu(id, menuId, commandId),
+      ).catchError((Object _) {}),
     );
   }
 
@@ -795,6 +853,65 @@ class ChromiumWebViewController extends ChangeNotifier {
   /// Navigates forwards one step in the browser's session history.
   Future<void> goForward() => _invoke(_platform.goForward);
 
+  /// Evaluates in the main document. Promises are awaited; undefined becomes
+  /// null. Results must be JSON-compatible and at most 1 MiB. Execution starts
+  /// in send order per browser; asynchronous results can finish out of order.
+  /// Navigation, close, renderer/host loss, cancellation and timeout fail with
+  /// [JavaScriptException]. Timeout/cancellation do not undo JavaScript effects.
+  /// This API is currently supported by the macOS IPC backend.
+  Future<Object?> evaluateJavaScript(
+    String js, {
+    Duration timeout = const Duration(seconds: 10),
+    JavaScriptCancellationToken? cancellationToken,
+  }) async {
+    if (timeout.inMilliseconds < 1 ||
+        timeout.inMilliseconds > 60000 ||
+        utf8.encode(js).length > 1024 * 1024) {
+      throw ArgumentError(
+        'Expected JavaScript up to 1 MiB and timeout 1–60000 ms',
+      );
+    }
+    if (_isDisposed)
+      throw const JavaScriptException('browser_closed', 'Browser disposed');
+    await _creation;
+    final id = _browserId;
+    if (_isDisposed || id == null)
+      throw const JavaScriptException(
+        'browser_closed',
+        'Create a browser before evaluating JavaScript',
+      );
+    if (cancellationToken?.isCancelled ?? false)
+      throw const JavaScriptException(
+        'cancelled',
+        'JavaScript request cancelled',
+      );
+    final operationId = '${++_nextJavaScriptOperation}';
+    final future = _platform.evaluateJavaScript(
+      id,
+      js,
+      operationId: operationId,
+      timeoutMs: timeout.inMilliseconds,
+    );
+    final removeListener = cancellationToken?._listen(() {
+      unawaited(
+        _platform.cancelJavaScript(id, operationId).catchError((Object _) {}),
+      );
+    });
+    try {
+      return await future;
+    } on PlatformException catch (error) {
+      final details = error.details;
+      throw JavaScriptException(
+        error.code,
+        error.message ?? 'JavaScript request failed',
+        name: details is Map ? details['name'] as String? : null,
+        stack: details is Map ? details['stack'] as String? : null,
+      );
+    } finally {
+      removeListener?.call();
+    }
+  }
+
   /// Executes the provided JavaScript string [js] asynchronously in the main frame.
   Future<void> executeJavaScript(String js) =>
       _invoke((id) => _platform.executeJavaScript(id, js));
@@ -819,6 +936,7 @@ class ChromiumWebViewController extends ChangeNotifier {
     required int x,
     required int y,
     int button = 0,
+    int clickCount = 1,
     int deltaX = 0,
     int deltaY = 0,
     int modifiers = 0,
@@ -830,6 +948,7 @@ class ChromiumWebViewController extends ChangeNotifier {
         x: x,
         y: y,
         button: button,
+        clickCount: clickCount,
         deltaX: deltaX,
         deltaY: deltaY,
         modifiers: modifiers,
@@ -876,6 +995,7 @@ class ChromiumWebViewController extends ChangeNotifier {
   Future<void> dispose() {
     if (_disposal != null) return _disposal!;
     _isDisposed = true;
+    unawaited(_messages.close());
     _dismissTransientUi();
     super.dispose();
     return _disposal = _dispose();
@@ -956,6 +1076,8 @@ class _ChromiumWebViewState extends State<ChromiumWebView> {
   Size? _currentSize;
   double? _currentDpr;
   int _buttons = 0;
+  final Map<int, (Duration, Offset, int)> _clicks = {};
+  final Map<int, int> _pressedClickCounts = {};
   Object? _error;
 
   void _handleTakeFocus(bool next) {
@@ -1037,6 +1159,8 @@ class _ChromiumWebViewState extends State<ChromiumWebView> {
       _currentSize = null;
       _currentDpr = null;
       _buttons = 0;
+      _clicks.clear();
+      _pressedClickCounts.clear();
       _error = null;
       _initBrowser();
     }
@@ -1085,6 +1209,23 @@ class _ChromiumWebViewState extends State<ChromiumWebView> {
         kMiddleMouseButton: 3,
       }.entries) {
         if (changedButtons & entry.key == 0) continue;
+        final down = nextButtons & entry.key != 0;
+        var clickCount = _pressedClickCounts[entry.key] ?? 1;
+        if (down) {
+          final last = _clicks[entry.key];
+          final elapsed = last == null ? null : event.timeStamp - last.$1;
+          clickCount =
+              last != null &&
+                  elapsed! >= Duration.zero &&
+                  elapsed <= const Duration(milliseconds: 500) &&
+                  (position - last.$2).distance <= 4
+              ? last.$3 % 3 + 1
+              : 1;
+          _clicks[entry.key] = (event.timeStamp, position, clickCount);
+          _pressedClickCounts[entry.key] = clickCount;
+        } else {
+          _pressedClickCounts.remove(entry.key);
+        }
         _send(
           widget.controller.sendPointerInput(
             type: (nextButtons & entry.key != 0)
@@ -1093,6 +1234,7 @@ class _ChromiumWebViewState extends State<ChromiumWebView> {
             x: position.dx.round(),
             y: position.dy.round(),
             button: entry.value,
+            clickCount: clickCount,
             modifiers: _modifiers(nextButtons),
           ),
         );
@@ -1216,7 +1358,9 @@ class _ChromiumWebViewState extends State<ChromiumWebView> {
     return Focus(
       focusNode: _focus,
       autofocus: widget.autofocus,
-      onFocusChange: (focused) => _send(widget.controller.setFocus(focused)),
+      onFocusChange: (focused) {
+        _send(widget.controller.setFocus(focused));
+      },
       child: LayoutBuilder(
         builder: (context, constraints) {
           if (widget.controller.textureId == null) {

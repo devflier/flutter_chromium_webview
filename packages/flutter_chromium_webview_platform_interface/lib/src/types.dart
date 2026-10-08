@@ -88,6 +88,7 @@ class PointerInput {
     required this.x,
     required this.y,
     this.button = 0,
+    this.clickCount = 1,
     this.deltaX = 0,
     this.deltaY = 0,
     this.modifiers = 0,
@@ -104,6 +105,9 @@ class PointerInput {
 
   /// Button identifier: 0 none, 1 primary, 2 secondary, 3 middle.
   final int button;
+
+  /// Number of consecutive clicks for this button.
+  final int clickCount;
 
   /// Horizontal wheel delta.
   final int deltaX;

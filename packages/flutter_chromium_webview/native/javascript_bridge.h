@@ -19,8 +19,10 @@ inline std::string Origin(const std::string& url) {
   if (!CefParseURL(url, parts)) return {};
   auto scheme = CefString(&parts.scheme).ToString();
   if (scheme != "http" && scheme != "https") return {};
-  auto origin = CefString(&parts.origin).ToString();
-  while (!origin.empty() && origin.back() == '/') origin.pop_back();
+  auto host = CefString(&parts.host).ToString();
+  auto port = CefString(&parts.port).ToString();
+  std::string origin = scheme + "://" + host;
+  if (!port.empty()) origin += ":" + port;
   return origin;
 }
 
@@ -40,8 +42,13 @@ class Policy {
       auto list = dictionary->GetList(key);
       for (size_t i = 0; i < list->GetSize(); ++i) {
         if (list->GetType(i) != VTYPE_STRING) continue;
-        auto origin = Origin(list->GetString(i).ToString());
-        if (!origin.empty()) channels_[key.ToString()].insert(origin);
+        std::string raw_origin = list->GetString(i).ToString();
+        if (raw_origin == "*") {
+          channels_[key.ToString()].insert("*");
+        } else {
+          auto origin = Origin(raw_origin);
+          if (!origin.empty()) channels_[key.ToString()].insert(origin);
+        }
       }
     }
   }
@@ -62,7 +69,8 @@ class Policy {
         args->GetString(3).ToString() != result.origin ||
         result.message.size() > kMaxMessageBytes) return std::nullopt;
     auto found = channels_.find(result.channel);
-    if (found == channels_.end() || !found->second.count(result.origin))
+    if (found == channels_.end()) return std::nullopt;
+    if (!found->second.count(result.origin) && !found->second.count("*"))
       return std::nullopt;
     return result;
   }
@@ -107,14 +115,17 @@ class PostMessage : public CefV8Handler {
 class RendererApp : public CefApp, public CefRenderProcessHandler {
  public:
   CefRefPtr<CefRenderProcessHandler> GetRenderProcessHandler() override { return this; }
-  void OnContextCreated(CefRefPtr<CefBrowser>, CefRefPtr<CefFrame> frame,
+  void OnContextCreated(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
       CefRefPtr<CefV8Context> context) override {
     if (!frame->IsMain()) return;
-    // Capture the document's security origin before page scripts can replace
-    // window.origin. CSP-sandboxed HTTP documents have an opaque "null" origin.
-    auto origin_value = context->GetGlobal()->GetValue("origin");
-    const auto origin = origin_value && origin_value->IsString()
-      ? origin_value->GetStringValue().ToString() : std::string();
+    
+    std::string origin = Origin(frame->GetURL().ToString());
+    // Window.origin reflects a sandboxed document's actual security origin;
+    // location/frame URLs alone can still look like trusted HTTP URLs.
+    auto security_origin = context->GetGlobal()->GetValue("origin");
+    if (origin.empty() || !security_origin || !security_origin->IsString() ||
+        security_origin->GetStringValue().ToString() != origin) return;
+    
     context->GetGlobal()->SetValue("chromiumPostMessage",
       CefV8Value::CreateFunction("chromiumPostMessage", new PostMessage(origin)),
       static_cast<cef_v8_propertyattribute_t>(V8_PROPERTY_ATTRIBUTE_READONLY |

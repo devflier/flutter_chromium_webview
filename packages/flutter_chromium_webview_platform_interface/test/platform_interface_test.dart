@@ -212,6 +212,7 @@ void main() {
         'y': 2,
         'type': 3,
         'button': 0,
+        'clickCount': 1,
         'deltaX': 0,
         'deltaY': -3,
         'modifiers': 0,

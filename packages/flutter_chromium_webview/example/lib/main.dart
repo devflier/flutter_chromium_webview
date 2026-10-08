@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_chromium_webview/flutter_chromium_webview.dart';
 import 'package:path_provider/path_provider.dart';
@@ -95,6 +96,18 @@ class _BrowserScreenState extends State<BrowserScreen> {
     super.initState();
     _controller = ChromiumWebViewController(
       initialUrl: widget.initialUrl ?? 'https://example.com',
+      javaScriptChannels: [
+        JavaScriptChannel(
+          name: 'TestChannel',
+          allowedOrigins: {'https://example.com'},
+          onMessageReceived: (message) {
+            print('JS_BRIDGE_TEST: Received message from ${message.origin}: ${message.message}');
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('JS msg from ${message.origin}: ${message.message}')),
+            );
+          },
+        ),
+      ],
     );
     _urlController.text = _controller.initialUrl;
     _controller.onTransientUiDismissed = () =>
@@ -105,6 +118,14 @@ class _BrowserScreenState extends State<BrowserScreen> {
         _urlController.text = url;
       }
     };
+
+    Timer.periodic(const Duration(seconds: 5), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      _controller.executeJavaScript("window.chromiumPostMessage('TestChannel', 'Hello from JS bridge loop!');");
+    });
 
     _controller.onLoadError = (errorCode, errorText, failedUrl) {
       if (!mounted) return;
@@ -296,7 +317,8 @@ class _BrowserScreenState extends State<BrowserScreen> {
                     tooltip: 'Run JavaScript',
                     icon: const Icon(Icons.code),
                     onPressed: () => _controller.executeJavaScript(
-                      "document.body.style.background = '#fff3c4';",
+                      "document.body.style.background = '#fff3c4';"
+                      "window.chromiumPostMessage('TestChannel', 'Hello from JS bridge!');",
                     ),
                   ),
                   Expanded(

@@ -1,13 +1,15 @@
 #import "ChromiumInput.h"
+#import "ChromiumHostManager.h"
 
 namespace {
 int Modifiers(NSEventModifierFlags flags) {
   int result = 0;
-  if (flags & NSEventModifierFlagShift) result |= EVENTFLAG_SHIFT_DOWN;
-  if (flags & NSEventModifierFlagControl) result |= EVENTFLAG_CONTROL_DOWN;
-  if (flags & NSEventModifierFlagOption) result |= EVENTFLAG_ALT_DOWN;
-  if (flags & NSEventModifierFlagCommand) result |= EVENTFLAG_COMMAND_DOWN;
-  if (flags & NSEventModifierFlagCapsLock) result |= EVENTFLAG_CAPS_LOCK_ON;
+  // cef_event_flags_t (same values used by Flutter pointer forwarding).
+  if (flags & NSEventModifierFlagCapsLock) result |= 1;
+  if (flags & NSEventModifierFlagShift) result |= 2;
+  if (flags & NSEventModifierFlagControl) result |= 4;
+  if (flags & NSEventModifierFlagOption) result |= 8;
+  if (flags & NSEventModifierFlagCommand) result |= 128;
   return result;
 }
 int WindowsKey(NSEvent* event) {
@@ -53,92 +55,108 @@ int WindowsKey(NSEvent* event) {
     default: return 0;
   }
 }
-std::u16string UTF16(NSString* text) {
-  std::u16string value(text.length, 0);
-  if (text.length) [text getCharacters:reinterpret_cast<unichar*>(value.data()) range:NSMakeRange(0, text.length)];
-  return value;
-}
 }
 
 @implementation ChromiumInput {
-  CefRefPtr<CefBrowser> _browser;
+  int64_t _browserId;
+  BOOL _hasBrowser;
   __weak NSResponder* _previousResponder;
   NSString* _marked;
   NSRange _selection;
+  int _textModifiers;
+  int _textScanCode;
 }
+- (instancetype)initWithFrame:(NSRect)frameRect {
+  if (self = [super initWithFrame:frameRect]) {
+      _browserId = -1;
+      _hasBrowser = NO;
+  }
+  return self;
+}
++ (int)cefModifiersForFlags:(NSEventModifierFlags)flags { return Modifiers(flags); }
 - (BOOL)acceptsFirstResponder { return YES; }
 - (BOOL)isFlipped { return YES; }
-- (BOOL)focused { return _browser && self.window.firstResponder == self; }
-- (BOOL)ownsBrowser:(CefRefPtr<CefBrowser>)browser { return _browser && _browser == browser; }
-- (void)setBrowser:(CefRefPtr<CefBrowser>)browser {
-  if (_browser && _browser != browser) {
-    _browser->GetHost()->ImeCancelComposition();
-    _browser->GetHost()->SetFocus(false);
+- (NSView *)hitTest:(NSPoint)point { return nil; }
+- (BOOL)focused { return _hasBrowser && self.window.firstResponder == self; }
+- (BOOL)ownsBrowserId:(int64_t)browserId { return _hasBrowser && _browserId == browserId; }
+- (void)setBrowserId:(int64_t)browserId {
+  // Preserve an active IME composition when focus is reaffirmed.
+  if (_hasBrowser && _browserId == browserId && self.focused) return;
+  if (_hasBrowser && _browserId != browserId) {
+    IPC::Message msg1; msg1.type = "imeCancelComposition"; msg1.payload = @{@"browserId": @(_browserId)};
+    [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg1 responseCallback:nullptr];
+    IPC::Message msg2; msg2.type = "setFocus"; msg2.payload = @{@"browserId": @(_browserId), @"focused": @(NO)};
+    [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg2 responseCallback:nullptr];
   }
-  _browser = browser;
+  _browserId = browserId;
+  _hasBrowser = (browserId != -1);
   _marked = @"";
   _selection = NSMakeRange(0, 0);
-  if (_browser) {
+  if (_hasBrowser) {
     if (self.window.firstResponder != self) _previousResponder = self.window.firstResponder;
     [self.window makeFirstResponder:self];
-    _browser->GetHost()->SetFocus(true);
+    IPC::Message msg; msg.type = "setFocus"; msg.payload = @{@"browserId": @(_browserId), @"focused": @(YES)};
+    [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:nullptr];
   } else if (self.window.firstResponder == self) {
     [self.window makeFirstResponder:_previousResponder ?: self.superview];
     _previousResponder = nil;
   }
 }
 - (BOOL)resignFirstResponder {
-  if (_browser) _browser->GetHost()->SetFocus(false);
+  if (_hasBrowser) {
+      IPC::Message msg; msg.type = "setFocus"; msg.payload = @{@"browserId": @(_browserId), @"focused": @(NO)};
+      [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:nullptr];
+  }
   return YES;
 }
-- (void)sendKey:(NSEvent*)event type:(cef_key_event_type_t)type {
-  if (!_browser) return;
-  CefKeyEvent key;
-  key.type = type;
-  key.windows_key_code = WindowsKey(event);
-  key.native_key_code = event.keyCode;
-  key.modifiers = Modifiers(event.modifierFlags);
-  key.is_system_key = (event.modifierFlags & NSEventModifierFlagCommand) != 0;
-  // Cocoa throws if characters are requested for a flagsChanged event.
+- (void)sendKey:(NSEvent*)event type:(int)type {
+  if (!_hasBrowser) return;
+  NSMutableDictionary* payload = [NSMutableDictionary dictionaryWithDictionary:@{
+      @"browserId": @(_browserId),
+      @"type": @(type),
+      @"keyCode": @(WindowsKey(event)),
+      @"scanCode": @(event.keyCode),
+      @"modifiers": @(Modifiers(event.modifierFlags)),
+      @"is_system_key": @((event.modifierFlags & NSEventModifierFlagCommand) != 0)
+  }];
   if (event.type != NSEventTypeFlagsChanged) {
-    if (event.characters.length) key.character = [event.characters characterAtIndex:0];
+    if (event.characters.length) payload[@"character"] = @([event.characters characterAtIndex:0]);
     if (event.charactersIgnoringModifiers.length)
-      key.unmodified_character = [event.charactersIgnoringModifiers characterAtIndex:0];
+      payload[@"unmodified_character"] = @([event.charactersIgnoringModifiers characterAtIndex:0]);
   }
-  _browser->GetHost()->SendKeyEvent(key);
+  IPC::Message msg; msg.type = type == 2 ? "keyUp" : "keyDown"; msg.browserId = std::to_string(_browserId); msg.payload = payload;
+  [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:nullptr];
 }
 - (void)keyDown:(NSEvent*)event {
-  if (!_browser) { [super keyDown:event]; return; }
+  if (!_hasBrowser) { [super keyDown:event]; return; }
   if (event.modifierFlags & NSEventModifierFlagCommand) {
-    auto frame = _browser->GetFocusedFrame();
-    if (!frame) frame = _browser->GetMainFrame();
     NSString* key = event.charactersIgnoringModifiers.lowercaseString;
-    if ([key isEqualToString:@"c"]) { frame->Copy(); return; }
-    if ([key isEqualToString:@"v"]) { frame->Paste(); return; }
-    if ([key isEqualToString:@"x"]) { frame->Cut(); return; }
-    if ([key isEqualToString:@"a"]) { frame->SelectAll(); return; }
-    if ([key isEqualToString:@"z"]) {
-      if (event.modifierFlags & NSEventModifierFlagShift) frame->Redo(); else frame->Undo();
-      return;
+    NSString* cmd = nil;
+    if ([key isEqualToString:@"c"]) cmd = @"copy";
+    else if ([key isEqualToString:@"v"]) cmd = @"paste";
+    else if ([key isEqualToString:@"x"]) cmd = @"cut";
+    else if ([key isEqualToString:@"a"]) cmd = @"selectAll";
+    else if ([key isEqualToString:@"z"]) cmd = (event.modifierFlags & NSEventModifierFlagShift) ? @"redo" : @"undo";
+    if (cmd) {
+        IPC::Message msg; msg.type = "doCommand"; msg.payload = @{@"browserId": @(_browserId), @"command": cmd};
+        [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:nullptr];
+        return;
     }
   }
-  [self sendKey:event type:KEYEVENT_RAWKEYDOWN];
+  _textModifiers = Modifiers(event.modifierFlags);
+  _textScanCode = event.keyCode;
+  [self sendKey:event type:0]; // KEYEVENT_RAWKEYDOWN = 0
   [self interpretKeyEvents:@[event]];
 }
-- (void)keyUp:(NSEvent*)event { [self sendKey:event type:KEYEVENT_KEYUP]; }
-- (CefRefPtr<CefFrame>)editingFrame {
-  if (!_browser) return nullptr;
-  auto frame = _browser->GetFocusedFrame();
-  return frame ? frame : _browser->GetMainFrame();
-}
-// Cocoa menus dispatch editing actions through the responder chain before
-// keyDown. Handle both menu selections and keyboard-equivalent shortcuts.
-- (void)copy:(id)sender { if (auto frame = [self editingFrame]) frame->Copy(); }
-- (void)cut:(id)sender { if (auto frame = [self editingFrame]) frame->Cut(); }
-- (void)paste:(id)sender { if (auto frame = [self editingFrame]) frame->Paste(); }
-- (void)selectAll:(id)sender { if (auto frame = [self editingFrame]) frame->SelectAll(); }
-- (void)undo:(id)sender { if (auto frame = [self editingFrame]) frame->Undo(); }
-- (void)redo:(id)sender { if (auto frame = [self editingFrame]) frame->Redo(); }
+- (void)keyUp:(NSEvent*)event { [self sendKey:event type:2]; } // KEYEVENT_KEYUP = 2
+
+- (void)copy:(id)sender { IPC::Message msg; msg.type = "doCommand"; msg.payload = @{@"browserId": @(_browserId), @"command": @"copy"}; [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:nullptr]; }
+- (void)cut:(id)sender { IPC::Message msg; msg.type = "doCommand"; msg.payload = @{@"browserId": @(_browserId), @"command": @"cut"}; [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:nullptr]; }
+- (void)paste:(id)sender { IPC::Message msg; msg.type = "doCommand"; msg.payload = @{@"browserId": @(_browserId), @"command": @"paste"}; [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:nullptr]; }
+- (void)selectAll:(id)sender { IPC::Message msg; msg.type = "doCommand"; msg.payload = @{@"browserId": @(_browserId), @"command": @"selectAll"}; [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:nullptr]; }
+- (void)undo:(id)sender { IPC::Message msg; msg.type = "doCommand"; msg.payload = @{@"browserId": @(_browserId), @"command": @"undo"}; [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:nullptr]; }
+- (void)redo:(id)sender { IPC::Message msg; msg.type = "doCommand"; msg.payload = @{@"browserId": @(_browserId), @"command": @"redo"}; [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:nullptr]; }
+
 - (void)flagsChanged:(NSEvent*)event {
   NSEventModifierFlags flag = 0;
   switch (event.keyCode) {
@@ -149,41 +167,49 @@ std::u16string UTF16(NSString* text) {
     case 57: flag = NSEventModifierFlagCapsLock; break;
     default: return;
   }
-  [self sendKey:event type:(event.modifierFlags & flag) ? KEYEVENT_RAWKEYDOWN : KEYEVENT_KEYUP];
+  [self sendKey:event type:(event.modifierFlags & flag) ? 0 : 2]; // 0=RAWKEYDOWN, 2=KEYUP
 }
 - (void)insertText:(id)value replacementRange:(NSRange)range {
-  if (!_browser) return;
+  if (!_hasBrowser) return;
   NSString* text = [value isKindOfClass:[NSAttributedString class]] ? [value string] : value;
   if (_marked.length) {
-    _browser->GetHost()->ImeCommitText(UTF16(text), CefRange::InvalidRange(), 0);
+    IPC::Message msg; msg.type = "imeCommitText"; msg.payload = @{@"browserId": @(_browserId), @"text": text};
+    [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:nullptr];
   } else {
     for (NSUInteger index = 0; index < text.length; ++index) {
-      CefKeyEvent key;
-      key.type = KEYEVENT_CHAR;
-      key.character = key.unmodified_character = [text characterAtIndex:index];
-      key.windows_key_code = key.character;
-      _browser->GetHost()->SendKeyEvent(key);
+      NSMutableDictionary* payload = [NSMutableDictionary dictionaryWithDictionary:@{
+          @"browserId": @(_browserId),
+          @"type": @(3), // KEYEVENT_CHAR = 3
+          @"keyCode": @([text characterAtIndex:index]),
+          @"scanCode": @(_textScanCode),
+          @"character": @([text characterAtIndex:index]),
+          @"unmodified_character": @([text characterAtIndex:index]),
+          @"modifiers": @(_textModifiers),
+          @"is_system_key": @(NO)
+      }];
+      IPC::Message msg; msg.type = "textInput"; msg.browserId = std::to_string(_browserId); msg.payload = payload;
+      [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:nullptr];
     }
   }
   _marked = @"";
 }
 - (void)setMarkedText:(id)value selectedRange:(NSRange)selected replacementRange:(NSRange)replacement {
-  if (!_browser) return;
+  if (!_hasBrowser) return;
   _marked = [value isKindOfClass:[NSAttributedString class]] ? [value string] : value;
   _selection = selected;
-  std::vector<CefCompositionUnderline> underlines;
-  if (_marked.length) {
-    CefCompositionUnderline underline;
-    underline.range = CefRange(0, static_cast<uint32_t>(_marked.length));
-    underline.color = 0xFF000000;
-    underlines.push_back(underline);
-  }
-  _browser->GetHost()->ImeSetComposition(UTF16(_marked), underlines, CefRange::InvalidRange(),
-      CefRange(static_cast<uint32_t>(selected.location), static_cast<uint32_t>(NSMaxRange(selected))));
+  IPC::Message msg; msg.type = "imeSetComposition"; msg.payload = @{
+      @"browserId": @(_browserId),
+      @"text": _marked,
+      @"selectionStart": @(selected.location),
+      @"selectionEnd": @(NSMaxRange(selected))
+  };
+  [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:nullptr];
 }
 - (void)unmarkText {
-  if (_browser && _marked.length)
-    _browser->GetHost()->ImeCommitText(UTF16(_marked), CefRange::InvalidRange(), 0);
+  if (_hasBrowser && _marked.length) {
+      IPC::Message msg; msg.type = "imeCommitText"; msg.payload = @{@"browserId": @(_browserId), @"text": _marked};
+      [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:nullptr];
+  }
   _marked = @"";
 }
 - (BOOL)hasMarkedText { return _marked.length > 0; }
@@ -197,8 +223,7 @@ std::u16string UTF16(NSString* text) {
 - (NSUInteger)characterIndexForPoint:(NSPoint)point { return NSNotFound; }
 - (NSRect)firstRectForCharacterRange:(NSRange)range actualRange:(NSRangePointer)actual {
   if (actual) *actual = _selection;
-  // Caret geometry is not exposed yet; candidate positioning is a release gate.
   return [self.window convertRectToScreen:[self convertRect:NSMakeRect(0, 0, 1, 20) toView:nil]];
 }
-- (void)doCommandBySelector:(SEL)selector { /* Editing/navigation keys were sent as raw CEF events. */ }
+- (void)doCommandBySelector:(SEL)selector { }
 @end

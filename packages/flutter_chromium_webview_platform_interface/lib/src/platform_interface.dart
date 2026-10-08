@@ -76,6 +76,19 @@ abstract class ChromiumWebViewPlatform extends PlatformInterface {
       throw UnimplementedError('goForward() has not been implemented.');
 
   /// Executes [javaScript] in the main frame.
+  /// Evaluates in the main document and returns a JSON-compatible result.
+  Future<Object?> evaluateJavaScript(
+    int browserId,
+    String javaScript, {
+    required String operationId,
+    required int timeoutMs,
+  }) => throw UnimplementedError(
+    'evaluateJavaScript() has not been implemented.',
+  );
+
+  Future<void> cancelJavaScript(int browserId, String operationId) =>
+      throw UnimplementedError('cancelJavaScript() has not been implemented.');
+
   Future<void> executeJavaScript(int browserId, String javaScript) =>
       throw UnimplementedError('executeJavaScript() has not been implemented.');
 

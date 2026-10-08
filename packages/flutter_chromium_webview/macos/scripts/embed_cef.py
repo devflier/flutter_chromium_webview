@@ -39,6 +39,37 @@ def embed():
     contents = app / "Contents"
     if app.suffix != ".app" or not contents.is_dir():
         raise RuntimeError(f"Expected built Runner app: {app}")
+        
+    identity = os.environ.get("EXPANDED_CODE_SIGN_IDENTITY") or "-"
+
+    if app.name != "ChromiumWebViewHost.app":
+        frameworks = contents / "Frameworks"
+        frameworks.mkdir(exist_ok=True)
+        host_source = ROOT / "Host" / "ChromiumWebViewHost.app"
+        if host_source.exists():
+            host_dest = frameworks / "ChromiumWebViewHost.app"
+            if host_dest.exists():
+                shutil.rmtree(host_dest)
+            shutil.copytree(host_source, host_dest, symlinks=True)
+            
+            # Re-sign the inner frameworks and helpers with the current identity
+            host_frameworks = host_dest / "Contents" / "Frameworks"
+            cef_framework = host_frameworks / "Chromium Embedded Framework.framework"
+            if cef_framework.exists():
+                for library in sorted((cef_framework / "Versions/A/Libraries").glob("*.dylib")):
+                    sign(library, identity)
+                sign(cef_framework, identity)
+                
+            for suffix in SUFFIXES:
+                helper_app = host_frameworks / ("ChromiumWebView Helper" + suffix + ".app")
+                if helper_app.exists():
+                    entitlements = ROOT / "Helpers/Renderer.entitlements" if suffix == " (Renderer)" else None
+                    sign(helper_app, identity, entitlements)
+            
+            sign(host_dest, identity)
+        print("Embedded ChromiumWebViewHost.app into Flutter App")
+        return
+
     project = Path(os.environ["PROJECT_DIR"])
     entitlements = os.environ.get("CODE_SIGN_ENTITLEMENTS")
     if entitlements:
@@ -70,7 +101,6 @@ def embed():
         with (helper / "Info.plist").open("wb") as output:
             plistlib.dump(helper_plist(name, identifier + ".cef-helper" + ("." + tag if tag else "")), output)
     shutil.copy2(ROOT / "cef/root/LICENSE.txt", contents / "Resources/CEF-LICENSE.txt")
-    identity = os.environ.get("EXPANDED_CODE_SIGN_IDENTITY") or "-"
     # Sign nested code from the inside out. Never use --deep to generate a signature.
     for library in sorted((version / "Libraries").glob("*.dylib")):
         sign(library, identity)
@@ -78,6 +108,7 @@ def embed():
     for suffix in SUFFIXES:
         entitlements = ROOT / "Helpers/Renderer.entitlements" if suffix == " (Renderer)" else None
         sign(frameworks / ("ChromiumWebView Helper" + suffix + ".app"), identity, entitlements)
+
     print(f"Embedded CEF {config['version']} ({config['arch']}) and five signed helpers")
 
 

@@ -79,16 +79,14 @@ class MethodChannelChromiumWebView extends ChromiumWebViewPlatform {
   Future<BrowserCreationResult> createBrowser(
     BrowserCreationParams params,
   ) async {
-    final result = await methodChannel.invokeMethod<Map<Object?, Object?>>(
-      'createBrowser',
-      {
-        'initialUrl': params.initialUrl,
-        'mediaPlaybackRequiresUserGesture':
-            params.mediaPlaybackRequiresUserGesture,
-        'profileName': params.profileName,
-        'javascriptChannels': jsonEncode(params.javaScriptChannels),
-      },
-    );
+    final result = await methodChannel
+        .invokeMethod<Map<Object?, Object?>>('createBrowser', {
+          'initialUrl': params.initialUrl,
+          'mediaPlaybackRequiresUserGesture':
+              params.mediaPlaybackRequiresUserGesture,
+          'profileName': params.profileName,
+          'javascriptChannels': jsonEncode(params.javaScriptChannels),
+        });
     final browserId = result?['browserId'];
     final textureId = result?['textureId'];
     final popupTextureId = result?['popupTextureId'];
@@ -126,6 +124,23 @@ class MethodChannelChromiumWebView extends ChromiumWebViewPlatform {
   Future<void> goForward(int browserId) => _invoke(browserId, 'goForward');
 
   @override
+  Future<Object?> evaluateJavaScript(
+    int browserId,
+    String javaScript, {
+    required String operationId,
+    required int timeoutMs,
+  }) => methodChannel.invokeMethod<Object?>('evaluateJavaScript', {
+    'browserId': browserId,
+    'js': javaScript,
+    'operationId': operationId,
+    'timeoutMs': timeoutMs,
+  });
+
+  @override
+  Future<void> cancelJavaScript(int browserId, String operationId) =>
+      _invoke(browserId, 'cancelJavaScript', {'operationId': operationId});
+
+  @override
   Future<void> executeJavaScript(int browserId, String javaScript) =>
       _invoke(browserId, 'executeJavaScript', {'js': javaScript});
 
@@ -156,6 +171,7 @@ class MethodChannelChromiumWebView extends ChromiumWebViewPlatform {
         'y': input.y,
         'type': input.type.index,
         'button': input.button,
+        'clickCount': input.clickCount,
         'deltaX': input.deltaX,
         'deltaY': input.deltaY,
         'modifiers': input.modifiers,
