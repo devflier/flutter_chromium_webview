@@ -292,6 +292,9 @@ void Core::OnHostMessage(const std::string& type, int64_t browserId, NSDictionar
 
 void Core::OnHostDisconnected() {
     [input_ setBrowserId:-1];
+    for (auto const& entry : browsers_) {
+        [channel_ invokeMethod:@"browserCrash" arguments:@{@"browserId": @(entry.first)}];
+    }
     CloseAll();
     Runtime::Shared().HostFailed();
 }
@@ -351,16 +354,24 @@ void Core::Handle(FlutterMethodCall* call, FlutterResult result) {
     };
     
     std::weak_ptr<int> alive = lifetime_;
-    [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:^(const IPC::Message& response) {
-        if (alive.expired()) return;
-        if (response.type == "error") {
+    [[ChromiumHostManager sharedManager] ensureHostRunning:^(BOOL success, NSError *error) {
+        if (!success) {
             proxy->Close();
-            result(Error(@"CREATE_FAILED", response.payload[@"message"] ?: @"CEF browser creation failed"));
+            result(Error(@"HOST_FAILED", error.localizedDescription ?: @"Failed to start host"));
             return;
         }
-        browsers_[id] = proxy;
-        runtime.browser_count++;
-        result(@{@"browserId": @(id), @"textureId": @(proxy->texture_id), @"popupTextureId": @(proxy->popup_id)});
+        runtime.HostReady();
+        [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:^(const IPC::Message& response) {
+            if (alive.expired()) return;
+            if (response.type == "error") {
+                proxy->Close();
+                result(Error(@"CREATE_FAILED", response.payload[@"message"] ?: @"CEF browser creation failed"));
+                return;
+            }
+            browsers_[id] = proxy;
+            runtime.browser_count++;
+            result(@{@"browserId": @(id), @"textureId": @(proxy->texture_id), @"popupTextureId": @(proxy->popup_id)});
+        }];
     }];
     return;
   }

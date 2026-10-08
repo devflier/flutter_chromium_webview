@@ -55,6 +55,24 @@
     }
 }
 
+- (void)ensureHostRunning:(void(^)(BOOL success, NSError* error))completion {
+    if (_state == HostStateReady) {
+        if (completion) completion(YES, nil);
+        return;
+    }
+    if (_state == HostStateStopped || _state == HostStateFailed) {
+        [self launchHostWithCompletion:completion];
+        return;
+    }
+    if (completion) {
+        void(^original)(BOOL, NSError*) = _launchCompletion;
+        _launchCompletion = [^(BOOL success, NSError* error) {
+            if (original) original(success, error);
+            completion(success, error);
+        } copy];
+    }
+}
+
 - (void)launchHostWithCompletion:(void(^)(BOOL success, NSError* error))completion {
     if (_state == HostStateReady) {
         completion(YES, nil);
@@ -202,9 +220,12 @@
         [self transitionToState:HostStateFailed];
         NSLog(@"[ChromiumHostManager] IPC disconnected unexpectedly.");
         [self cleanup];
-    }
-    if (self.delegate) {
-        [self.delegate onHostDisconnected];
+        if (self.delegate) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSLog(@"[ChromiumHostManager] calling onHostDisconnected");
+            [self.delegate onHostDisconnected];
+            });
+        }
     }
 }
 
@@ -219,9 +240,10 @@
         [self transitionToState:HostStateFailed];
         NSLog(@"[ChromiumHostManager] Host terminated unexpectedly.");
         [self cleanup];
-    }
-    if (self.delegate) {
-        [self.delegate onHostDisconnected];
+        if (self.delegate) {
+            NSLog(@"[ChromiumHostManager] calling onHostDisconnected");
+            [self.delegate onHostDisconnected];
+        }
     }
 }
 

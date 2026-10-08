@@ -410,6 +410,17 @@ class ChromiumWebViewController extends ChangeNotifier {
   void _dispatchEvent(BrowserEvent browserEvent) {
     final eventArgs = browserEvent.arguments;
     switch (browserEvent.name) {
+      case 'browserCrash':
+        print('[Flutter] ChromiumWebViewController _dispatchEvent handling browserCrash');
+        // The underlying native browser crashed.
+        // Reset internal state and transparently trigger recreation.
+        _browserId = null;
+        _textureId = null;
+        _popupTextureId = null;
+        _isPopupShowing = false;
+        _creation = _create();
+        notifyListeners();
+        break;
       case 'javascriptMessage':
         final name = eventArgs['channel'];
         final message = eventArgs['message'];
@@ -713,6 +724,10 @@ class ChromiumWebViewController extends ChangeNotifier {
     return _creation = _create();
   }
 
+  String? _lastLoadRequestUrl;
+  String? _lastHtmlString;
+  String? _lastHtmlBaseUrl;
+
   Future<void> _create() async {
     _creatingCount++;
     try {
@@ -751,6 +766,13 @@ class ChromiumWebViewController extends ChangeNotifier {
           await _platform.setUserAgent(newBrowserId, userAgent!);
         }
         if (!_isDisposed &&
+            (_lastHtmlString != null || _lastLoadRequestUrl != null)) {
+          if (_lastHtmlString != null) {
+            await _platform.loadHtml(newBrowserId, _lastHtmlString!, _lastHtmlBaseUrl!);
+          } else {
+            await _platform.loadUrl(newBrowserId, _lastLoadRequestUrl!);
+          }
+        } else if (!_isDisposed &&
             (userAgent != null ||
                 (!mediaPlaybackRequiresUserGesture && profileName == null))) {
           await _platform.loadUrl(newBrowserId, initialUrl);
@@ -807,6 +829,9 @@ class ChromiumWebViewController extends ChangeNotifier {
   /// Can be called before the browser has finished initializing; the request
   /// will be sent once the browser is ready.
   Future<void> loadRequest(String url) {
+    _lastLoadRequestUrl = url;
+    _lastHtmlString = null;
+    _lastHtmlBaseUrl = null;
     _dismissTransientUi();
     return _invoke((id) => _platform.loadUrl(id, url));
   }
@@ -840,6 +865,9 @@ class ChromiumWebViewController extends ChangeNotifier {
         'HTML exceeds 4 MiB of UTF-8',
       );
     }
+    _lastLoadRequestUrl = null;
+    _lastHtmlString = html;
+    _lastHtmlBaseUrl = uri.toString();
     _dismissTransientUi();
     await _invoke((id) => _platform.loadHtml(id, html, uri.toString()));
   }

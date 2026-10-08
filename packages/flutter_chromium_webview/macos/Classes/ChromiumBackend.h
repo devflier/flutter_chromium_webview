@@ -19,6 +19,7 @@ class Runtime {
   void RequestShutdown(std::function<void()> done);
   void BrowserClosed();
   void HostFailed();
+  void HostReady() { ready_ = true; }
   void Register(Core* core);
   void Unregister(Core* core);
  private:

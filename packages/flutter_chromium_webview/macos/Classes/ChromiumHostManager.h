@@ -25,6 +25,7 @@ typedef NS_ENUM(NSInteger, HostState) {
 @property (nonatomic, weak) id<ChromiumHostManagerDelegate> delegate;
 
 + (instancetype)sharedManager;
+- (void)ensureHostRunning:(void(^)(BOOL success, NSError* error))completion;
 - (void)launchHostWithCompletion:(void(^)(BOOL success, NSError* error))completion;
 - (void)shutdown;
 
