@@ -35,7 +35,19 @@ class ChromiumYoutubePlayerController {
           onMessageReceived: _receive,
         ),
       ],
+      onBrowserCrashed: _onBrowserCrashed,
     );
+  }
+
+  void _onBrowserCrashed() {
+    print('[ChromiumYoutubePlayerController] Browser crashed, reloading...');
+    final error = StateError('Browser crashed');
+    if (_ready?.isCompleted == false) _ready!.completeError(error);
+    for (final completion in _pending.values) {
+      if (!completion.isCompleted) completion.completeError(error);
+    }
+    _pending.clear();
+    unawaited(reload().catchError((Object _) {}));
   }
 
   /// HTTP(S) document URL chosen by the host; supplies origin and referrer.
@@ -96,9 +108,14 @@ class ChromiumYoutubePlayerController {
   }
 
   Future<void> _initialize() async {
-    await webViewController.createBrowser();
-    _checkOpen();
-    await _loadDocument();
+    try {
+      await webViewController.createBrowser();
+      _checkOpen();
+      await _loadDocument();
+    } catch (e) {
+      _initializing = null;
+      rethrow;
+    }
   }
 
   Future<void> _loadDocument() async {

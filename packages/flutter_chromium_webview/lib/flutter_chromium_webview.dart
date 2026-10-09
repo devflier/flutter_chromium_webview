@@ -246,6 +246,7 @@ class ChromiumWebViewController extends ChangeNotifier {
     this.userAgent,
     this.profileName,
     this.mediaPlaybackRequiresUserGesture = true,
+    this.onBrowserCrashed,
     List<JavaScriptChannel> javaScriptChannels = const [],
   }) : javaScriptChannels = List.unmodifiable(javaScriptChannels) {
     _validateUserAgent(userAgent);
@@ -279,6 +280,9 @@ class ChromiumWebViewController extends ChangeNotifier {
   /// False enables autoplay. Unless [profileName] is provided, this creates
   /// a private, in-memory browser context with no shared cookies/storage.
   final bool mediaPlaybackRequiresUserGesture;
+
+  /// Called when the native browser process crashes and is being automatically restarted.
+  final void Function()? onBrowserCrashed;
 
   static void _validateUserAgent(String? value) {
     if (value != null &&
@@ -419,6 +423,7 @@ class ChromiumWebViewController extends ChangeNotifier {
         _popupTextureId = null;
         _isPopupShowing = false;
         _creation = _create();
+        onBrowserCrashed?.call();
         notifyListeners();
         break;
       case 'javascriptMessage':
@@ -786,6 +791,29 @@ class ChromiumWebViewController extends ChangeNotifier {
         await _platform.disposeBrowser(newBrowserId);
         rethrow;
       }
+    } catch (e) {
+      print('[Flutter] _create caught exception: $e');
+      if (!_isDisposed &&
+          e is PlatformException &&
+          const {'INIT_FAILED', 'HOST_FAILED', 'INIT_TIMEOUT'}
+              .contains(e.code)) {
+        // If the host crashes during initialization, createBrowser throws.
+        // We simulate a browser crash event to recreate the browser transparently.
+        _browserId = null;
+        _textureId = null;
+        _popupTextureId = null;
+        _isPopupShowing = false;
+
+        onBrowserCrashed?.call();
+        notifyListeners();
+
+        await Future.delayed(const Duration(milliseconds: 500));
+        if (!_isDisposed) {
+          await _create();
+        }
+        return;
+      }
+      rethrow;
     } finally {
       _creation = null;
       _creatingCount--;
@@ -1389,33 +1417,33 @@ class _ChromiumWebViewState extends State<ChromiumWebView> {
       onFocusChange: (focused) {
         _send(widget.controller.setFocus(focused));
       },
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          if (widget.controller.textureId == null) {
-            return const SizedBox.expand();
-          }
-          final size = constraints.biggest;
-          final dpr = MediaQuery.devicePixelRatioOf(context);
-          if (size.isFinite &&
-              !size.isEmpty &&
-              (size != _currentSize || dpr != _currentDpr)) {
-            _currentSize = size;
-            _currentDpr = dpr;
-            _send(
-              widget.controller.updateBrowserSize(size.width, size.height, dpr),
-            );
-          }
-          return CompositedTransformTarget(
-            key: _viewKey,
-            link: _popupLink,
-            child: OverlayPortal(
-              controller: _popupOverlay,
-              overlayChildBuilder: _buildPopupOverlay,
-              child: _pointerSurface(
-                ListenableBuilder(
-                  listenable: widget.controller,
-                  builder: (context, _) {
-                    return Stack(
+      child: ListenableBuilder(
+        listenable: widget.controller,
+        builder: (context, _) {
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              if (widget.controller.textureId == null) {
+                return const SizedBox.expand();
+              }
+              final size = constraints.biggest;
+              final dpr = MediaQuery.devicePixelRatioOf(context);
+              if (size.isFinite &&
+                  !size.isEmpty &&
+                  (size != _currentSize || dpr != _currentDpr)) {
+                _currentSize = size;
+                _currentDpr = dpr;
+                _send(
+                  widget.controller.updateBrowserSize(size.width, size.height, dpr),
+                );
+              }
+              return CompositedTransformTarget(
+                key: _viewKey,
+                link: _popupLink,
+                child: OverlayPortal(
+                  controller: _popupOverlay,
+                  overlayChildBuilder: _buildPopupOverlay,
+                  child: _pointerSurface(
+                    Stack(
                       clipBehavior: Clip.none,
                       children: [
                         Positioned.fill(
@@ -1436,11 +1464,11 @@ class _ChromiumWebViewState extends State<ChromiumWebView> {
                             ),
                           ),
                       ],
-                    );
-                  },
+                    ),
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           );
         },
       ),

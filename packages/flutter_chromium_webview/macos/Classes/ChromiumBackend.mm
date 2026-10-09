@@ -191,6 +191,7 @@ void Runtime::Initialize(NSString* cache, std::function<void(bool, NSString*)> c
           _this->ready_ = true;
           if (completion) completion(true, nil);
       } else {
+          _this->attempted_ = false;
           if (completion) completion(false, error ? [error localizedDescription] : @"Launch failed");
       }
   }];
@@ -252,7 +253,7 @@ void Core::Detach() {
 }
 
 void Core::CloseAll(std::function<void()> done) {
-  [input_ setBrowserId:-1];
+  NSLog(@"[Core] OnHostDisconnected, browsers count: %zu", browsers_.size()); [input_ setBrowserId:-1];
   auto browsers = std::move(browsers_); browsers_.clear();
   if (browsers.empty()) { if (done) done(); return; }
   auto count = std::make_shared<size_t>(browsers.size());
@@ -292,7 +293,7 @@ void Core::OnHostMessage(const std::string& type, int64_t browserId, NSDictionar
 }
 
 void Core::OnHostDisconnected() {
-    [input_ setBrowserId:-1];
+    NSLog(@"[Core] OnHostDisconnected, browsers count: %zu", browsers_.size()); [input_ setBrowserId:-1];
     for (auto const& entry : browsers_) {
         [channel_ invokeMethod:@"browserCrash" arguments:@{@"browserId": @(entry.first)}];
     }
@@ -331,7 +332,7 @@ void Core::Handle(FlutterMethodCall* call, FlutterResult result) {
     });
     return;
   }
-  if (resetting_ || !runtime.Ready() || !session_) {
+  if (resetting_ || !session_) {
     result(Error(@"NOT_READY", @"Initialize this browser session first")); return;
   }
   
@@ -382,7 +383,7 @@ void Core::Handle(FlutterMethodCall* call, FlutterResult result) {
   if ([method isEqualToString:@"disposeBrowser"]) {
     if (found == browsers_.end()) { result(nil); return; }
     auto proxy = found->second;
-    if ([input_ ownsBrowserId:id]) [input_ setBrowserId:-1];
+    if ([input_ ownsBrowserId:id]) NSLog(@"[Core] OnHostDisconnected, browsers count: %zu", browsers_.size()); [input_ setBrowserId:-1];
     browsers_.erase(found);
     std::weak_ptr<int> alive = lifetime_;
     proxy->Close([result, alive] { if (!alive.expired()) result(nil); }); return;
@@ -460,7 +461,7 @@ void Core::Handle(FlutterMethodCall* call, FlutterResult result) {
       [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:nil];
   } else if ([method isEqualToString:@"setFocus"]) {
     if (Number(args, @"focused")) [input_ setBrowserId:id];
-    else if ([input_ ownsBrowserId:id]) [input_ setBrowserId:-1];
+    else if ([input_ ownsBrowserId:id]) NSLog(@"[Core] OnHostDisconnected, browsers count: %zu", browsers_.size()); [input_ setBrowserId:-1];
     
     msg.type = "setFocus";
     msg.payload = @{@"browserId": @(id), @"focused": @(Number(args, @"focused") != 0)};

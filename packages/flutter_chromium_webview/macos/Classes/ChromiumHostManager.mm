@@ -220,6 +220,10 @@
         [self transitionToState:HostStateFailed];
         NSLog(@"[ChromiumHostManager] IPC disconnected unexpectedly.");
         [self cleanup];
+        if (_launchCompletion) {
+            _launchCompletion(NO, [NSError errorWithDomain:@"HostManager" code:6 userInfo:@{NSLocalizedDescriptionKey:@"IPC disconnected during launch"}]);
+            _launchCompletion = nil;
+        }
         if (self.delegate) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 NSLog(@"[ChromiumHostManager] calling onHostDisconnected");
@@ -240,6 +244,10 @@
         [self transitionToState:HostStateFailed];
         NSLog(@"[ChromiumHostManager] Host terminated unexpectedly.");
         [self cleanup];
+        if (_launchCompletion) {
+            _launchCompletion(NO, [NSError errorWithDomain:@"HostManager" code:5 userInfo:@{NSLocalizedDescriptionKey:@"Host terminated during launch"}]);
+            _launchCompletion = nil;
+        }
         if (self.delegate) {
             NSLog(@"[ChromiumHostManager] calling onHostDisconnected");
             [self.delegate onHostDisconnected];
