@@ -1,0 +1,402 @@
+{
+  "startedUtc": "2026-10-09T15:13:51.837843Z",
+  "requestedSeconds": 600,
+  "mockKeychain": true,
+  "workload": "animated",
+  "disposalSamples": [],
+  "videos": [
+    "M7lc1UVf-VE",
+    "aqz-KE-bpKQ"
+  ],
+  "samples": [
+    {
+      "label": "0 min",
+      "elapsedSeconds": 0.396,
+      "timestampUtc": "2026-10-09T15:13:55.857160Z",
+      "videoId": "M7lc1UVf-VE",
+      "position": null,
+      "playerState": null,
+      "playerError": null,
+      "heartbeatCount": 0,
+      "lastHeartbeat": null,
+      "visible": true,
+      "rendering": {
+        "surfaceGeneration": 2,
+        "completedMetalFrames": 26,
+        "hostPid": 21512,
+        "failedMetalFrames": 0,
+        "softwareFrames": 0,
+        "acceleratedCallbacks": 26,
+        "frameSequence": 26,
+        "browserPresent": true,
+        "droppedFrames": null
+      },
+      "resources": {
+        "client": {
+          "activeBrowsers": 0,
+          "hostGeneration": 1,
+          "activeIOSurfaces": 3,
+          "activeMachSendRights": 1,
+          "activeMachReceiveRights": 1,
+          "activeFlutterTextures": 2,
+          "activeMetalTextures": 0,
+          "pendingIpcRequests": 0,
+          "activeIpcConnections": 1
+        },
+        "host": {
+          "activeBrowsers": 1,
+          "hostGeneration": 0,
+          "activeIOSurfaces": 3,
+          "activeMachSendRights": 0,
+          "activeMachReceiveRights": 0,
+          "activeFlutterTextures": 0,
+          "activeMetalTextures": 0,
+          "pendingIpcRequests": 0,
+          "activeIpcConnections": 1
+        }
+      },
+      "processes": [
+        {
+          "pid": 21512,
+          "ppid": 21472,
+          "rssKiB": 132272,
+          "cpuPercent": 8.3,
+          "elapsed": "00:04",
+          "processType": "host",
+          "command": "/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/MacOS/ChromiumWebViewHost --ipc-socket=/tmp/f_cef_21472_E6B160F2/ipc.sock --ipc-token=<redacted> --parent-pid=21472"
+        },
+        {
+          "pid": 21758,
+          "ppid": 21512,
+          "rssKiB": 92400,
+          "cpuPercent": 12.4,
+          "elapsed": "00:01",
+          "processType": "gpu-process",
+          "command": "/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/ChromiumWebView Helper.app/Contents/MacOS/ChromiumWebView Helper --type=gpu-process --disable-breakpad --start-stack-profiler --user-data-dir=/private/var/folders/81/ycpgyt397wvdx03d5kwdmpwr0000gn/T/cef_cache_21512 --framework-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework --main-bundle-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app --locales-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --log-severity=verbose --resources-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --gpu-preferences=SAAAAAAAAAAgAQAMAAAAAAAAAAAAAGAAAwAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAAAAACAAAAAAAAAAIAAAAAAAAAA== --shared-files --metrics-shmem-handle=1752395122,r,11028615135367235657,18204726658112647369,262144 --field-trial-handle=1718379636,r,685149664675258358,6339805621564208692,262144 --disable-features=Accessibility --variations-seed-version --pseudonymization-salt-handle=1935764596,r,10546247870479023017,18345472808334723111,4 --trace-process-track-uuid=3190708988185955192 --log-file=/tmp/cef.log --seatbelt-client=18"
+        },
+        {
+          "pid": 21759,
+          "ppid": 21512,
+          "rssKiB": 74912,
+          "cpuPercent": 0.7,
+          "elapsed": "00:01",
+          "processType": "utility",
+          "command": "/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/ChromiumWebView Helper.app/Contents/MacOS/ChromiumWebView Helper --type=utility --utility-sub-type=network.mojom.NetworkService --lang=en-US --service-sandbox-type=network --start-stack-profiler --user-data-dir=/private/var/folders/81/ycpgyt397wvdx03d5kwdmpwr0000gn/T/cef_cache_21512 --framework-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework --main-bundle-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app --locales-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --log-severity=verbose --resources-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --shared-files --metrics-shmem-handle=1752395122,r,538348114533068746,11248849069745969079,524288 --field-trial-handle=1718379636,r,685149664675258358,6339805621564208692,262144 --disable-features=Accessibility --variations-seed-version --pseudonymization-salt-handle=1935764596,r,10546247870479023017,18345472808334723111,4 --trace-process-track-uuid=3190708989122997041 --log-file=/tmp/cef.log --seatbelt-client=26"
+        },
+        {
+          "pid": 21760,
+          "ppid": 21512,
+          "rssKiB": 57824,
+          "cpuPercent": 0.1,
+          "elapsed": "00:01",
+          "processType": "utility",
+          "command": "/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/ChromiumWebView Helper.app/Contents/MacOS/ChromiumWebView Helper --type=utility --utility-sub-type=storage.mojom.StorageService --lang=en-US --service-sandbox-type=service --user-data-dir=/private/var/folders/81/ycpgyt397wvdx03d5kwdmpwr0000gn/T/cef_cache_21512 --framework-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework --main-bundle-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app --locales-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --log-severity=verbose --resources-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --shared-files --metrics-shmem-handle=1752395122,r,17635220509722790009,11776764114812350021,524288 --field-trial-handle=1718379636,r,685149664675258358,6339805621564208692,262144 --disable-features=Accessibility --variations-seed-version --pseudonymization-salt-handle=1935764596,r,10546247870479023017,18345472808334723111,4 --trace-process-track-uuid=3190708990060038890 --log-file=/tmp/cef.log --seatbelt-client=40"
+        },
+        {
+          "pid": 21767,
+          "ppid": 21512,
+          "rssKiB": 75040,
+          "cpuPercent": 2.0,
+          "elapsed": "00:01",
+          "processType": "renderer",
+          "command": "/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/ChromiumWebView Helper (Renderer).app/Contents/MacOS/ChromiumWebView Helper (Renderer) --type=renderer --user-data-dir=/private/var/folders/81/ycpgyt397wvdx03d5kwdmpwr0000gn/T/cef_cache_21512 --framework-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework --main-bundle-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app --locales-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --log-severity=verbose --resources-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --autoplay-policy=no-user-gesture-required --remote-debugging-port=9229 --lang=en-US --num-raster-threads=4 --enable-zero-copy --enable-gpu-memory-buffer-compositor-resources --enable-main-frame-before-activation --renderer-client-id=7 --time-ticks-at-unix-epoch=-1791482161371263 --launch-time-ticks=76673470706 --shared-files --metrics-shmem-handle=1752395122,r,11835940711067317112,8228925317236945247,2097152 --field-trial-handle=1718379636,r,685149664675258358,6339805621564208692,262144 --disable-features=Accessibility --variations-seed-version --pseudonymization-salt-handle=1935764596,r,10546247870479023017,18345472808334723111,4 --trace-process-track-uuid=3190708992871164437 --log-file=/tmp/cef.log --seatbelt-client=96"
+        },
+        {
+          "pid": 21768,
+          "ppid": 21512,
+          "rssKiB": 109616,
+          "cpuPercent": 7.7,
+          "elapsed": "00:01",
+          "processType": "renderer",
+          "command": "/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/ChromiumWebView Helper (Renderer).app/Contents/MacOS/ChromiumWebView Helper (Renderer) --type=renderer --user-data-dir=/private/var/folders/81/ycpgyt397wvdx03d5kwdmpwr0000gn/T/cef_cache_21512 --framework-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework --main-bundle-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app --locales-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --log-severity=verbose --resources-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --autoplay-policy=no-user-gesture-required --remote-debugging-port=9229 --lang=en-US --num-raster-threads=4 --enable-zero-copy --enable-gpu-memory-buffer-compositor-resources --enable-main-frame-before-activation --renderer-client-id=6 --time-ticks-at-unix-epoch=-1791482161371263 --launch-time-ticks=76673490467 --shared-files --metrics-shmem-handle=1752395122,r,5143299552422272488,9438118703575980543,2097152 --field-trial-handle=1718379636,r,685149664675258358,6339805621564208692,262144 --disable-features=Accessibility --variations-seed-version --pseudonymization-salt-handle=1935764596,r,10546247870479023017,18345472808334723111,4 --trace-process-track-uuid=3190708991934122588 --log-file=/tmp/cef.log --seatbelt-client=96"
+        }
+      ],
+      "lsofRows": 161,
+      "numericDescriptors": 102,
+      "window": {
+        "fullscreen": false
+      }
+    },
+    {
+      "label": "30s",
+      "elapsedSeconds": 30.644,
+      "timestampUtc": "2026-10-09T15:14:26.105587Z",
+      "videoId": "M7lc1UVf-VE",
+      "position": null,
+      "playerState": null,
+      "playerError": null,
+      "heartbeatCount": 0,
+      "lastHeartbeat": null,
+      "visible": true,
+      "rendering": {
+        "surfaceGeneration": 2,
+        "completedMetalFrames": 1845,
+        "hostPid": 21512,
+        "failedMetalFrames": 0,
+        "softwareFrames": 0,
+        "acceleratedCallbacks": 1845,
+        "frameSequence": 1845,
+        "browserPresent": true,
+        "droppedFrames": null
+      },
+      "resources": {
+        "client": {
+          "activeBrowsers": 0,
+          "hostGeneration": 1,
+          "activeIOSurfaces": 3,
+          "activeMachSendRights": 1,
+          "activeMachReceiveRights": 1,
+          "activeFlutterTextures": 2,
+          "activeMetalTextures": 0,
+          "pendingIpcRequests": 0,
+          "activeIpcConnections": 1
+        },
+        "host": {
+          "activeBrowsers": 1,
+          "hostGeneration": 0,
+          "activeIOSurfaces": 3,
+          "activeMachSendRights": 0,
+          "activeMachReceiveRights": 0,
+          "activeFlutterTextures": 0,
+          "activeMetalTextures": 0,
+          "pendingIpcRequests": 0,
+          "activeIpcConnections": 1
+        }
+      },
+      "processes": [
+        {
+          "pid": 21512,
+          "ppid": 21472,
+          "rssKiB": 56656,
+          "cpuPercent": 5.0,
+          "elapsed": "00:35",
+          "processType": "host",
+          "command": "/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/MacOS/ChromiumWebViewHost --ipc-socket=/tmp/f_cef_21472_E6B160F2/ipc.sock --ipc-token=<redacted> --parent-pid=21472"
+        },
+        {
+          "pid": 21758,
+          "ppid": 21512,
+          "rssKiB": 39200,
+          "cpuPercent": 11.6,
+          "elapsed": "00:32",
+          "processType": "gpu-process",
+          "command": "/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/ChromiumWebView Helper.app/Contents/MacOS/ChromiumWebView Helper --type=gpu-process --disable-breakpad --start-stack-profiler --user-data-dir=/private/var/folders/81/ycpgyt397wvdx03d5kwdmpwr0000gn/T/cef_cache_21512 --framework-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework --main-bundle-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app --locales-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --log-severity=verbose --resources-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --gpu-preferences=SAAAAAAAAAAgAQAMAAAAAAAAAAAAAGAAAwAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAAAAACAAAAAAAAAAIAAAAAAAAAA== --shared-files --metrics-shmem-handle=1752395122,r,11028615135367235657,18204726658112647369,262144 --field-trial-handle=1718379636,r,685149664675258358,6339805621564208692,262144 --disable-features=Accessibility --variations-seed-version --pseudonymization-salt-handle=1935764596,r,10546247870479023017,18345472808334723111,4 --trace-process-track-uuid=3190708988185955192 --log-file=/tmp/cef.log --seatbelt-client=18"
+        },
+        {
+          "pid": 21759,
+          "ppid": 21512,
+          "rssKiB": 27968,
+          "cpuPercent": 0.0,
+          "elapsed": "00:32",
+          "processType": "utility",
+          "command": "/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/ChromiumWebView Helper.app/Contents/MacOS/ChromiumWebView Helper --type=utility --utility-sub-type=network.mojom.NetworkService --lang=en-US --service-sandbox-type=network --start-stack-profiler --user-data-dir=/private/var/folders/81/ycpgyt397wvdx03d5kwdmpwr0000gn/T/cef_cache_21512 --framework-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework --main-bundle-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app --locales-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --log-severity=verbose --resources-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --shared-files --metrics-shmem-handle=1752395122,r,538348114533068746,11248849069745969079,524288 --field-trial-handle=1718379636,r,685149664675258358,6339805621564208692,262144 --disable-features=Accessibility --variations-seed-version --pseudonymization-salt-handle=1935764596,r,10546247870479023017,18345472808334723111,4 --trace-process-track-uuid=3190708989122997041 --log-file=/tmp/cef.log --seatbelt-client=26"
+        },
+        {
+          "pid": 21760,
+          "ppid": 21512,
+          "rssKiB": 18416,
+          "cpuPercent": 0.0,
+          "elapsed": "00:32",
+          "processType": "utility",
+          "command": "/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/ChromiumWebView Helper.app/Contents/MacOS/ChromiumWebView Helper --type=utility --utility-sub-type=storage.mojom.StorageService --lang=en-US --service-sandbox-type=service --user-data-dir=/private/var/folders/81/ycpgyt397wvdx03d5kwdmpwr0000gn/T/cef_cache_21512 --framework-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework --main-bundle-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app --locales-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --log-severity=verbose --resources-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --shared-files --metrics-shmem-handle=1752395122,r,17635220509722790009,11776764114812350021,524288 --field-trial-handle=1718379636,r,685149664675258358,6339805621564208692,262144 --disable-features=Accessibility --variations-seed-version --pseudonymization-salt-handle=1935764596,r,10546247870479023017,18345472808334723111,4 --trace-process-track-uuid=3190708990060038890 --log-file=/tmp/cef.log --seatbelt-client=40"
+        },
+        {
+          "pid": 21767,
+          "ppid": 21512,
+          "rssKiB": 23232,
+          "cpuPercent": 0.0,
+          "elapsed": "00:32",
+          "processType": "renderer",
+          "command": "/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/ChromiumWebView Helper (Renderer).app/Contents/MacOS/ChromiumWebView Helper (Renderer) --type=renderer --user-data-dir=/private/var/folders/81/ycpgyt397wvdx03d5kwdmpwr0000gn/T/cef_cache_21512 --framework-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework --main-bundle-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app --locales-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --log-severity=verbose --resources-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --autoplay-policy=no-user-gesture-required --remote-debugging-port=9229 --lang=en-US --num-raster-threads=4 --enable-zero-copy --enable-gpu-memory-buffer-compositor-resources --enable-main-frame-before-activation --renderer-client-id=7 --time-ticks-at-unix-epoch=-1791482161371263 --launch-time-ticks=76673470706 --shared-files --metrics-shmem-handle=1752395122,r,11835940711067317112,8228925317236945247,2097152 --field-trial-handle=1718379636,r,685149664675258358,6339805621564208692,262144 --disable-features=Accessibility --variations-seed-version --pseudonymization-salt-handle=1935764596,r,10546247870479023017,18345472808334723111,4 --trace-process-track-uuid=3190708992871164437 --log-file=/tmp/cef.log --seatbelt-client=96"
+        },
+        {
+          "pid": 21768,
+          "ppid": 21512,
+          "rssKiB": 39984,
+          "cpuPercent": 4.6,
+          "elapsed": "00:32",
+          "processType": "renderer",
+          "command": "/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/ChromiumWebView Helper (Renderer).app/Contents/MacOS/ChromiumWebView Helper (Renderer) --type=renderer --user-data-dir=/private/var/folders/81/ycpgyt397wvdx03d5kwdmpwr0000gn/T/cef_cache_21512 --framework-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework --main-bundle-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app --locales-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --log-severity=verbose --resources-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --autoplay-policy=no-user-gesture-required --remote-debugging-port=9229 --lang=en-US --num-raster-threads=4 --enable-zero-copy --enable-gpu-memory-buffer-compositor-resources --enable-main-frame-before-activation --renderer-client-id=6 --time-ticks-at-unix-epoch=-1791482161371263 --launch-time-ticks=76673490467 --shared-files --metrics-shmem-handle=1752395122,r,5143299552422272488,9438118703575980543,2097152 --field-trial-handle=1718379636,r,685149664675258358,6339805621564208692,262144 --disable-features=Accessibility --variations-seed-version --pseudonymization-salt-handle=1935764596,r,10546247870479023017,18345472808334723111,4 --trace-process-track-uuid=3190708991934122588 --log-file=/tmp/cef.log --seatbelt-client=96"
+        }
+      ],
+      "lsofRows": 185,
+      "numericDescriptors": 121,
+      "window": {
+        "fullscreen": false
+      }
+    },
+    {
+      "label": "60s",
+      "elapsedSeconds": 60.953,
+      "timestampUtc": "2026-10-09T15:14:56.414905Z",
+      "videoId": "M7lc1UVf-VE",
+      "position": null,
+      "playerState": null,
+      "playerError": null,
+      "heartbeatCount": 0,
+      "lastHeartbeat": null,
+      "visible": true,
+      "rendering": {
+        "surfaceGeneration": 2,
+        "completedMetalFrames": 3662,
+        "hostPid": 21512,
+        "failedMetalFrames": 0,
+        "softwareFrames": 0,
+        "acceleratedCallbacks": 3662,
+        "frameSequence": 3662,
+        "browserPresent": true,
+        "droppedFrames": null
+      },
+      "resources": {
+        "client": {
+          "activeBrowsers": 0,
+          "hostGeneration": 1,
+          "activeIOSurfaces": 3,
+          "activeMachSendRights": 1,
+          "activeMachReceiveRights": 1,
+          "activeFlutterTextures": 2,
+          "activeMetalTextures": 0,
+          "pendingIpcRequests": 0,
+          "activeIpcConnections": 1
+        },
+        "host": {
+          "activeBrowsers": 1,
+          "hostGeneration": 0,
+          "activeIOSurfaces": 3,
+          "activeMachSendRights": 0,
+          "activeMachReceiveRights": 0,
+          "activeFlutterTextures": 0,
+          "activeMetalTextures": 0,
+          "pendingIpcRequests": 0,
+          "activeIpcConnections": 1
+        }
+      },
+      "processes": [
+        {
+          "pid": 21512,
+          "ppid": 21472,
+          "rssKiB": 58576,
+          "cpuPercent": 6.0,
+          "elapsed": "01:05",
+          "processType": "host",
+          "command": "/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/MacOS/ChromiumWebViewHost --ipc-socket=/tmp/f_cef_21472_E6B160F2/ipc.sock --ipc-token=<redacted> --parent-pid=21472"
+        },
+        {
+          "pid": 21758,
+          "ppid": 21512,
+          "rssKiB": 35472,
+          "cpuPercent": 13.0,
+          "elapsed": "01:02",
+          "processType": "gpu-process",
+          "command": "/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/ChromiumWebView Helper.app/Contents/MacOS/ChromiumWebView Helper --type=gpu-process --disable-breakpad --start-stack-profiler --user-data-dir=/private/var/folders/81/ycpgyt397wvdx03d5kwdmpwr0000gn/T/cef_cache_21512 --framework-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework --main-bundle-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app --locales-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --log-severity=verbose --resources-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --gpu-preferences=SAAAAAAAAAAgAQAMAAAAAAAAAAAAAGAAAwAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAAAAACAAAAAAAAAAIAAAAAAAAAA== --shared-files --metrics-shmem-handle=1752395122,r,11028615135367235657,18204726658112647369,262144 --field-trial-handle=1718379636,r,685149664675258358,6339805621564208692,262144 --disable-features=Accessibility --variations-seed-version --pseudonymization-salt-handle=1935764596,r,10546247870479023017,18345472808334723111,4 --trace-process-track-uuid=3190708988185955192 --log-file=/tmp/cef.log --seatbelt-client=18"
+        },
+        {
+          "pid": 21759,
+          "ppid": 21512,
+          "rssKiB": 31104,
+          "cpuPercent": 0.0,
+          "elapsed": "01:02",
+          "processType": "utility",
+          "command": "/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/ChromiumWebView Helper.app/Contents/MacOS/ChromiumWebView Helper --type=utility --utility-sub-type=network.mojom.NetworkService --lang=en-US --service-sandbox-type=network --start-stack-profiler --user-data-dir=/private/var/folders/81/ycpgyt397wvdx03d5kwdmpwr0000gn/T/cef_cache_21512 --framework-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework --main-bundle-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app --locales-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --log-severity=verbose --resources-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --shared-files --metrics-shmem-handle=1752395122,r,538348114533068746,11248849069745969079,524288 --field-trial-handle=1718379636,r,685149664675258358,6339805621564208692,262144 --disable-features=Accessibility --variations-seed-version --pseudonymization-salt-handle=1935764596,r,10546247870479023017,18345472808334723111,4 --trace-process-track-uuid=3190708989122997041 --log-file=/tmp/cef.log --seatbelt-client=26"
+        },
+        {
+          "pid": 21760,
+          "ppid": 21512,
+          "rssKiB": 17984,
+          "cpuPercent": 0.0,
+          "elapsed": "01:02",
+          "processType": "utility",
+          "command": "/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/ChromiumWebView Helper.app/Contents/MacOS/ChromiumWebView Helper --type=utility --utility-sub-type=storage.mojom.StorageService --lang=en-US --service-sandbox-type=service --user-data-dir=/private/var/folders/81/ycpgyt397wvdx03d5kwdmpwr0000gn/T/cef_cache_21512 --framework-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework --main-bundle-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app --locales-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --log-severity=verbose --resources-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --shared-files --metrics-shmem-handle=1752395122,r,17635220509722790009,11776764114812350021,524288 --field-trial-handle=1718379636,r,685149664675258358,6339805621564208692,262144 --disable-features=Accessibility --variations-seed-version --pseudonymization-salt-handle=1935764596,r,10546247870479023017,18345472808334723111,4 --trace-process-track-uuid=3190708990060038890 --log-file=/tmp/cef.log --seatbelt-client=40"
+        },
+        {
+          "pid": 21767,
+          "ppid": 21512,
+          "rssKiB": 22464,
+          "cpuPercent": 0.0,
+          "elapsed": "01:02",
+          "processType": "renderer",
+          "command": "/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/ChromiumWebView Helper (Renderer).app/Contents/MacOS/ChromiumWebView Helper (Renderer) --type=renderer --user-data-dir=/private/var/folders/81/ycpgyt397wvdx03d5kwdmpwr0000gn/T/cef_cache_21512 --framework-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework --main-bundle-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app --locales-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --log-severity=verbose --resources-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --autoplay-policy=no-user-gesture-required --remote-debugging-port=9229 --lang=en-US --num-raster-threads=4 --enable-zero-copy --enable-gpu-memory-buffer-compositor-resources --enable-main-frame-before-activation --renderer-client-id=7 --time-ticks-at-unix-epoch=-1791482161371263 --launch-time-ticks=76673470706 --shared-files --metrics-shmem-handle=1752395122,r,11835940711067317112,8228925317236945247,2097152 --field-trial-handle=1718379636,r,685149664675258358,6339805621564208692,262144 --disable-features=Accessibility --variations-seed-version --pseudonymization-salt-handle=1935764596,r,10546247870479023017,18345472808334723111,4 --trace-process-track-uuid=3190708992871164437 --log-file=/tmp/cef.log --seatbelt-client=96"
+        },
+        {
+          "pid": 21768,
+          "ppid": 21512,
+          "rssKiB": 38208,
+          "cpuPercent": 5.0,
+          "elapsed": "01:02",
+          "processType": "renderer",
+          "command": "/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/ChromiumWebView Helper (Renderer).app/Contents/MacOS/ChromiumWebView Helper (Renderer) --type=renderer --user-data-dir=/private/var/folders/81/ycpgyt397wvdx03d5kwdmpwr0000gn/T/cef_cache_21512 --framework-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework --main-bundle-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app --locales-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --log-severity=verbose --resources-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --autoplay-policy=no-user-gesture-required --remote-debugging-port=9229 --lang=en-US --num-raster-threads=4 --enable-zero-copy --enable-gpu-memory-buffer-compositor-resources --enable-main-frame-before-activation --renderer-client-id=6 --time-ticks-at-unix-epoch=-1791482161371263 --launch-time-ticks=76673490467 --shared-files --metrics-shmem-handle=1752395122,r,5143299552422272488,9438118703575980543,2097152 --field-trial-handle=1718379636,r,685149664675258358,6339805621564208692,262144 --disable-features=Accessibility --variations-seed-version --pseudonymization-salt-handle=1935764596,r,10546247870479023017,18345472808334723111,4 --trace-process-track-uuid=3190708991934122588 --log-file=/tmp/cef.log --seatbelt-client=96"
+        }
+      ],
+      "lsofRows": 186,
+      "numericDescriptors": 122,
+      "window": {
+        "fullscreen": false
+      }
+    }
+  ],
+  "interactions": [],
+  "droppedFramesMeasured": false,
+  "passed": false,
+  "idleBaseline": {
+    "client": {
+      "activeBrowsers": 0,
+      "hostGeneration": 1,
+      "activeIOSurfaces": 0,
+      "activeMachSendRights": 1,
+      "activeMachReceiveRights": 1,
+      "activeFlutterTextures": 0,
+      "activeMetalTextures": 0,
+      "pendingIpcRequests": 0,
+      "activeIpcConnections": 1
+    },
+    "host": {
+      "activeBrowsers": 0,
+      "hostGeneration": 0,
+      "activeIOSurfaces": 0,
+      "activeMachSendRights": 0,
+      "activeMachReceiveRights": 0,
+      "activeFlutterTextures": 0,
+      "activeMetalTextures": 0,
+      "pendingIpcRequests": 0,
+      "activeIpcConnections": 1
+    }
+  },
+  "idleProcesses": [
+    {
+      "pid": 21512,
+      "ppid": 21472,
+      "rssKiB": 120688,
+      "cpuPercent": 37.5,
+      "elapsed": "00:03",
+      "processType": "host",
+      "command": "/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/MacOS/ChromiumWebViewHost --ipc-socket=/tmp/f_cef_21472_E6B160F2/ipc.sock --ipc-token=<redacted> --parent-pid=21472"
+    },
+    {
+      "pid": 21758,
+      "ppid": 21512,
+      "rssKiB": 92512,
+      "cpuPercent": 28.7,
+      "elapsed": "00:00",
+      "processType": "gpu-process",
+      "command": "/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/ChromiumWebView Helper.app/Contents/MacOS/ChromiumWebView Helper --type=gpu-process --disable-breakpad --start-stack-profiler --user-data-dir=/private/var/folders/81/ycpgyt397wvdx03d5kwdmpwr0000gn/T/cef_cache_21512 --framework-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework --main-bundle-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app --locales-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --log-severity=verbose --resources-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --gpu-preferences=SAAAAAAAAAAgAQAMAAAAAAAAAAAAAGAAAwAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAQAAAAAAAAABAAAAAAAAAACAAAAAAAAAAIAAAAAAAAAA== --shared-files --metrics-shmem-handle=1752395122,r,11028615135367235657,18204726658112647369,262144 --field-trial-handle=1718379636,r,685149664675258358,6339805621564208692,262144 --disable-features=Accessibility --variations-seed-version --pseudonymization-salt-handle=1935764596,r,10546247870479023017,18345472808334723111,4 --trace-process-track-uuid=3190708988185955192 --log-file=/tmp/cef.log --seatbelt-client=18"
+    },
+    {
+      "pid": 21759,
+      "ppid": 21512,
+      "rssKiB": 86400,
+      "cpuPercent": 16.6,
+      "elapsed": "00:00",
+      "processType": "utility",
+      "command": "/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/ChromiumWebView Helper.app/Contents/MacOS/ChromiumWebView Helper --type=utility --utility-sub-type=network.mojom.NetworkService --lang=en-US --service-sandbox-type=network --start-stack-profiler --user-data-dir=/private/var/folders/81/ycpgyt397wvdx03d5kwdmpwr0000gn/T/cef_cache_21512 --framework-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework --main-bundle-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app --locales-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --log-severity=verbose --resources-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --shared-files --metrics-shmem-handle=1752395122,r,538348114533068746,11248849069745969079,524288 --field-trial-handle=1718379636,r,685149664675258358,6339805621564208692,262144 --disable-features=Accessibility --variations-seed-version --pseudonymization-salt-handle=1935764596,r,10546247870479023017,18345472808334723111,4 --trace-process-track-uuid=3190708989122997041 --log-file=/tmp/cef.log --seatbelt-client=26"
+    },
+    {
+      "pid": 21760,
+      "ppid": 21512,
+      "rssKiB": 72912,
+      "cpuPercent": 7.8,
+      "elapsed": "00:00",
+      "processType": "utility",
+      "command": "/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/ChromiumWebView Helper.app/Contents/MacOS/ChromiumWebView Helper --type=utility --utility-sub-type=storage.mojom.StorageService --lang=en-US --service-sandbox-type=service --user-data-dir=/private/var/folders/81/ycpgyt397wvdx03d5kwdmpwr0000gn/T/cef_cache_21512 --framework-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework --main-bundle-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app --locales-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --log-severity=verbose --resources-dir-path=/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Resources --shared-files --metrics-shmem-handle=1752395122,r,17635220509722790009,11776764114812350021,524288 --field-trial-handle=1718379636,r,685149664675258358,6339805621564208692,262144 --disable-features=Accessibility --variations-seed-version --pseudonymization-salt-handle=1935764596,r,10546247870479023017,18345472808334723111,4 --trace-process-track-uuid=3190708990060038890 --log-file=/tmp/cef.log --seatbelt-client=40"
+    }
+  ]
+}

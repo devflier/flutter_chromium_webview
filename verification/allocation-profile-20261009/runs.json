@@ -47,6 +47,13 @@
       "profiledRendererPid": 14681,
       "flutterExitCode": 0,
       "completedUtc": "2026-10-09T15:12:39Z"
+    },
+    {
+      "workload": "animated",
+      "label": "animated",
+      "startedUtc": "2026-10-09T15:12:52Z",
+      "profilers": [],
+      "vmmap": []
     }
   ]
 }

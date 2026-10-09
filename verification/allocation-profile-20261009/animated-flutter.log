@@ -1,0 +1,22 @@
+00:00 +0: loading /Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/allocation_profile_test.dart
+The following plugins do not support Swift Package Manager for macos:
+  - flutter_chromium_webview
+This will become an error in a future version of Flutter. Please contact the plugin maintainers to request Swift Package Manager adoption.
+Plugin flutter_chromium_webview does not have Swift Package Manager support for macos. Consider adding Swift Package Manager compatibility to your plugin. See https://docs.flutter.dev/packages-and-plugins/swift-package-manager/for-plugin-authors for more information.
+Building macOS application...                                   
+✓ Built build/macos/Build/Products/Debug/flutter_chromium_webview_example.app
+Failed to foreground app; open returned 1
+00:00 +0: renderer allocation workload
+SOAK_SAMPLE 0 min elapsed=0.396 position=null hostPid=21512 metal=26 software=0 fd=102 processes=6
+00:15 +0: loading /Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/allocation_profile_test.dart
+Some possible finders for the widgets at Offset(882.5, 336.2):
+  find.byType(Positioned)
+  find.byType(Stack)
+  find.byType(Listener)
+  find.byType(MouseRegion)
+  find.byType(OverlayPortal)
+  find.byElementType(InheritedModelElement<_MediaQueryAspect>)
+  find.byElementType(StatelessElement)
+00:34 +0: renderer allocation workload
+SOAK_SAMPLE 30s elapsed=30.644 position=null hostPid=21512 metal=1845 software=0 fd=121 processes=6
+SOAK_SAMPLE 60s elapsed=60.953 position=null hostPid=21512 metal=3662 software=0 fd=122 processes=6
