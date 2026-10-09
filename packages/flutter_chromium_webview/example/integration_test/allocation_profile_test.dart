@@ -253,6 +253,10 @@ void main() {
           'numericDescriptors': descriptors.length,
           'window': await query('debugSoakWindow'),
         };
+        if (rendering['droppedFrames'] != null) {
+          report['droppedFramesMeasured'] = true;
+          record['droppedFrames'] = rendering['droppedFrames'];
+        }
         (report['samples'] as List).add(record);
         save();
         debugPrint(

@@ -5,6 +5,7 @@
 #include "include/cef_display_handler.h"
 #include "include/cef_load_handler.h"
 #include "include/cef_request_handler.h"
+#include "include/cef_devtools_message_observer.h"
 #include <unordered_map>
 #include <functional>
 #include "../Classes/Protocol.h"
@@ -31,6 +32,8 @@ public:
         chromium_bridge::Policy javascript_policy;
         std::string context_token;
         bool renderer_gone = false;
+        CefRefPtr<CefDevToolsMessageObserver> media_observer;
+        CefRefPtr<CefRegistration> media_observer_registration;
         
         std::vector<IOSurfaceRef> io_surfaces;
         uint32_t current_surface_slot = 0;
@@ -44,6 +47,7 @@ public:
         uint64_t acceleratedFrames = 0;
         double totalGpuBlitTimeMs = 0;
         uint64_t lastPrintTime = 0;
+        int64_t droppedFrames = -1;
     };
 
     HostBrowserClient(std::function<void(const IPC::Message&)> on_message);

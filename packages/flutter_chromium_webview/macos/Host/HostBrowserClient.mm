@@ -14,6 +14,7 @@
 #include <servers/bootstrap.h>
 #include <algorithm>
 #include <iostream>
+#include "include/cef_parser.h"
 
 namespace {
 
@@ -76,6 +77,41 @@ public:
 private:
     std::string html_;
     IMPLEMENT_REFCOUNTING(HtmlResourceRequestHandler);
+};
+
+class MediaDevToolsObserver : public CefDevToolsMessageObserver {
+public:
+    CefRefPtr<HostBrowserClient> client;
+    int64_t browserId;
+    
+    MediaDevToolsObserver(CefRefPtr<HostBrowserClient> client, int64_t browserId) 
+        : client(client), browserId(browserId) {}
+    
+    void OnDevToolsEvent(CefRefPtr<CefBrowser> browser,
+                         const CefString& method,
+                         const void* params,
+                         size_t params_size) override {
+        if (method != "Media.playerPropertiesChanged") return;
+        if (!params || params_size == 0) return;
+        std::string json(static_cast<const char*>(params), params_size);
+        auto value = CefParseJSON(json, JSON_PARSER_ALLOW_TRAILING_COMMAS);
+        if (value && value->GetType() == VTYPE_DICTIONARY) {
+            auto dict = value->GetDictionary();
+            if (dict->HasKey("properties")) {
+                auto props = dict->GetList("properties");
+                for (size_t i = 0; i < props->GetSize(); ++i) {
+                    auto prop = props->GetDictionary(i);
+                    if (prop && prop->GetString("name") == "dropped_video_frames") {
+                        std::string valStr = prop->GetString("value").ToString();
+                        if (auto* session = client->GetSession(browserId)) {
+                            session->droppedFrames = std::atoll(valStr.c_str());
+                        }
+                    }
+                }
+            }
+        }
+    }
+    IMPLEMENT_REFCOUNTING(MediaDevToolsObserver);
 };
 
 }
@@ -179,7 +215,7 @@ NSDictionary* HostBrowserClient::RenderDiagnostics(int64_t browserId) {
         @"acceleratedCallbacks": @(session->acceleratedFrames),
         @"completedMetalFrames": @(session->completedMetalFrames),
         @"failedMetalFrames": @(session->failedMetalFrames),
-        @"droppedFrames": NSNull.null};
+        @"droppedFrames": session->droppedFrames >= 0 ? @(session->droppedFrames) : NSNull.null};
 }
 #endif
 
@@ -392,7 +428,12 @@ void HostBrowserClient::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
     CEF_REQUIRE_UI_THREAD();
     // This callback also runs during synchronous creation, before CEF asks
     // for the initial view rect/screen scale. Bind only the active request.
-    if (auto* session = GetSession(creating_browser_id_)) session->browser = browser;
+    if (auto* session = GetSession(creating_browser_id_)) {
+        session->browser = browser;
+        session->media_observer = new MediaDevToolsObserver(this, creating_browser_id_);
+        session->media_observer_registration = browser->GetHost()->AddDevToolsMessageObserver(session->media_observer);
+        browser->GetHost()->ExecuteDevToolsMethod(0, "Media.enable", nullptr);
+    }
 }
 
 void HostBrowserClient::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
