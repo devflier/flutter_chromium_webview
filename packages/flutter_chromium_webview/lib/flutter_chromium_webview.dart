@@ -914,9 +914,8 @@ class ChromiumWebViewController extends ChangeNotifier {
 
   void _closeMenu(int menuId, int commandId) {
     unawaited(
-      _invoke(
-        (id) => _platform.closeContextMenu(id, menuId, commandId),
-      ).catchError((Object _) {}),
+      _invoke((id) => _platform.closeContextMenu(id, menuId, commandId))
+          .catchError((Object _) {}),
     );
   }
 

@@ -64,9 +64,9 @@ void main() {
       }
       if (call.method == 'executeJavaScript') {
         final js = (call.arguments as Map)['js'] as String;
-        final request =
-            jsonDecode(js.substring(js.indexOf('(') + 1, js.length - 2))
-                as Map<String, dynamic>;
+        final request = jsonDecode(
+          js.substring(js.indexOf('(') + 1, js.length - 2),
+        ) as Map<String, dynamic>;
         commands.add(request);
         if (reply) {
           await send({

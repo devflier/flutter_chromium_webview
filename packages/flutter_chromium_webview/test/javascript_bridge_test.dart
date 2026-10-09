@@ -81,39 +81,36 @@ void main() {
       throwsArgumentError,
     );
   });
-  test(
-    'browser-scoped callbacks reject other channels, origins and oversized UTF8',
-    () async {
-      final received = <String>[];
-      final config = JavaScriptChannel(
-        name: 'player',
-        allowedOrigins: {'https://example.com'},
-        onMessageReceived: (value) => received.add(value.message),
-      );
-      final first = ChromiumWebViewController(javaScriptChannels: [config]);
-      final second = ChromiumWebViewController();
-      await first.createBrowser();
-      await second.createBrowser();
-      expect(
-        jsonDecode(
-          (calls.first.arguments as Map)['javascriptChannels'] as String,
-        ),
-        {
-          'player': ['https://example.com'],
-        },
-      );
-      await send(2, 'player', 'https://example.com', 'wrong browser');
-      await send(1, 'other', 'https://example.com', 'wrong channel');
-      await send(1, 'player', 'https://example.com.evil', 'wrong origin');
-      await send(1, 'player', 'https://example.com', '🌍' * 16385);
-      await send(1, 'player', 'https://example.com', 'hello 🌍');
-      expect(received, ['hello 🌍']);
-      await first.dispose();
-      await send(1, 'player', 'https://example.com', 'after dispose');
-      expect(received, ['hello 🌍']);
-      await second.dispose();
-    },
-  );
+  test('browser-scoped callbacks reject other channels, origins and oversized UTF8', () async {
+    final received = <String>[];
+    final config = JavaScriptChannel(
+      name: 'player',
+      allowedOrigins: {'https://example.com'},
+      onMessageReceived: (value) => received.add(value.message),
+    );
+    final first = ChromiumWebViewController(javaScriptChannels: [config]);
+    final second = ChromiumWebViewController();
+    await first.createBrowser();
+    await second.createBrowser();
+    expect(
+      jsonDecode(
+        (calls.first.arguments as Map)['javascriptChannels'] as String,
+      ),
+      {
+        'player': ['https://example.com'],
+      },
+    );
+    await send(2, 'player', 'https://example.com', 'wrong browser');
+    await send(1, 'other', 'https://example.com', 'wrong channel');
+    await send(1, 'player', 'https://example.com.evil', 'wrong origin');
+    await send(1, 'player', 'https://example.com', '🌍' * 16385);
+    await send(1, 'player', 'https://example.com', 'hello 🌍');
+    expect(received, ['hello 🌍']);
+    await first.dispose();
+    await send(1, 'player', 'https://example.com', 'after dispose');
+    expect(received, ['hello 🌍']);
+    await second.dispose();
+  });
   test(
     'evaluation correlates concurrent calls and returns structured errors',
     () async {

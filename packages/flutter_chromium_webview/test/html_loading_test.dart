@@ -39,39 +39,36 @@ void main() {
       await controller.dispose();
     },
   );
-  test(
-    'sends HTML without rewriting, dismisses transient UI, suppresses after disposal',
-    () async {
-      final calls = <MethodCall>[];
-      messenger.setMockMethodCallHandler(channel, (call) async {
-        calls.add(call);
-        if (call.method == 'createBrowser') {
-          return {'browserId': 7, 'textureId': 8, 'popupTextureId': 9};
-        }
-        return null;
-      });
-      final controller = ChromiumWebViewController();
-      var dismissed = 0;
-      controller.onTransientUiDismissed = () => dismissed++;
-      await controller.createBrowser();
-      const html = '<title>Olá 🌍</title>';
-      await controller.loadHtmlString(
-        html,
-        baseUrl: 'https://example.com/player/index.html?q=1',
-      );
-      expect(calls.last.method, 'loadHtmlString');
-      expect(calls.last.arguments, {
-        'browserId': 7,
-        'html': html,
-        'baseUrl': 'https://example.com/player/index.html?q=1',
-      });
-      expect(dismissed, 1);
-      await controller.loadHtmlString('', baseUrl: 'https://example.com/empty');
-      expect((calls.last.arguments as Map)['html'], '');
-      await controller.dispose();
-      final count = calls.length;
-      await controller.loadHtmlString(html, baseUrl: 'https://example.com/');
-      expect(calls.length, count);
-    },
-  );
+  test('sends HTML without rewriting, dismisses transient UI, suppresses after disposal', () async {
+    final calls = <MethodCall>[];
+    messenger.setMockMethodCallHandler(channel, (call) async {
+      calls.add(call);
+      if (call.method == 'createBrowser') {
+        return {'browserId': 7, 'textureId': 8, 'popupTextureId': 9};
+      }
+      return null;
+    });
+    final controller = ChromiumWebViewController();
+    var dismissed = 0;
+    controller.onTransientUiDismissed = () => dismissed++;
+    await controller.createBrowser();
+    const html = '<title>Olá 🌍</title>';
+    await controller.loadHtmlString(
+      html,
+      baseUrl: 'https://example.com/player/index.html?q=1',
+    );
+    expect(calls.last.method, 'loadHtmlString');
+    expect(calls.last.arguments, {
+      'browserId': 7,
+      'html': html,
+      'baseUrl': 'https://example.com/player/index.html?q=1',
+    });
+    expect(dismissed, 1);
+    await controller.loadHtmlString('', baseUrl: 'https://example.com/empty');
+    expect((calls.last.arguments as Map)['html'], '');
+    await controller.dispose();
+    final count = calls.length;
+    await controller.loadHtmlString(html, baseUrl: 'https://example.com/');
+    expect(calls.length, count);
+  });
 }
