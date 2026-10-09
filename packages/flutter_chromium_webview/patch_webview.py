@@ -1,31 +1,29 @@
 import sys
 
-path = '/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/android/src/main/java/dev/devflier/flutter_chromium_webview/FlutterChromiumWebviewPlugin.java'
-with open(path, 'r') as f:
+with open("lib/flutter_chromium_webview.dart", "r") as f:
     content = f.read()
 
-target = "      web = new WebView(viewContext);"
-replacement = """      web = new WebView(viewContext) {
-        @Override
-        protected void onWindowVisibilityChanged(int visibility) {
-          super.onWindowVisibilityChanged(visibility);
-          android.util.Log.i("ChromiumBG", "webview=" + hashCode() + " onWindowVisibilityChanged visibility=" + visibility);
-        }
-        @Override
-        public void onPause() {
-          super.onPause();
-          android.util.Log.i("ChromiumBG", "webview=" + hashCode() + " onPause");
-        }
-        @Override
-        public void onResume() {
-          super.onResume();
-          android.util.Log.i("ChromiumBG", "webview=" + hashCode() + " onResume");
-        }
-      };"""
+old_code = """          return LayoutBuilder(
+            builder: (context, constraints) {
+              if (widget.controller.textureId == null) {
+                return const SizedBox.expand();
+              }
+              final size = constraints.biggest;"""
 
-if target in content:
-    content = content.replace(target, replacement)
-    with open(path, 'w') as f:
+new_code = """          return LayoutBuilder(
+            builder: (context, constraints) {
+              if (widget.controller.textureId == null) {
+                _currentSize = null;
+                _currentDpr = null;
+                return const SizedBox.expand();
+              }
+              final size = constraints.biggest;"""
+
+if old_code in content:
+    content = content.replace(old_code, new_code)
+    with open("lib/flutter_chromium_webview.dart", "w") as f:
         f.write(content)
+    print("Patched ChromiumWebView successfully.")
 else:
-    print("Target not found")
+    print("Old code not found.")
+

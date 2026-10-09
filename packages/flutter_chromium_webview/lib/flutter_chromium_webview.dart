@@ -1423,6 +1423,8 @@ class _ChromiumWebViewState extends State<ChromiumWebView> {
           return LayoutBuilder(
             builder: (context, constraints) {
               if (widget.controller.textureId == null) {
+                _currentSize = null;
+                _currentDpr = null;
                 return const SizedBox.expand();
               }
               final size = constraints.biggest;
