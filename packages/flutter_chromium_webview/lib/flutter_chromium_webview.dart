@@ -1137,9 +1137,9 @@ class _ChromiumWebViewState extends State<ChromiumWebView> {
       if (widget.controller.isPopupShowing &&
           widget.controller.popupTextureId != null &&
           Overlay.maybeOf(context) != null) {
-        _popupOverlay.show();
+        if (!_popupOverlay.isShowing) _popupOverlay.show();
       } else {
-        _popupOverlay.hide();
+        if (_popupOverlay.isShowing) _popupOverlay.hide();
       }
     });
     // Native events can arrive while Flutter has no scheduled frame.

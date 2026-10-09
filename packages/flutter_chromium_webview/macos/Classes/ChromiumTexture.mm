@@ -5,14 +5,14 @@
 @implementation ChromiumTexture {
   std::mutex _mutex;
   CVPixelBufferRef _frames[3];
-  uint32_t _currentSlot;
+  CVPixelBufferRef _activeFrame;
 }
 
 - (instancetype)init {
   self = [super init];
   if (self) {
     for (int i = 0; i < 3; i++) _frames[i] = nullptr;
-    _currentSlot = 0;
+    _activeFrame = nullptr;
   }
   return self;
 }
@@ -38,7 +38,8 @@
   std::lock_guard<std::mutex> lock(_mutex);
   if (_frames[0]) CVPixelBufferRelease(_frames[0]);
   _frames[0] = next;
-  _currentSlot = 0;
+  if (_activeFrame) CVPixelBufferRelease(_activeFrame);
+  _activeFrame = CVPixelBufferRetain(_frames[0]);
   return YES;
 }
 
@@ -74,7 +75,8 @@
 - (void)selectSlot:(uint32_t)slot {
   std::lock_guard<std::mutex> lock(_mutex);
   if (slot < 3) {
-    _currentSlot = slot;
+    if (_activeFrame) CVPixelBufferRelease(_activeFrame);
+    _activeFrame = _frames[slot] ? CVPixelBufferRetain(_frames[slot]) : nullptr;
   }
 }
 
@@ -82,11 +84,12 @@
   std::lock_guard<std::mutex> lock(_mutex);
   // A raster sample retains its immutable buffer independently of resize,
   // subsequent paints, texture unregistration and this object's destruction.
-  return _frames[_currentSlot] ? CVPixelBufferRetain(_frames[_currentSlot]) : nullptr;
+  return _activeFrame ? CVPixelBufferRetain(_activeFrame) : nullptr;
 }
 - (void)dealloc {
   for (int i = 0; i < 3; i++) {
     if (_frames[i]) CVPixelBufferRelease(_frames[i]);
   }
+  if (_activeFrame) CVPixelBufferRelease(_activeFrame);
 }
 @end

@@ -28,15 +28,6 @@
   FlutterChromiumWebviewPlugin* plugin = [[self alloc] init];
   plugin->_channel = [FlutterMethodChannel methodChannelWithName:@"flutter_chromium_webview" binaryMessenger:registrar.messenger];
   plugin->_core = std::make_unique<chromium_macos::Core>(registrar, plugin->_channel);
-  __weak FlutterChromiumWebviewPlugin* weakPlugin = plugin;
-  if (registrar.view.window) {
-    plugin->_windowCloseObserver = [NSNotificationCenter.defaultCenter
-      addObserverForName:NSWindowWillCloseNotification object:registrar.view.window
-      queue:NSOperationQueue.mainQueue usingBlock:^(NSNotification*) {
-        FlutterChromiumWebviewPlugin* current = weakPlugin;
-        if (current && current->_core) current->_core->Detach();
-      }];
-  }
   [registrar addMethodCallDelegate:plugin channel:plugin->_channel];
 }
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
@@ -44,7 +35,6 @@
   else result([FlutterError errorWithCode:@"DETACHED" message:@"Flutter engine detached" details:nil]);
 }
 - (void)dealloc {
-  if (_windowCloseObserver) [NSNotificationCenter.defaultCenter removeObserver:_windowCloseObserver];
   _core.reset();
 }
 @end
