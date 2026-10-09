@@ -1,3 +1,8 @@
+## 0.5.2
+
+* Fix JavaScript mocked player properties in integration test.
+* Prevent git tracking of temporary and machine-specific profiling artifacts.
+
 ## 0.5.1
 
 * Complete public API documentation audit. Documented all public classes, methods, and fields.
