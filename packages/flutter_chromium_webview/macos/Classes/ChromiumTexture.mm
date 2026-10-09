@@ -7,6 +7,7 @@
   CVPixelBufferRef _frames[3];
   CVPixelBufferRef _activeFrame;
   uint32_t _generation;
+  int32_t _activeSlot;
 }
 
 - (instancetype)init {
@@ -15,6 +16,7 @@
     for (int i = 0; i < 3; i++) _frames[i] = nullptr;
     _activeFrame = nullptr;
     _generation = 0;
+    _activeSlot = -1;
   }
   return self;
 }
@@ -71,7 +73,14 @@
   std::lock_guard<std::mutex> lock(_mutex);
   if (_frames[slot]) CVPixelBufferRelease(_frames[slot]);
   _frames[slot] = next;
-  _generation = generation;
+  
+  if (generation >= _generation) {
+    _generation = generation;
+    if (_activeSlot == slot) {
+       if (_activeFrame) CVPixelBufferRelease(_activeFrame);
+       _activeFrame = _frames[slot] ? CVPixelBufferRetain(_frames[slot]) : nullptr;
+    }
+  }
   return YES;
 }
 
@@ -80,7 +89,9 @@
   if (generation < _generation) {
     return;
   }
+  _generation = generation;
   if (slot < 3) {
+    _activeSlot = slot;
     if (_activeFrame) CVPixelBufferRelease(_activeFrame);
     _activeFrame = _frames[slot] ? CVPixelBufferRetain(_frames[slot]) : nullptr;
   }

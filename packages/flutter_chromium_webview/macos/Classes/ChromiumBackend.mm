@@ -101,6 +101,7 @@ class BrowserProxy {
     }
     ChromiumTexture* target = isPopup ? popup_ : main_;
     [target updateWithIOSurface:surface slot:slot width:width height:height generation:generation];
+    [textures_ textureFrameAvailable:isPopup ? popup_id : texture_id];
   }
   
   void OnSurfaceFrameReady(uint32_t slot, uint32_t generation, bool isPopup) {
@@ -460,8 +461,12 @@ void Core::Handle(FlutterMethodCall* call, FlutterResult result) {
       msg.payload = args;
       [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:nil];
   } else if ([method isEqualToString:@"setFocus"]) {
-    if (Number(args, @"focused")) [input_ setBrowserId:id];
-    else if ([input_ ownsBrowserId:id]) NSLog(@"[Core] OnHostDisconnected, browsers count: %zu", browsers_.size()); [input_ setBrowserId:-1];
+    if (Number(args, @"focused")) {
+        [input_ setBrowserId:id];
+    } else if ([input_ ownsBrowserId:id]) {
+        NSLog(@"[Core] OnHostDisconnected, browsers count: %zu", browsers_.size());
+        [input_ setBrowserId:-1];
+    }
     
     msg.type = "setFocus";
     msg.payload = @{@"browserId": @(id), @"focused": @(Number(args, @"focused") != 0)};
@@ -477,6 +482,9 @@ void Core::Handle(FlutterMethodCall* call, FlutterResult result) {
       result(Error(@"INVALID_SIZE", @"Dimensions must be finite and at most 16384 physical pixels")); return;
     }
     proxy->dpr_ = dpr;
+    if (proxy && proxy->texture_id) {
+        [proxy->textures_ textureFrameAvailable:proxy->texture_id];
+    }
     msg.type = "resizeBrowser";
     msg.payload = @{@"browserId": @(id), @"width": @(width), @"height": @(height), @"deviceScaleFactor": @(dpr)};
     [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:nil];

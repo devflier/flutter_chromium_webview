@@ -1131,6 +1131,7 @@ class _ChromiumWebViewState extends State<ChromiumWebView> {
   final OverlayPortalController _popupOverlay = OverlayPortalController();
   Size? _currentSize;
   double? _currentDpr;
+  int? _lastTextureId;
   int _buttons = 0;
   final Map<int, (Duration, Offset, int)> _clicks = {};
   final Map<int, int> _pressedClickCounts = {};
@@ -1422,16 +1423,24 @@ class _ChromiumWebViewState extends State<ChromiumWebView> {
         builder: (context, _) {
           return LayoutBuilder(
             builder: (context, constraints) {
-              if (widget.controller.textureId == null) {
+              final textureId = widget.controller.textureId;
+
+              if (_lastTextureId != textureId) {
+                _lastTextureId = textureId;
                 _currentSize = null;
                 _currentDpr = null;
+              }
+
+              if (textureId == null) {
                 return const SizedBox.expand();
               }
               final size = constraints.biggest;
               final dpr = MediaQuery.devicePixelRatioOf(context);
+              print('[ChromiumWebView] LayoutBuilder size=$size dpr=$dpr currentSize=$_currentSize lastTextureId=$_lastTextureId textureId=$textureId');
               if (size.isFinite &&
                   !size.isEmpty &&
                   (size != _currentSize || dpr != _currentDpr)) {
+                print('[ChromiumWebView] Sending updateBrowserSize(${size.width}, ${size.height}, $dpr)');
                 _currentSize = size;
                 _currentDpr = dpr;
                 _send(
