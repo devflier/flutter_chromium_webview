@@ -42,3 +42,8 @@ jobs:
         with:
           name: android-example-apk
           path: packages/flutter_chromium_webview/example/build/app/outputs/flutter-apk/app-release.apk
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-smoke-diagnostics
+          path: docs/validation/

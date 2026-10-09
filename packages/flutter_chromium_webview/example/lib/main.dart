@@ -139,13 +139,6 @@ class _BrowserScreenState extends State<BrowserScreen> {
       );
     });
 
-    _crashTimer = Timer(const Duration(seconds: 3), () {
-      if (mounted) {
-        debugPrint('CRASH TEST CALLING loadRequest');
-        _controller.loadRequest('chrome://crash');
-      }
-    });
-
     _controller.onLoadError = (errorCode, errorText, failedUrl) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
