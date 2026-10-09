@@ -11,6 +11,7 @@ import 'flutter_chromium_webview.dart';
 /// ChromiumWebView with disposeController: false, and dispose this controller.
 /// Autoplay uses the plugin's private, nonpersistent browser context.
 class ChromiumYoutubePlayerController {
+  /// Creates a [ChromiumYoutubePlayerController] with the given configuration.
   ChromiumYoutubePlayerController({
     required this.documentUrl,
     String? userAgent,
@@ -40,7 +41,9 @@ class ChromiumYoutubePlayerController {
   }
 
   void _onBrowserCrashed() {
-    print('[ChromiumYoutubePlayerController] Browser crashed, reloading...');
+    debugPrint(
+      '[ChromiumYoutubePlayerController] Browser crashed, reloading...',
+    );
     final error = StateError('Browser crashed');
     if (_ready?.isCompleted == false) _ready!.completeError(error);
     for (final completion in _pending.values) {
@@ -52,19 +55,34 @@ class ChromiumYoutubePlayerController {
 
   /// HTTP(S) document URL chosen by the host; supplies origin and referrer.
   final String documentUrl;
+
+  /// The maximum duration to wait for the player to become ready.
   final Duration readyTimeout;
+
+  /// The maximum duration to wait for a command to complete.
   final Duration commandTimeout;
   @visibleForTesting
+  /// The URL used to load the YouTube IFrame Player API.
   final String iframeApiUrl;
   static int _nextPlayer = 0;
+
+  /// The unique identifier for this YouTube player instance.
   final String playerId = 'Youtube${++_nextPlayer}';
+
+  /// The underlying [ChromiumWebViewController] managing the native web view.
   late final ChromiumWebViewController webViewController;
   final _events = StreamController<Map<String, Object?>>.broadcast();
 
   /// ppplayer-compatible event names, with playerId and a document generation.
   Stream<Map<String, Object?>> get events => _events.stream;
+
+  /// The current state of the player (e.g., playing, paused, buffering), or null if unknown.
   int? get playerState => _state;
+
+  /// The current error code from the player, if any.
   int? get playerError => _error;
+
+  /// Whether the player is intended to be playing right now.
   bool get intendedPlaying => _playing;
   int? _state;
   int? _error;
@@ -102,6 +120,9 @@ class ChromiumYoutubePlayerController {
     if (_closed) throw StateError('YouTube controller is disposed');
   }
 
+  /// Initializes the YouTube player.
+  ///
+  /// Must be called before interacting with the player.
   Future<void> initialize() {
     _checkOpen();
     return _initializing ??= _initialize();
@@ -190,7 +211,7 @@ class ChromiumYoutubePlayerController {
       return;
     }
     if (decoded['DebugHeartbeat'] != null) {
-      print('[ChromiumBG] JS Heartbeat -> ' + decoded['DebugHeartbeat'].toString());
+      debugPrint('[ChromiumBG] JS Heartbeat -> ${decoded['DebugHeartbeat']}');
     }
     if (decoded['Ready'] == true && _ready?.isCompleted == false) {
       _ready!.complete();
@@ -205,24 +226,24 @@ class ChromiumYoutubePlayerController {
     } else if (state == 1) {
       _error = null;
     }
-  final progress = decoded['VideoState'];
-  if (progress is String) {
-    try {
-      final value = jsonDecode(progress);
-      if (value is Map) {
-        if (value['currentTime'] is num) {
-          final time = (value['currentTime'] as num).toDouble();
-          if (time.isFinite && time >= 0) _position = time;
+    final progress = decoded['VideoState'];
+    if (progress is String) {
+      try {
+        final value = jsonDecode(progress);
+        if (value is Map) {
+          if (value['currentTime'] is num) {
+            final time = (value['currentTime'] as num).toDouble();
+            if (time.isFinite && time >= 0) _position = time;
+          }
+          if (value['playlistIndex'] is num) {
+            final index = (value['playlistIndex'] as num).toInt();
+            if (index >= 0) _playlistIndex = index;
+          }
         }
-        if (value['playlistIndex'] is num) {
-          final index = (value['playlistIndex'] as num).toInt();
-          if (index >= 0) _playlistIndex = index;
-        }
+      } on FormatException {
+        return;
       }
-    } on FormatException {
-      return;
     }
-  }
     _events.add(Map<String, Object?>.unmodifiable(decoded));
   }
 
@@ -232,12 +253,18 @@ class ChromiumYoutubePlayerController {
     }
   }
 
+  /// Loads and plays a YouTube video by its [videoId].
+  ///
+  /// Optionally starts at [startSeconds] and ends at [endSeconds].
   Future<void> loadVideoById({
     required String videoId,
     double startSeconds = 0,
     double? endSeconds,
   }) => _selectVideo(videoId, startSeconds, endSeconds, true);
 
+  /// Cues a YouTube video by its [videoId] without autoplaying.
+  ///
+  /// Optionally starts at [startSeconds] and ends at [endSeconds].
   Future<void> cueVideoById({
     required String videoId,
     double startSeconds = 0,
@@ -270,12 +297,18 @@ class ChromiumYoutubePlayerController {
     });
   }
 
+  /// Loads and plays a YouTube playlist by its [playlistId].
+  ///
+  /// Optionally starts at the given [index] and [startSeconds].
   Future<void> loadPlaylist({
     required String playlistId,
     int index = 0,
     double startSeconds = 0,
   }) => _selectPlaylist(playlistId, index, startSeconds, true);
 
+  /// Cues a YouTube playlist by its [playlistId] without autoplaying.
+  ///
+  /// Optionally starts at the given [index] and [startSeconds].
   Future<void> cuePlaylist({
     required String playlistId,
     int index = 0,
@@ -292,7 +325,9 @@ class ChromiumYoutubePlayerController {
       throw ArgumentError.value(playlistId, 'playlistId', 'Cannot be empty');
     }
     _time(start);
-    if (index < 0) throw ArgumentError.value(index, 'index', 'Cannot be negative');
+    if (index < 0) {
+      throw ArgumentError.value(index, 'index', 'Cannot be negative');
+    }
 
     return _enqueue(() async {
       _videoId = null;
@@ -302,48 +337,65 @@ class ChromiumYoutubePlayerController {
       _end = null;
       _playing = play;
       await _request(play ? 'loadPlaylist' : 'cuePlaylist', [
-        {'list': playlistId, 'listType': 'playlist', 'index': index, 'startSeconds': start},
+        {
+          'list': playlistId,
+          'listType': 'playlist',
+          'index': index,
+          'startSeconds': start,
+        },
       ]);
     });
   }
 
+  /// Skips to the next video in the playlist.
   Future<void> nextVideo() => _enqueue(() async {
     await _request('nextVideo', []);
   });
 
+  /// Skips to the previous video in the playlist.
   Future<void> previousVideo() => _enqueue(() async {
     await _request('previousVideo', []);
   });
 
+  /// Plays the video at the given [index] in the playlist.
   Future<void> playVideoAt(int index) {
-    if (index < 0) throw ArgumentError.value(index, 'index', 'Cannot be negative');
+    if (index < 0) {
+      throw ArgumentError.value(index, 'index', 'Cannot be negative');
+    }
     return _enqueue(() async {
       await _request('playVideoAt', [index]);
     });
   }
 
+  /// Returns a list of video IDs in the current playlist.
   Future<List<String>> getPlaylist() => _enqueue(() async {
     final value = await _request('getPlaylist', []);
     if (value is! List) throw StateError('Invalid playlist result');
     return value.cast<String>();
   });
 
+  /// Returns the index of the currently playing video in the playlist.
   Future<int> getPlaylistIndex() => _enqueue(() async {
     final value = await _request('getPlaylistIndex', []);
     if (value is! num) throw StateError('Invalid playlist index result');
     return value.toInt();
   });
 
+  /// Resumes playback of the current video.
   Future<void> playVideo() => _enqueue(() async {
     _playing = true;
     await _request('playVideo', []);
   });
 
+  /// Pauses playback of the current video.
   Future<void> pauseVideo() => _enqueue(() async {
     _playing = false;
     await _request('pauseVideo', []);
   });
 
+  /// Seeks to a specific time in the video, in [seconds].
+  ///
+  /// If [allowSeekAhead] is true, the player will make a new request if the time is unbuffered.
   Future<void> seekTo({required double seconds, bool allowSeekAhead = true}) {
     _time(seconds);
     return _enqueue(() async {
@@ -352,6 +404,7 @@ class ChromiumYoutubePlayerController {
     });
   }
 
+  /// Sets the player volume, from 0 to 100.
   Future<void> setVolume(int volume) {
     if (volume < 0 || volume > 100) throw ArgumentError.value(volume, 'volume');
     return _enqueue(() async {
@@ -360,8 +413,13 @@ class ChromiumYoutubePlayerController {
     });
   }
 
+  /// Returns the current playback position in seconds.
   Future<double> get currentTime => _number('getCurrentTime');
+
+  /// Returns the total duration of the current video in seconds.
   Future<double> get duration => _number('getDuration');
+
+  /// Returns the current volume level of the player (0-100).
   Future<double> get volume => _number('getVolume');
   Future<double> _number(String method) => _enqueue(() async {
     final value = await _request(method, []);
@@ -371,6 +429,7 @@ class ChromiumYoutubePlayerController {
     return value.toDouble();
   });
 
+  /// Returns metadata and information about the current video.
   Future<Map<String, Object?>> get videoData => _enqueue(() async {
     final value = await _request('getVideoData', []);
     if (value is! Map<String, dynamic>) throw StateError('Invalid video data');
@@ -401,7 +460,12 @@ class ChromiumYoutubePlayerController {
     }
   });
 
+  /// Closes the player and releases its resources.
+  ///
+  /// This is an alias for [dispose].
   Future<void> close() => dispose();
+
+  /// Disposes of the player, releasing its resources and closing the underlying web view.
   Future<void> dispose() => _disposing ??= _dispose();
   Future<void> _dispose() async {
     _closed = true;

@@ -52,8 +52,50 @@
       "workload": "animated",
       "label": "animated",
       "startedUtc": "2026-10-09T15:12:52Z",
-      "profilers": [],
-      "vmmap": []
+      "profilers": [
+        {
+          "template": "Allocations",
+          "pid": 21768,
+          "startedUtc": "2026-10-09T15:15:57Z",
+          "trace": "animated-allocations.trace",
+          "log": "animated-allocations.log",
+          "requestedSeconds": 60,
+          "exitCode": 0
+        },
+        {
+          "template": "Leaks",
+          "pid": 21768,
+          "startedUtc": "2026-10-09T15:17:57Z",
+          "trace": "animated-leaks.trace",
+          "log": "animated-leaks.log",
+          "requestedSeconds": 30,
+          "exitCode": 0
+        }
+      ],
+      "vmmap": [
+        {
+          "elapsedSeconds": 121.347,
+          "pid": 21768,
+          "file": "animated-vmmap-120s.txt",
+          "exitCode": 0
+        },
+        {
+          "elapsedSeconds": 300.942,
+          "pid": 21768,
+          "file": "animated-vmmap-300s.txt",
+          "exitCode": 0
+        },
+        {
+          "elapsedSeconds": 570.916,
+          "pid": 21768,
+          "file": "animated-vmmap-550s.txt",
+          "exitCode": 0
+        }
+      ],
+      "profiledRendererPid": 21768,
+      "flutterExitCode": 0,
+      "completedUtc": "2026-10-09T15:25:02Z"
     }
-  ]
+  ],
+  "complete": true
 }

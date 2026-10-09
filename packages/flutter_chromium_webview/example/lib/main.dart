@@ -102,9 +102,15 @@ class _BrowserScreenState extends State<BrowserScreen> {
           name: 'TestChannel',
           allowedOrigins: {'https://example.com'},
           onMessageReceived: (message) {
-            print('JS_BRIDGE_TEST: Received message from ${message.origin}: ${message.message}');
+            debugPrint(
+              'JS_BRIDGE_TEST: Received message from ${message.origin}: ${message.message}',
+            );
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('JS msg from ${message.origin}: ${message.message}')),
+              SnackBar(
+                content: Text(
+                  'JS msg from ${message.origin}: ${message.message}',
+                ),
+              ),
             );
           },
         ),
@@ -125,12 +131,15 @@ class _BrowserScreenState extends State<BrowserScreen> {
         timer.cancel();
         return;
       }
-      _controller.executeJavaScript("window.chromiumPostMessage('TestChannel', 'Hello from JS bridge loop!');");
+      _controller.executeJavaScript(
+        "window.chromiumPostMessage('TestChannel', 'Hello from JS bridge loop!');",
+      );
     });
-    
+
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
-        print('CRASH TEST CALLING loadRequest');_controller.loadRequest('chrome://crash');
+        debugPrint('CRASH TEST CALLING loadRequest');
+        _controller.loadRequest('chrome://crash');
       }
     });
 
@@ -361,7 +370,8 @@ class _BrowserScreenState extends State<BrowserScreen> {
                           ),
                         );
                       } else if (page == 'crash') {
-                        print('CRASH TEST CALLING loadRequest');_controller.loadRequest('chrome://crash');
+                        debugPrint('CRASH TEST CALLING loadRequest');
+                        _controller.loadRequest('chrome://crash');
                       } else {
                         _controller.loadRequest(
                           page == 'input' ? inputTestUrl : popupTestUrl,
@@ -379,10 +389,7 @@ class _BrowserScreenState extends State<BrowserScreen> {
                         value: 'stress',
                         child: Text('Stress test'),
                       ),
-                      PopupMenuItem(
-                        value: 'crash',
-                        child: Text('Crash test'),
-                      ),
+                      PopupMenuItem(value: 'crash', child: Text('Crash test')),
                     ],
                   ),
                 ],

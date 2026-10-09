@@ -120,12 +120,13 @@ void main() {
       final deferred = <String, Completer<Object?>>{};
       messenger.setMockMethodCallHandler(channel, (call) async {
         calls.add(call);
-        if (call.method == 'createBrowser')
+        if (call.method == 'createBrowser') {
           return {
             'browserId': ++nextId,
             'textureId': nextId,
             'popupTextureId': 100 + nextId,
           };
+        }
         if (call.method == 'evaluateJavaScript') {
           final args = call.arguments as Map;
           final pending = Completer<Object?>();
@@ -183,17 +184,19 @@ void main() {
       final pending = Completer<Object?>();
       messenger.setMockMethodCallHandler(channel, (call) async {
         calls.add(call);
-        if (call.method == 'createBrowser')
+        if (call.method == 'createBrowser') {
           return {
             'browserId': ++nextId,
             'textureId': nextId,
             'popupTextureId': 100 + nextId,
           };
+        }
         if (call.method == 'evaluateJavaScript') return pending.future;
-        if (call.method == 'cancelJavaScript')
+        if (call.method == 'cancelJavaScript') {
           pending.completeError(
             PlatformException(code: 'cancelled', message: 'Cancelled'),
           );
+        }
         return null;
       });
       final controller = ChromiumWebViewController();

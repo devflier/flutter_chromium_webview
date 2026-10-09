@@ -33,6 +33,7 @@ export 'package:flutter_chromium_webview_platform_interface/flutter_chromium_web
 
 /// Represents a request from the browser to open a new window or tab.
 class NewWindowRequest {
+  /// Creates a [NewWindowRequest] with the given parameters.
   const NewWindowRequest({
     required this.url,
     required this.targetFrameName,
@@ -71,6 +72,7 @@ enum JSDialogType {
 
 /// A request from the browser to display a JavaScript dialog.
 class JSDialogRequest {
+  /// Creates a [JSDialogRequest] with the given parameters.
   const JSDialogRequest({
     required this.type,
     required this.message,
@@ -89,6 +91,7 @@ class JSDialogRequest {
 
 /// The response to a JavaScript dialog.
 class JSDialogResponse {
+  /// Creates a [JSDialogResponse] with the given parameters.
   const JSDialogResponse({required this.success, this.userInput = ''});
 
   /// Whether the user accepted the dialog (e.g., clicked OK).
@@ -100,6 +103,7 @@ class JSDialogResponse {
 
 /// An item in a context menu.
 class ContextMenuItem {
+  /// Creates a [ContextMenuItem] with the given parameters.
   const ContextMenuItem({
     required this.commandId,
     required this.label,
@@ -109,35 +113,57 @@ class ContextMenuItem {
     this.subMenu,
   });
 
+  /// The unique command ID for this menu item.
   final int commandId;
+
+  /// The display label for this menu item.
   final String label;
+
+  /// The type of this menu item (e.g., normal, check, radio).
   final int type;
+
+  /// Whether this menu item is enabled and can be interacted with.
   final bool isEnabled;
+
+  /// Whether this menu item is currently checked (for check/radio types).
   final bool isChecked;
+
+  /// The submenu items if this item is a parent menu, or null otherwise.
   final List<ContextMenuItem>? subMenu;
 }
 
 /// A request from the browser to display a context menu.
 class ContextMenuRequest {
+  /// Creates a [ContextMenuRequest] with the given parameters.
   const ContextMenuRequest({
     required this.x,
     required this.y,
     required this.items,
   });
 
+  /// The X coordinate of the context menu request relative to the browser.
   final int x;
+
+  /// The Y coordinate of the context menu request relative to the browser.
   final int y;
+
+  /// The list of items to display in the context menu.
   final List<ContextMenuItem> items;
 }
 
 /// A string sent by an allowed main-frame document.
 class JavaScriptMessage {
+  /// Creates a [JavaScriptMessage] with the given parameters.
   const JavaScriptMessage({
     required this.message,
     required this.origin,
     this.channel,
   });
+
+  /// The raw string message received from JavaScript.
   final String message;
+
+  /// The origin URL of the document that sent this message.
   final String origin;
 
   /// The configured channel that delivered this message.
@@ -150,6 +176,7 @@ class JavaScriptMessage {
 /// Configuration is fixed for the browser's lifetime. No channels are enabled
 /// by default, and data/file/about URLs and subframes cannot use the bridge.
 class JavaScriptChannel {
+  /// Creates a [JavaScriptChannel] with the given configuration.
   JavaScriptChannel({
     required this.name,
     required Set<String> allowedOrigins,
@@ -172,8 +199,13 @@ class JavaScriptChannel {
     }
   }
 
+  /// The name of the JavaScript channel. This will be exposed as a property on the `window` object.
   final String name;
+
+  /// The set of HTTP/HTTPS origins allowed to send messages to this channel.
   final Set<String> allowedOrigins;
+
+  /// The callback invoked when a message is successfully received from an allowed origin.
   final void Function(JavaScriptMessage message) onMessageReceived;
 
   static void _ignoreMessage(JavaScriptMessage message) {}
@@ -199,10 +231,19 @@ class JavaScriptChannel {
 
 /// A structured failure from evaluating JavaScript or its document lifecycle.
 class JavaScriptException implements Exception {
+  /// Creates a [JavaScriptException] with the given details.
   const JavaScriptException(this.code, this.message, {this.name, this.stack});
+
+  /// The error code or type associated with the exception.
   final String code;
+
+  /// The detailed error message describing what went wrong.
   final String message;
+
+  /// The name of the exception, if provided by the JavaScript runtime.
   final String? name;
+
+  /// The stack trace associated with the exception, if available.
   final String? stack;
   @override
   String toString() => 'JavaScriptException($code): $message';
@@ -213,7 +254,11 @@ class JavaScriptException implements Exception {
 class JavaScriptCancellationToken {
   bool _cancelled = false;
   final Set<void Function()> _listeners = {};
+
+  /// Whether this token has been cancelled.
   bool get isCancelled => _cancelled;
+
+  /// Cancels the associated JavaScript evaluation and discards its response.
   void cancel() {
     if (_cancelled) return;
     _cancelled = true;
@@ -261,6 +306,7 @@ class ChromiumWebViewController extends ChangeNotifier {
     _currentUrl = initialUrl;
   }
 
+  /// The list of configured [JavaScriptChannel]s for this browser.
   final List<JavaScriptChannel> javaScriptChannels;
   final StreamController<JavaScriptMessage> _messages =
       StreamController.broadcast();
@@ -312,6 +358,7 @@ class ChromiumWebViewController extends ChangeNotifier {
   static int _creatingCount = 0;
 
   @visibleForTesting
+  /// Resets the internal state of the controller. Intended only for testing purposes.
   static void resetTestingState() {
     _controllers.clear();
     _pendingEvents.clear();
@@ -415,7 +462,9 @@ class ChromiumWebViewController extends ChangeNotifier {
     final eventArgs = browserEvent.arguments;
     switch (browserEvent.name) {
       case 'browserCrash':
-        print('[Flutter] ChromiumWebViewController _dispatchEvent handling browserCrash');
+        debugPrint(
+          '[Flutter] ChromiumWebViewController _dispatchEvent handling browserCrash',
+        );
         // The underlying native browser crashed.
         // Reset internal state and transparently trigger recreation.
         final oldId = _browserId;
@@ -785,7 +834,11 @@ class ChromiumWebViewController extends ChangeNotifier {
         if (!_isDisposed &&
             (_lastHtmlString != null || _lastLoadRequestUrl != null)) {
           if (_lastHtmlString != null) {
-            await _platform.loadHtml(newBrowserId, _lastHtmlString!, _lastHtmlBaseUrl!);
+            await _platform.loadHtml(
+              newBrowserId,
+              _lastHtmlString!,
+              _lastHtmlBaseUrl!,
+            );
           } else {
             await _platform.loadUrl(newBrowserId, _lastLoadRequestUrl!);
           }
@@ -804,11 +857,14 @@ class ChromiumWebViewController extends ChangeNotifier {
         rethrow;
       }
     } catch (e) {
-      print('[Flutter] _create caught exception: $e');
+      debugPrint('[Flutter] _create caught exception: $e');
       if (!_isDisposed &&
           e is PlatformException &&
-          const {'INIT_FAILED', 'HOST_FAILED', 'INIT_TIMEOUT'}
-              .contains(e.code)) {
+          const {
+            'INIT_FAILED',
+            'HOST_FAILED',
+            'INIT_TIMEOUT',
+          }.contains(e.code)) {
         // If the host crashes during initialization, createBrowser throws.
         // We simulate a browser crash event to recreate the browser transparently.
         _browserId = null;
@@ -939,20 +995,23 @@ class ChromiumWebViewController extends ChangeNotifier {
         'Expected JavaScript up to 1 MiB and timeout 1–60000 ms',
       );
     }
-    if (_isDisposed)
+    if (_isDisposed) {
       throw const JavaScriptException('browser_closed', 'Browser disposed');
+    }
     await _creation;
     final id = _browserId;
-    if (_isDisposed || id == null)
+    if (_isDisposed || id == null) {
       throw const JavaScriptException(
         'browser_closed',
         'Create a browser before evaluating JavaScript',
       );
-    if (cancellationToken?.isCancelled ?? false)
+    }
+    if (cancellationToken?.isCancelled ?? false) {
       throw const JavaScriptException(
         'cancelled',
         'JavaScript request cancelled',
       );
+    }
     final operationId = '${++_nextJavaScriptOperation}';
     final future = _platform.evaluateJavaScript(
       id,
@@ -1451,14 +1510,18 @@ class _ChromiumWebViewState extends State<ChromiumWebView> {
               }
               final size = constraints.biggest;
               final dpr = MediaQuery.devicePixelRatioOf(context);
-              
+
               if (size.isFinite &&
                   !size.isEmpty &&
                   (size != _currentSize || dpr != _currentDpr)) {
                 _currentSize = size;
                 _currentDpr = dpr;
                 _send(
-                  widget.controller.updateBrowserSize(size.width, size.height, dpr),
+                  widget.controller.updateBrowserSize(
+                    size.width,
+                    size.height,
+                    dpr,
+                  ),
                 );
               }
               return CompositedTransformTarget(

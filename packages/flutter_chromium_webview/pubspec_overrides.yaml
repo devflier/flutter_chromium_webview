@@ -2,4 +2,3 @@
 dependency_overrides:
   flutter_chromium_webview_platform_interface:
     path: ../flutter_chromium_webview_platform_interface
-

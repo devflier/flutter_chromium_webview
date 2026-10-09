@@ -37,7 +37,7 @@ class MethodChannelChromiumWebView extends ChromiumWebViewPlatform {
 
   Future<void> _handleCall(MethodCall call) async {
     if (call.method == 'browserCrash') {
-      print('[Flutter] received browserCrash');
+      debugPrint('[Flutter] received browserCrash');
       final args = call.arguments;
       if (args is! Map) return;
       final browserId = args['browserId'];
@@ -51,7 +51,7 @@ class MethodChannelChromiumWebView extends ChromiumWebViewPlatform {
       );
       return;
     }
-    
+
     if (call.method != 'onBrowserEvent') return;
     final args = call.arguments;
     if (args is! Map) return;

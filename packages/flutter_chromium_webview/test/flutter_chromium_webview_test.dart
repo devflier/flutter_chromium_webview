@@ -252,14 +252,16 @@ void main() {
     expect(lastRequest!.sourceBrowserId, 1);
   });
 
-  testWidgets('Generation change forces resize and focus despite reused IDs', (tester) async {
+  testWidgets('Generation change forces resize and focus despite reused IDs', (
+    tester,
+  ) async {
     ChromiumWebViewController.resetTestingState();
-    
+
     int mockedTextureId = 123;
     int mockedBrowserId = 1;
     int createCalls = 0;
     final log = <MethodCall>[];
-    
+
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(
           const MethodChannel('flutter_chromium_webview'),
@@ -292,32 +294,36 @@ void main() {
     );
 
     await tester.pumpAndSettle();
-    
+
     expect(createCalls, 1);
     expect(controller.browserGeneration, 1);
 
-    int initialResizeCalls = log.where((m) => m.method == 'updateBrowserSize').length;
+    int initialResizeCalls = log
+        .where((m) => m.method == 'updateBrowserSize')
+        .length;
     int initialFocusCalls = log.where((m) => m.method == 'setFocus').length;
-    
+
     expect(initialResizeCalls, 1);
     expect(initialFocusCalls, greaterThanOrEqualTo(1));
-    
+
     // Clear log for next phase
     log.clear();
 
     // Simulate complete native recreation with IDENTICAL identifiers
     await sendNativeEvent(mockedBrowserId, 'browserCrash', {});
     await tester.pumpAndSettle();
-    
+
     expect(createCalls, 2);
     expect(controller.browserGeneration, 2);
     expect(controller.browserId, mockedBrowserId);
     expect(controller.textureId, mockedTextureId);
 
     // The widget should force a new resize and focus call despite constraints and IDs being identical
-    int finalResizeCalls = log.where((m) => m.method == 'updateBrowserSize').length;
+    int finalResizeCalls = log
+        .where((m) => m.method == 'updateBrowserSize')
+        .length;
     int finalFocusCalls = log.where((m) => m.method == 'setFocus').length;
-    
+
     expect(finalResizeCalls, 1);
     expect(finalFocusCalls, greaterThanOrEqualTo(1));
   });

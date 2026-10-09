@@ -1,3 +1,9 @@
+## 0.5.1
+
+* Complete public API documentation audit. Documented all public classes, methods, and fields.
+* Resolve analyzer warnings and info-level lints.
+* Exclude large binary artifacts from publication to comply with package size limits.
+
 ## 0.5.0
 
 * Add macOS CEF and YouTube playlist support.
