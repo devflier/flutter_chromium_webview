@@ -24,7 +24,7 @@ jobs:
     name: Dart/Flutter Quality
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.47.4'
@@ -46,7 +46,7 @@ jobs:
             exit 1
           fi
           
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: formatting-diff
@@ -81,7 +81,7 @@ jobs:
     needs: quality
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.47.4'
@@ -101,7 +101,7 @@ jobs:
           pactl set-default-sink validation
           xvfb-run -a ./scripts/validate_linux.sh
           
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: linux-native-logs
@@ -113,7 +113,7 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.47.4'
@@ -131,7 +131,7 @@ jobs:
           ./scripts/package_windows.ps1 -NoBuild -Destination $bundle
           ./scripts/smoke_windows.ps1 -Bundle $bundle -LogDirectory ./docs/validation
           
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: windows-smoke-logs
@@ -143,8 +143,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '17'
@@ -169,13 +169,13 @@ jobs:
           disable-animations: true
           script: pwsh -File scripts/validate_android.ps1 -Device emulator-5554
           
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: success()
         with:
           name: android-example-apk
           path: packages/flutter_chromium_webview/example/build/app/outputs/flutter-apk/app-release.apk
           
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: android-smoke-diagnostics
@@ -188,7 +188,7 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.47.4'
@@ -204,7 +204,7 @@ jobs:
       - name: Native build, integrations, texture ownership and bundle shutdown
         run: bash scripts/validate_macos.sh
         
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: macos-smoke-logs
@@ -219,7 +219,7 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.47.4'
@@ -249,7 +249,7 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.47.4'
