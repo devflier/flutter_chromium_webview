@@ -207,8 +207,10 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: macos-smoke-logs
-          path: docs/validation/macos-packaged-*.log
+          name: macos-validation-diagnostics
+          path: |
+            docs/validation/macos/
+            docs/validation/macos-packaged-*.log
 
   publish_webview:
     name: Publish main package

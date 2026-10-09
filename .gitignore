@@ -43,3 +43,8 @@ docs/validation/*.xml
 packages/flutter_chromium_webview/macos/Host/ChromiumWebViewHost.app
 verification/
 scratch/
+
+docs/validation/macos/
+docs/validation/macos-investigation/
+
+__pycache__/

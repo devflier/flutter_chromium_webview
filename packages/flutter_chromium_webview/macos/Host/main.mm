@@ -87,7 +87,8 @@ int main(int argc, char* argv[]) {
         NSString* cachePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"cef_cache_%d", getpid()]];
         CefString(&settings.root_cache_path) = [cachePath UTF8String];
         CefString(&settings.cache_path) = [cachePath UTF8String];
-        CefString(&settings.log_file) = "/tmp/cef.log";
+        NSString* logPath = NSProcessInfo.processInfo.environment[@"CEF_LOG_FILE"] ?: @"/tmp/cef.log";
+        CefString(&settings.log_file) = [logPath UTF8String];
         settings.log_severity = LOGSEVERITY_VERBOSE;
 
         if (!CefInitialize(main_args, settings, app, nullptr)) {
@@ -95,11 +96,15 @@ int main(int argc, char* argv[]) {
             return 1;
         }
 
+        NSLog(@"[CEFHost] CefInitialize succeeded");
         NSLog(@"[CEFHost] Before CefRunMessageLoop");
-        CefRunMessageLoop();
+        // OnContextInitialized may run inside CefInitialize. A quit request
+        // before entering the loop cannot be relied on to stop that loop.
+        if (!app->StartupFailed()) CefRunMessageLoop();
         NSLog(@"[CEFHost] After CefRunMessageLoop");
         
         CefShutdown();
-        return 0;
+        NSLog(@"[CEFHost] CefShutdown complete");
+        return app->StartupFailed() ? 1 : 0;
     }
 }

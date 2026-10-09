@@ -436,15 +436,6 @@ class ChromiumYoutubePlayerController {
     return Map<String, Object?>.unmodifiable(value);
   });
 
-  /// Returns the video playback quality statistics.
-  Future<Map<String, Object?>> get videoPlaybackQuality => _enqueue(() async {
-    final value = await _request('getVideoPlaybackQuality', []);
-    if (value is! Map<String, dynamic>) {
-      throw StateError('Invalid video playback quality');
-    }
-    return Map<String, Object?>.unmodifiable(value);
-  });
-
   /// Rebuild the player and restore the last reported position and host intent.
   Future<void> reload() => _enqueue(() async {
     await _loadDocument();
@@ -510,7 +501,7 @@ let player, timer;
 function send(key,value){try{chromiumPostMessage(config.playerId,JSON.stringify({playerId:config.playerId,generation:config.generation,[key]:value}));}catch(_){}}
 const media=document.createElement('video');
 send('MediaCapabilities',{userAgent:navigator.userAgent,vp9:media.canPlayType('video/webm; codecs="vp9"'),av1:media.canPlayType('video/mp4; codecs="av01.0.05M.08"'),h264:media.canPlayType('video/mp4; codecs="avc1.42E01E"'),aac:media.canPlayType('audio/mp4; codecs="mp4a.40.2"'),opus:media.canPlayType('audio/webm; codecs="opus"')});
-const methods=new Set(['loadVideoById','cueVideoById','loadPlaylist','cuePlaylist','nextVideo','previousVideo','playVideoAt','getPlaylist','getPlaylistIndex','playVideo','pauseVideo','seekTo','setVolume','getVolume','getCurrentTime','getDuration','getVideoData','getVideoPlaybackQuality']);
+const methods=new Set(['loadVideoById','cueVideoById','loadPlaylist','cuePlaylist','nextVideo','previousVideo','playVideoAt','getPlaylist','getPlaylistIndex','playVideo','pauseVideo','seekTo','setVolume','getVolume','getCurrentTime','getDuration','getVideoData']);
 window.__chromiumYoutubeDispatch=function(request){
  if(request.generation!==config.generation)return;
  try{

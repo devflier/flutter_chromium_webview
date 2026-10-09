@@ -2,12 +2,18 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_chromium_webview/flutter_chromium_webview.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isMacOS) {
+    // Manual pumps must finish even when macOS throttles a background window.
+    binding.framePolicy =
+        LiveTestWidgetsFlutterBindingFramePolicy.benchmarkLive;
+  }
 
   testWidgets('Host crash recovers correctly and releases resources', (
     tester,
@@ -17,7 +23,7 @@ void main() {
         .path;
     // Run 20 cycles
     for (int i = 0; i < 20; i++) {
-      debugPrint('--- Cycle \$i ---');
+      debugPrint('--- Cycle $i ---');
 
       await ChromiumWebViewController.initialize(cachePath: cachePath);
 
@@ -39,7 +45,10 @@ void main() {
           completer.complete();
         }
       };
-      await completer.future;
+      if (!controller.isLoading && controller.pageTitle.isNotEmpty) {
+        completer.complete();
+      }
+      await completer.future.timeout(const Duration(seconds: 30));
 
       // Let it render some frames
       await tester.pumpAndSettle(const Duration(milliseconds: 500));
@@ -62,10 +71,14 @@ void main() {
           .catchError((_) {});
 
       // Now brutally kill the host
-      await Process.run('killall', ['-KILL', 'ChromiumWebViewHost']);
-      debugPrint(
-        'killall result: \${result.exitCode} (stdout: \${result.stdout}, stderr: \${result.stderr})',
+      const channel = MethodChannel('flutter_chromium_webview');
+      final render = await channel.invokeMapMethod<String, dynamic>(
+        'getRenderDiagnostics',
+        {'browserId': browserId},
       );
+      final hostPid = render!['hostPid'] as int;
+      final result = await Process.run('kill', ['-KILL', '$hostPid']);
+      expect(result.exitCode, 0, reason: '${result.stderr}');
 
       // The pending eval MUST fail.
       await pendingEval;

@@ -7,7 +7,12 @@ import 'package:integration_test/integration_test.dart';
 import 'package:flutter_chromium_webview/flutter_chromium_webview.dart';
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isMacOS) {
+    // Manual pumps must finish even when macOS throttles a background window.
+    binding.framePolicy =
+        LiveTestWidgetsFlutterBindingFramePolicy.benchmarkLive;
+  }
   const channel = MethodChannel('flutter_chromium_webview');
   const cycles = int.fromEnvironment('RESOURCE_CYCLES', defaultValue: 100);
   const dwell = int.fromEnvironment('RESOURCE_DWELL_SECONDS', defaultValue: 5);

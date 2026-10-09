@@ -7,7 +7,13 @@ import 'package:integration_test/integration_test.dart';
 import 'package:flutter_chromium_webview/flutter_chromium_webview.dart';
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isMacOS) {
+    // Manual pumps must finish even when macOS throttles a background window.
+    binding.framePolicy =
+        LiveTestWidgetsFlutterBindingFramePolicy.benchmarkLive;
+  }
+  debugPrint("[lifecycle] integration binding initialized; app pid=$pid");
   const channel = MethodChannel('flutter_chromium_webview');
   final cache = Directory.systemTemp.createTempSync('cef-lifecycle-');
   Future<Map<Object?, Object?>> diagnostics() async =>
@@ -16,6 +22,7 @@ void main() {
   testWidgets('native lifecycle, focus, and hot-restart session cleanup', (
     tester,
   ) async {
+    debugPrint("[lifecycle] test body entered");
     await tester.pumpWidget(const SizedBox());
     expect(
       await ChromiumWebViewController.initialize(cachePath: cache.path),
@@ -25,11 +32,15 @@ void main() {
       await ChromiumWebViewController.initialize(cachePath: cache.path),
       isTrue,
     );
+    debugPrint('[lifecycle] initialize/MethodChannel round trip succeeded');
     expect((await diagnostics())['pumpRunning'], isTrue);
 
     for (int i = 0; i < 20; i++) {
       final controller = ChromiumWebViewController();
       await controller.createBrowser();
+      debugPrint(
+        "[lifecycle] browser created on cycle $i: ${controller.browserId}",
+      );
       await controller.updateBrowserSize(320, 200, i.isEven ? 1 : 2);
       await controller.loadRequest(
         'data:text/html,<input autofocus><p>Cycle $i</p>',
@@ -39,6 +50,7 @@ void main() {
       await controller.setFocus(false);
       await controller.dispose().timeout(const Duration(seconds: 30));
       final state = await diagnostics();
+      debugPrint('[lifecycle] disposed cycle $i: $state');
       expect(state['browsers'], 0, reason: 'CEF browser leaked on cycle $i');
       expect(state['textures'], 0, reason: 'Texture leaked on cycle $i');
     }

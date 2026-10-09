@@ -9,6 +9,8 @@ import 'package:integration_test/integration_test.dart';
 import 'package:flutter_chromium_webview/chromium_youtube_player.dart';
 import 'package:flutter_chromium_webview/flutter_chromium_webview.dart';
 
+import 'video_quality_probe.dart';
+
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   // Keep wall-clock observation independent of background-window vsync.
@@ -84,6 +86,7 @@ void main() {
       double width = 640, height = 360;
       var visible = true;
       var videoIndex = 0;
+      VideoQualityProbe? videoProbe;
       var heartbeatCount = 0;
       Map<String, Object?>? lastHeartbeat;
       final subscription = player.events.listen((event) {
@@ -253,6 +256,22 @@ void main() {
           'numericDescriptors': descriptors.length,
           'window': await query('debugSoakWindow'),
         };
+        if (videoProbe != null) {
+          final quality = await finish(videoProbe.sample());
+          rendering['videoQuality'] = quality;
+          final measured =
+              quality
+                  .where((video) => (video['totalVideoFrames'] as num) > 0)
+                  .toList()
+                ..sort(
+                  (a, b) => (b['totalVideoFrames'] as num).compareTo(
+                    a['totalVideoFrames'] as num,
+                  ),
+                );
+          if (measured.isNotEmpty) {
+            rendering['droppedFrames'] = measured.first['droppedVideoFrames'];
+          }
+        }
         if (rendering['droppedFrames'] != null) {
           report['droppedFramesMeasured'] = true;
           record['droppedFrames'] = rendering['droppedFrames'];
@@ -399,6 +418,12 @@ void main() {
           await finish(player.setVolume(0));
           await finish(player.loadVideoById(videoId: videos.first));
           await playing();
+          final port = int.parse(
+            Platform.environment['CEF_PROFILE_DEBUG_PORT']!,
+          );
+          videoProbe = await finish(
+            VideoQualityProbe.connect(port, player.documentUrl),
+          );
         } else {
           await finish(controller.createBrowser());
           final deadline = DateTime.now().add(const Duration(seconds: 40));
@@ -502,8 +527,34 @@ void main() {
           report['returnedToIdleBaseline'] = returned;
           expect(returned, isTrue);
         }
+        await videoProbe?.close();
         await subscription.cancel();
         await server.close(force: true);
+
+        final samplesList = report['samples'] as List;
+        if (samplesList.length > 2) {
+          int getRss(dynamic sample) => (sample['processes'] as List).fold<int>(
+            0,
+            (s, p) => s + (p['rssKiB'] as int),
+          );
+          final startRss = getRss(samplesList[1]);
+          final finalRss = getRss(samplesList.last);
+          report['rssGrowthKiB'] = finalRss - startRss;
+          expect(
+            report['rssGrowthKiB'],
+            lessThan(75000),
+            reason: 'RSS growth must stabilize and not leak',
+          );
+        }
+        if (workload == 'youtube') {
+          expect(
+            report['droppedFramesMeasured'],
+            isTrue,
+            reason:
+                'Must successfully measure dropped frames via DevTools observer',
+          );
+        }
+
         report['passed'] =
             report['completedMeasurement'] == true &&
             report['returnedToIdleBaseline'] == true;

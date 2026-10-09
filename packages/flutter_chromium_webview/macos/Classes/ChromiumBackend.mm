@@ -394,7 +394,9 @@ void Core::Handle(FlutterMethodCall* call, FlutterResult result) {
         @"width": @(1024), 
         @"height": @(768),
         @"deviceScaleFactor": @(proxy->dpr_),
-        @"javascriptChannels": String(args, @"javascriptChannels", @"{}")
+        @"javascriptChannels": String(args, @"javascriptChannels", @"{}"),
+        @"mediaPlaybackRequiresUserGesture": args[@"mediaPlaybackRequiresUserGesture"] ?: @YES,
+        @"profileName": String(args, @"profileName", @"")
     };
     
     std::weak_ptr<int> alive = lifetime_;
@@ -442,8 +444,16 @@ void Core::Handle(FlutterMethodCall* call, FlutterResult result) {
   ((NSMutableDictionary*)msg.payload)[@"browserId"] = @(id);
   
   if ([method isEqualToString:@"setUserAgent"]) {
-      // not implemented in HostBrowserClient yet
-      result(nil); return;
+      NSString* agent = String(args, @"userAgent");
+      if (!agent || [agent lengthOfBytesUsingEncoding:NSUTF8StringEncoding] > 4096 ||
+          [agent rangeOfCharacterFromSet:[[NSCharacterSet characterSetWithRange:NSMakeRange(32, 95)] invertedSet]].location != NSNotFound) {
+          result(Error(@"INVALID_USER_AGENT", @"Expected printable ASCII user-agent within 4096 bytes")); return;
+      }
+      msg.type = "setUserAgent";
+      [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:^(const IPC::Message& response) {
+          result(response.type == "error" ? Error(@"SETTINGS_FAILED", response.payload[@"message"]) : nil);
+      }];
+      return;
   } else if ([method isEqualToString:@"loadRequest"]) {
     NSString* url = String(args, @"url");
     if (![url stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet].length) {
@@ -455,9 +465,14 @@ void Core::Handle(FlutterMethodCall* call, FlutterResult result) {
   } else if ([method isEqualToString:@"loadHtmlString"]) {
     NSString* html = String(args, @"html");
     NSString* baseUrl = String(args, @"baseUrl");
-    std::system((std::string("echo 'ChromiumBackend loadHtmlString: ") + baseUrl.UTF8String + "' >> /tmp/cef_host_url.txt").c_str());
-    if (!html) html = @"";
-    if (!baseUrl) baseUrl = @"about:blank";
+    NSURLComponents* url = baseUrl ? [NSURLComponents componentsWithString:baseUrl] : nil;
+    if (!html || !baseUrl || ![baseUrl isEqualToString:[baseUrl stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet]] ||
+        !([url.scheme isEqualToString:@"http"] || [url.scheme isEqualToString:@"https"]) ||
+        !url.host.length || url.user != nil || url.password != nil || url.fragment != nil ||
+        [html lengthOfBytesUsingEncoding:NSUTF8StringEncoding] > 4 * 1024 * 1024) {
+        result(Error(@"INVALID_HTML", @"Expected HTML up to 4 MiB and an HTTP(S) base URL without credentials or fragment"));
+        return;
+    }
     msg.type = "loadHtmlString";
     msg.payload = @{@"browserId": @(id), @"html": html, @"baseUrl": baseUrl};
     [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:nil];
@@ -512,10 +527,10 @@ void Core::Handle(FlutterMethodCall* call, FlutterResult result) {
     msg.type = "setFocus";
     msg.payload = @{@"browserId": @(id), @"focused": @(Number(args, @"focused") != 0)};
     [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:nil];
-  } else if ([method isEqualToString:@"closeJSDialog"]) {
-    // not implemented
-  } else if ([method isEqualToString:@"closeContextMenu"]) {
-    // not implemented
+  } else if ([method isEqualToString:@"closeJSDialog"] || [method isEqualToString:@"closeContextMenu"]) {
+    msg.type = [method UTF8String];
+    msg.payload = args;
+    [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:nil];
   } else if ([method isEqualToString:@"updateBrowserSize"]) {
     const double width = Number(args, @"width"), height = Number(args, @"height"), dpr = Number(args, @"dpr", 1);
     if (!std::isfinite(width) || !std::isfinite(height) || !std::isfinite(dpr) ||

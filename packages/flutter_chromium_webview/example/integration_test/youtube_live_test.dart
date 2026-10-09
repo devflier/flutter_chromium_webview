@@ -9,7 +9,12 @@ import 'package:flutter_chromium_webview/flutter_chromium_webview.dart';
 
 /// Opt-in external-service probe; failure is evidence, never an offline CI gate.
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isMacOS) {
+    // Manual pumps must finish even when macOS throttles a background window.
+    binding.framePolicy =
+        LiveTestWidgetsFlutterBindingFramePolicy.benchmarkLive;
+  }
   testWidgets('live YouTube readiness and playback progress', (tester) async {
     final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
     server.listen((request) async {
