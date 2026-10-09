@@ -504,6 +504,29 @@ void main() {
         }
         await subscription.cancel();
         await server.close(force: true);
+
+        final samplesList = report['samples'] as List;
+        if (samplesList.length > 2) {
+          int getRss(dynamic sample) => (sample['processes'] as List).fold<int>(
+            0,
+            (s, p) => s + (p['rssKiB'] as int),
+          );
+          final startRss = getRss(samplesList[1]);
+          final finalRss = getRss(samplesList.last);
+          report['rssGrowthKiB'] = finalRss - startRss;
+          expect(
+            report['rssGrowthKiB'],
+            lessThan(75000),
+            reason: 'RSS growth must stabilize and not leak',
+          );
+        }
+        expect(
+          report['droppedFramesMeasured'],
+          isTrue,
+          reason:
+              'Must successfully measure dropped frames via DevTools observer',
+        );
+
         report['passed'] =
             report['completedMeasurement'] == true &&
             report['returnedToIdleBaseline'] == true;

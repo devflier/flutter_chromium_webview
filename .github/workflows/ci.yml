@@ -208,7 +208,9 @@ jobs:
         if: always()
         with:
           name: macos-smoke-logs
-          path: docs/validation/macos-packaged-*.log
+          path: |
+            docs/validation/macos-packaged-*.log
+            docs/validation/allocation-profile.json
 
   publish_webview:
     name: Publish main package

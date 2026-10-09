@@ -18,7 +18,8 @@ flutter test test
 for suite in plugin_integration_test input_scaling_test native_ui_test javascript_bridge_test html_loading_test browser_settings_test youtube_adapter_test; do
   flutter test "integration_test/$suite.dart" -d macos --no-pub
 done
-flutter test "integration_test/allocation_profile_test.dart" -d macos --no-pub --dart-define=ALLOCATION_PROFILE=true --dart-define=SOAK_SECONDS=300
+mkdir -p ../docs/validation
+CEF_INPUT_TEST_USE_MOCK_KEYCHAIN=1 PROFILE_REPORT_PATH=../docs/validation/allocation-profile.json flutter test "integration_test/allocation_profile_test.dart" -d macos --no-pub --dart-define=ALLOCATION_PROFILE=true --dart-define=SOAK_SECONDS=300
 flutter build macos --release --no-pub
 
 # Compile the texture ownership regression against genuine Apple/Flutter SDKs.
