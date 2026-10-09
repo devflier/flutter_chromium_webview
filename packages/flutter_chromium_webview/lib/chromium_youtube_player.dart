@@ -529,7 +529,7 @@ window.onYouTubeIframeAPIReady=function(){
      }));
    }, 1000);
  },
- onStateChange:event=>{clearInterval(timer);send('StateChange',event.data);if(event.data===1)timer=setInterval(()=>send('VideoState',JSON.stringify({currentTime:player.getCurrentTime(),loadedFraction:player.getVideoLoadedFraction(),playlistIndex:player.getPlaylistIndex()})),250);},
+ onStateChange:event=>{clearInterval(timer);send('StateChange',event.data);if(event.data===1)timer=setInterval(()=>send('VideoState',JSON.stringify({currentTime:player.getCurrentTime(),loadedFraction:player.getVideoLoadedFraction(),playlistIndex:player.getPlaylistIndex?player.getPlaylistIndex():null})),250);},
  onError:event=>send('PlayerError',event.data),
  onPlaybackRateChange:event=>send('PlaybackRateChange',event.data),
  onPlaybackQualityChange:event=>send('PlaybackQualityChange',event.data),

@@ -33,6 +33,8 @@ window.YT={Player:class {
  getDuration(){return 120;}
  getVideoLoadedFraction(){return 0.5;}
  getVideoData(){return {video_id:this.video,title:'Fixture '+this.volume};}
+ getPlaylistIndex(){return 0;}
+ getPlaylist(){return [];}
  destroy(){}
 }};
 onYouTubeIframeAPIReady();
