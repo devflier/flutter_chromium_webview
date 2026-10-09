@@ -40,7 +40,9 @@ void main() {
   testWidgets('BrowserScreen widget test', (WidgetTester tester) async {
     await tester.pumpWidget(const MaterialApp(home: BrowserScreen()));
     await tester.pump();
-    debugPrint('Initial Widgets with LinearProgressIndicator: ${find.byType(LinearProgressIndicator).evaluate().length}');
+    debugPrint(
+      'Initial Widgets with LinearProgressIndicator: ${find.byType(LinearProgressIndicator).evaluate().length}',
+    );
     await tester.pumpAndSettle();
 
     // Verify AppBar
