@@ -44,7 +44,9 @@
           "exitCode": 0
         }
       ],
-      "profiledRendererPid": 14681
+      "profiledRendererPid": 14681,
+      "flutterExitCode": 0,
+      "completedUtc": "2026-10-09T15:12:39Z"
     }
   ]
 }
