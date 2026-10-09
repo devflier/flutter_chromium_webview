@@ -14,9 +14,9 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral
 
 SPEC CHECKSUMS:
-  flutter_chromium_webview: 233739f26ebc70afdc6e9383bc24372dafdd06ef
+  flutter_chromium_webview: de7700662e306a880525394e073fe5157fdc9063
   FlutterMacOS: d0db08ddef1a9af05a5ec4b724367152bb0500b1
 
-PODFILE CHECKSUM: f28eec317035c2596b11b1725405ddf10693a123
+PODFILE CHECKSUM: 77592bffad708e9d2d362fdd3091eb01cf808c94
 
 COCOAPODS: 1.16.2

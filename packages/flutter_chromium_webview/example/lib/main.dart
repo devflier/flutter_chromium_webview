@@ -90,6 +90,9 @@ class _BrowserScreenState extends State<BrowserScreen> {
   late ChromiumWebViewController _controller;
   final TextEditingController _urlController = TextEditingController();
   final FocusNode _urlFocusNode = FocusNode();
+
+  Timer? _periodicTimer;
+  Timer? _crashTimer;
   late final String _uiRouteName = 'cef-ui-${identityHashCode(this)}';
 
   @override
@@ -126,7 +129,7 @@ class _BrowserScreenState extends State<BrowserScreen> {
       }
     };
 
-    Timer.periodic(const Duration(seconds: 5), (timer) {
+    _periodicTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
       if (!mounted) {
         timer.cancel();
         return;
@@ -136,7 +139,7 @@ class _BrowserScreenState extends State<BrowserScreen> {
       );
     });
 
-    Future.delayed(const Duration(seconds: 3), () {
+    _crashTimer = Timer(const Duration(seconds: 3), () {
       if (mounted) {
         debugPrint('CRASH TEST CALLING loadRequest');
         _controller.loadRequest('chrome://crash');
@@ -283,6 +286,8 @@ class _BrowserScreenState extends State<BrowserScreen> {
 
   @override
   void dispose() {
+    _periodicTimer?.cancel();
+    _crashTimer?.cancel();
     _controller.dispose();
     _urlController.dispose();
     _urlFocusNode.dispose();

@@ -14,7 +14,7 @@ widget: it can be clipped, transformed, stacked and overlaid. Android renders
 through a native Flutter platform view with native touch and keyboard input.
 iOS evaluates JavaScript headlessly in the background.
 
-> Published version: **`0.3.0`**.
+> Published version: **`0.5.1`**.
 
 ## Platform support
 
@@ -31,7 +31,7 @@ iOS evaluates JavaScript headlessly in the background.
 
 ```yaml
 dependencies:
-  flutter_chromium_webview: ^0.2.1
+  flutter_chromium_webview: ^0.5.1
 ```
 
 ### Requirements (Linux)
@@ -106,7 +106,6 @@ flutter run -d linux
 
 ## Limitations
 
-- macOS is not supported yet.
 - Rendering uses the CPU (software compositing). GPU acceleration is disabled.
 - Standard CEF builds have no proprietary codecs (for example H.264).
 - Native drag and drop and IME candidate-window positioning are unfinished.

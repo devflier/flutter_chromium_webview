@@ -15,15 +15,19 @@ Pod::Spec.new do |s|
   s.frameworks = 'Cocoa', 'CoreVideo', 'IOSurface', 'Metal'
   s.libraries = 'c++'
   s.preserve_paths = 'cef/**/*', 'scripts/**/*', 'Helpers/**/*', 'Host/**/*', 'CMakeLists.txt', '../native/**/*'
-  s.vendored_libraries = 'cef/build/lib/libcef_dll_wrapper.a'
-  # CocoaPods skips prepare_command for development/path pods. See Podfile setup
-  # in MACOS.md; the example prepares explicitly before pod installation.
-  s.prepare_command = 'python3 scripts/prepare_cef.py'
+  # CocoaPods skips prepare_command for development/path pods.
+  # Using script_phases allows downloading and building during the Xcode build,
+  # and removing vendored_libraries prevents pod install from failing if the library is missing.
+  s.script_phase = {
+    :name => 'Prepare CEF Framework',
+    :script => 'python3 "${PODS_TARGET_SRCROOT}/scripts/prepare_cef.py" --arch ${ARCHS%% *}',
+    :execution_position => :before_compile,
+  }
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
     'CLANG_CXX_LANGUAGE_STANDARD' => 'c++20',
     'HEADER_SEARCH_PATHS' => '$(inherited) "${PODS_TARGET_SRCROOT}/cef/root"',
     'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) CEF_USE_SANDBOX',
-    'OTHER_LDFLAGS' => '$(inherited) -ObjC -framework "FlutterMacOS" -F"${PODS_TARGET_SRCROOT}/cef/root/Release"',
+    'OTHER_LDFLAGS' => '$(inherited) -ObjC -framework "FlutterMacOS" -F"${PODS_TARGET_SRCROOT}/cef/root/Release" -L"${PODS_TARGET_SRCROOT}/cef/build/lib" -lcef_dll_wrapper',
   }
 end

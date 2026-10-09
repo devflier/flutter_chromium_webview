@@ -1,0 +1,4 @@
+# Local monorepo development only. Not published (see .pubignore).
+dependency_overrides:
+  flutter_chromium_webview_platform_interface:
+    path: ../../packages/flutter_chromium_webview_platform_interface

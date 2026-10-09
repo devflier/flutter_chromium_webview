@@ -39,6 +39,8 @@ void main() {
 
   testWidgets('BrowserScreen widget test', (WidgetTester tester) async {
     await tester.pumpWidget(const MaterialApp(home: BrowserScreen()));
+    await tester.pump();
+    debugPrint('Initial Widgets with LinearProgressIndicator: ${find.byType(LinearProgressIndicator).evaluate().length}');
     await tester.pumpAndSettle();
 
     // Verify AppBar
@@ -72,6 +74,7 @@ void main() {
       'canGoForward': false,
     });
     await tester.pump();
+    await tester.pump();
     expect(find.byType(LinearProgressIndicator), findsOneWidget);
 
     // Simulate Loaded State and canGoBack
@@ -80,7 +83,7 @@ void main() {
       'canGoBack': true,
       'canGoForward': false,
     });
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(find.byType(LinearProgressIndicator), findsNothing);
 
     // Find back button
@@ -103,6 +106,9 @@ void main() {
       'failedUrl': 'https://bad.com',
     });
     await tester.pump();
+    await tester.pump();
     expect(find.textContaining('CONNECTION_REFUSED'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
   });
 }

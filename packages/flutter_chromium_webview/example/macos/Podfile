@@ -21,12 +21,7 @@ target 'Runner' do
     inherit! :search_paths
   end
 end
-
-# Development pods do not run prepare_command. Build before CocoaPods resolves
-# the vendored wrapper library, rather than during the Runner's link phase.
-cef_plugin = File.join(__dir__, 'Flutter/ephemeral/.symlinks/plugins/flutter_chromium_webview/macos')
 cef_arch = ENV.fetch('CHROMIUM_WEBVIEW_MACOS_ARCH') { `uname -m`.strip }
-raise 'CEF preparation failed' unless system('python3', File.join(cef_plugin, 'scripts/prepare_cef.py'), '--arch', cef_arch)
 
 post_install do |installer|
   installer.pods_project.targets.each do |target|

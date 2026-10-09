@@ -41,3 +41,5 @@ docs/validation/ppplayer-*.png
 docs/validation/ppplayer-*.md
 docs/validation/ppplayer-*.json
 packages/flutter_chromium_webview/macos/Host/ChromiumWebViewHost.app
+verification/
+verification/
