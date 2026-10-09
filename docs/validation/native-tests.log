@@ -1,7 +1,0 @@
-Test project /home/user/flutter_chromium_release_audit/packages/flutter_chromium_webview/example/build/linux/x64/release/plugins/flutter_chromium_webview
-    Start 1: flutter_chromium_webview_plugin_test
-1/1 Test #1: flutter_chromium_webview_plugin_test ...   Passed    0.05 sec
-
-100% tests passed, 0 tests failed out of 1
-
-Total Test time (real) =   0.05 sec

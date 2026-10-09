@@ -1,6 +1,0 @@
-00:00 +0: loading C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/plugin_integration_test.dart
-Building Windows application...                                    15.5s
-√ Built build\windows\x64\runner\Debug\flutter_chromium_webview_example.exe
-00:00 +0: native lifecycle, focus, and hot-restart session cleanup
-00:00 +1: (tearDownAll)
-00:00 +1: All tests passed!

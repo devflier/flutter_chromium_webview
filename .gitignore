@@ -34,12 +34,12 @@ cef-artifacts/
 pubspec.lock
 /coverage/
 
-# Logs generated during validation sessions (ppplayer investigation)
-docs/validation/ppplayer-*.log
-docs/validation/ppplayer-*.txt
-docs/validation/ppplayer-*.png
-docs/validation/ppplayer-*.md
-docs/validation/ppplayer-*.json
+# Logs generated during validation sessions
+docs/validation/*.log
+docs/validation/*.txt
+docs/validation/*.png
+docs/validation/*.json
+docs/validation/*.xml
 packages/flutter_chromium_webview/macos/Host/ChromiumWebViewHost.app
 verification/
 scratch/

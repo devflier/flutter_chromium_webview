@@ -1,7 +1,0 @@
-Starting: Intent { cmp=com.ppplayer.app/.MainActivity }
-Status: ok
-LaunchState: COLD
-Activity: com.ppplayer.app/.MainActivity
-TotalTime: 1592
-WaitTime: 1596
-Complete

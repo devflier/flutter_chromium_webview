@@ -1,6 +1,0 @@
-00:00 +0: loading /home/user/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/input_scaling_test.dart
-Building Linux application...                                   
-✓ Built build/linux/x64/debug/bundle/flutter_chromium_webview_example
-00:00 +0: native click, resize, and wheel coordinates at multiple DPRs
-00:04 +1: (tearDownAll)
-00:04 +1: All tests passed!

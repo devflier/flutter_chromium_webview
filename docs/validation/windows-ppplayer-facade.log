@@ -1,8 +1,0 @@
-00:00 +0: loading C:/Users/User/Projects/ppplayer_chromium_preview/test/core/playback/chromium_playback_engine_test.dart
-00:00 +0: maps playing, progress, buffering, pause and one end event
-00:00 +1: prepare preserves subsecond seek and volume scale
-00:00 +2: switching to local and playlist keeps fallback and ignores old video events
-00:00 +3: late old player error cannot corrupt new track
-00:00 +4: pause while readiness is pending cues rather than starts playback
-00:00 +5: stop invalidates an in-flight open and disposal rejects new work
-00:00 +6: All tests passed!

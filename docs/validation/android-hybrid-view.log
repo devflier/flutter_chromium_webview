@@ -1,7 +1,0 @@
-00:00 +0: loading C:/Users/User/Projects/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/android_backend_test.dart
-Running Gradle task 'assembleDebug'...                             14.6s
-√ Built build\app\outputs\flutter-apk\app-debug.apk
-Installing build\app\outputs\flutter-apk\app-debug.apk...          778ms
-00:00 +0: Android platform view attaches, detaches, navigates and closes
-00:03 +1: (tearDownAll)
-00:03 +1: All tests passed!

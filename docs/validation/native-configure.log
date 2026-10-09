@@ -1,7 +1,0 @@
--- Performing Test CMAKE_HAVE_LIBC_PTHREAD
--- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
--- Found Threads: TRUE
--- Could NOT find JNI (missing: JVM) 
--- Configuring done (0.7s)
--- Generating done (0.0s)
--- Build files have been written to: /home/user/flutter_chromium_release_audit/packages/flutter_chromium_webview/example/build/linux/x64/release

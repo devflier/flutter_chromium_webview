@@ -1,4 +1,0 @@
-[IMPORTANT:flutter/shell/platform/embedder/embedder_surface_gl_impeller.cc(126)] Using the Impeller rendering backend (OpenGLESSDF).
-[CEF] Initializing runtime
-[CEF] Initialization result: 1; exit code: 0
-[CEF] Shutdown complete
