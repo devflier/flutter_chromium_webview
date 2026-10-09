@@ -1,0 +1,34 @@
+Can't examine target process's malloc zone PartitionAlloc_0x120bc6ba0, so memory analysis will be incomplete or incorrect.
+Reason: failed to resolve canonical path for /Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Chromium Embedded Framework in dyld shared cache.
+
+Process:         ChromiumWebView Helper (Renderer) [14681]
+Path:            /Users/USER/*/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/ChromiumWebView Helper (Renderer).app/Contents/MacOS/ChromiumWebView Helper (Renderer)
+Load Address:    0x1025d0000
+Identifier:      com.example.ChromiumWebViewHost.cef-helper.renderer
+Version:         1.0 (1)
+Code Type:       ARM64
+Platform:        macOS
+Parent Process:  ChromiumWebViewHost [14671]
+Target Type:     live task
+
+Date/Time:       2026-10-09 12:07:40.396 -0300
+Launch Time:     2026-10-09 12:01:20.418 -0300
+OS Version:      macOS 27.0.1 (26A434)
+Report Version:  7
+Analysis Tool:   /usr/bin/leaks
+
+Physical footprint:         36.9M
+Physical footprint (peak):  37.3M
+Idle exit:                  untracked
+----
+
+leaks Report Version: 4.0
+Process 14681: 2083 nodes malloced for 281 KB
+Process 14681: 4 leaks for 96 total leaked bytes.
+
+    4 (96 bytes) << TOTAL >>
+      1 (32 bytes) ROOT LEAK: <Metaclass.data (metaclass_rw_v2_t) 0x75ad002140> [32]  metaclass for __NSXPCInterfaceProxy_XTFontRegistryProtocol
+      1 (32 bytes) ROOT LEAK: <Metaclass.data (metaclass_rw_v2_t) 0x75ad002320> [32]  metaclass for __NSXPCInterfaceProxy_XTFontRegistryClientProtocol
+      1 (16 bytes) ROOT LEAK: <Class.data (class_rw_v2_t) 0x7b420010a0> [16]  __NSXPCInterfaceProxy_XTFontRegistryProtocol
+      1 (16 bytes) ROOT LEAK: <Class.data (class_rw_v2_t) 0x7b42001190> [16]  __NSXPCInterfaceProxy_XTFontRegistryClientProtocol
+

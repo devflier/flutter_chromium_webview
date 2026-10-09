@@ -1,0 +1,547 @@
+{
+  "platform": "macos",
+  "timestamp": "2026-10-09T13:33:45.203468Z",
+  "softwareGraphics": false,
+  "videoId": "M7lc1UVf-VE",
+  "renderMode": "attached-then-detached",
+  "events": [
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "MediaCapabilities": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36",
+        "vp9": "probably",
+        "av1": "probably",
+        "h264": "",
+        "aac": "",
+        "opus": "probably"
+      }
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "Ready": true
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "StateChange": -1
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "StateChange": 3
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "ApiChange": true
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "ApiChange": true
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "PlaybackQualityChange": "hd720"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "StateChange": 1
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":0.21334299809265136,\"loadedFraction\":0.014885451017779038,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "DebugHeartbeat": "{\"perfTimestamp\":2155.7000000029802,\"state\":1,\"currentTime\":0.2743431068115234,\"playlistIndex\":-1,\"hidden\":false,\"visibility\":\"visible\"}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":0.45598801525878907,\"loadedFraction\":0.014885451017779038,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":0.7137349847412109,\"loadedFraction\":0.014885451017779038,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":0.9629910667572021,\"loadedFraction\":0.014885451017779038,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":1.2119070343322753,\"loadedFraction\":0.014885451017779038,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "DebugHeartbeat": "{\"perfTimestamp\":3155.4000000059605,\"state\":1,\"currentTime\":1.2739070705718993,\"playlistIndex\":-1,\"hidden\":false,\"visibility\":\"visible\"}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":1.4635099599456787,\"loadedFraction\":0.014885451017779038,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":1.710273114440918,\"loadedFraction\":0.014885451017779038,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":1.96127304196167,\"loadedFraction\":0.014885451017779038,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":2.212733937057495,\"loadedFraction\":0.014885451017779038,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "DebugHeartbeat": "{\"perfTimestamp\":4155.20000000298,\"state\":1,\"currentTime\":2.2740331068115234,\"playlistIndex\":-1,\"hidden\":false,\"visibility\":\"visible\"}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":2.4630329980926513,\"loadedFraction\":0.014885451017779038,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":2.7127608931884764,\"loadedFraction\":0.014885451017779038,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":2.961848057220459,\"loadedFraction\":0.014885451017779038,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":3.213490066757202,\"loadedFraction\":0.014885451017779038,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "DebugHeartbeat": "{\"perfTimestamp\":5155.70000000298,\"state\":1,\"currentTime\":3.2744901754760742,\"playlistIndex\":-1,\"hidden\":false,\"visibility\":\"visible\"}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":3.462597961853027,\"loadedFraction\":0.014885451017779038,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":3.7119801049041747,\"loadedFraction\":0.014885451017779038,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":3.963524062942505,\"loadedFraction\":0.014885451017779038,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":4.214013102996826,\"loadedFraction\":0.014885451017779038,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "DebugHeartbeat": "{\"perfTimestamp\":6154.9000000059605,\"state\":1,\"currentTime\":4.274013045776367,\"playlistIndex\":-1,\"hidden\":false,\"visibility\":\"visible\"}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":4.463399070571899,\"loadedFraction\":0.014885451017779038,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":4.712814893188477,\"loadedFraction\":0.014885451017779038,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":4.963396984741211,\"loadedFraction\":0.014885451017779038,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":5.212541066757202,\"loadedFraction\":0.014885451017779038,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "DebugHeartbeat": "{\"perfTimestamp\":7155.70000000298,\"state\":1,\"currentTime\":5.273541175476074,\"playlistIndex\":-1,\"hidden\":false,\"visibility\":\"visible\"}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":5.4628099618530275,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":5.711191177383423,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":5.962130135421753,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":6.213130062942505,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "DebugHeartbeat": "{\"perfTimestamp\":8155.9000000059605,\"state\":1,\"currentTime\":6.274582211715698,\"playlistIndex\":-1,\"hidden\":false,\"visibility\":\"visible\"}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":6.463582102996826,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":6.713092070571899,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":6.963697059127807,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":7.212330057220459,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "DebugHeartbeat": "{\"perfTimestamp\":9155.10000000894,\"state\":1,\"currentTime\":7.274330093460083,\"playlistIndex\":-1,\"hidden\":false,\"visibility\":\"visible\"}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":7.463429066757202,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":7.71354488937378,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":7.9632960324249265,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":8.212385135421753,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "DebugHeartbeat": "{\"perfTimestamp\":10155.60000000894,\"state\":1,\"currentTime\":8.274385171661377,\"playlistIndex\":-1,\"hidden\":false,\"visibility\":\"visible\"}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":8.463610937057496,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":8.7125990705719,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":8.962492131607055,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":9.213565912261963,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "DebugHeartbeat": "{\"perfTimestamp\":11154.800000011921,\"state\":1,\"currentTime\":9.273565855041504,\"playlistIndex\":-1,\"hidden\":false,\"visibility\":\"visible\"}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":9.463613994277955,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":9.71315888937378,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":9.962258104904175,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":10.212240135421753,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "DebugHeartbeat": "{\"perfTimestamp\":12155.800000011921,\"state\":1,\"currentTime\":10.274240171661377,\"playlistIndex\":-1,\"hidden\":false,\"visibility\":\"visible\"}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":10.463240062942505,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":10.712206009536743,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":10.9621540705719,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":11.211871965667724,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "DebugHeartbeat": "{\"perfTimestamp\":13154.90000000596,\"state\":1,\"currentTime\":11.273286927520752,\"playlistIndex\":-1,\"hidden\":false,\"visibility\":\"visible\"}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":11.463286984741211,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":11.712765066757202,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":11.96302888937378,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":12.213679032424928,\"loadedFraction\":0.024361303185848216,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "DebugHeartbeat": "{\"perfTimestamp\":14155.800000011921,\"state\":1,\"currentTime\":12.2746791411438,\"playlistIndex\":-1,\"hidden\":false,\"visibility\":\"visible\"}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":12.463469990463256,\"loadedFraction\":0.025973812591122313,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":12.712268009536743,\"loadedFraction\":0.033292127255312165,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":12.962548998092652,\"loadedFraction\":0.033292127255312165,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":13.212803893188477,\"loadedFraction\":0.033292127255312165,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "DebugHeartbeat": "{\"perfTimestamp\":15154.90000000596,\"state\":1,\"currentTime\":13.272803835968018,\"playlistIndex\":-1,\"hidden\":false,\"visibility\":\"visible\"}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":13.463807912261963,\"loadedFraction\":0.033292127255312165,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":13.713236066757203,\"loadedFraction\":0.033292127255312165,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "StateChange": 2
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "DebugHeartbeat": "{\"perfTimestamp\":16155.70000000298,\"state\":2,\"currentTime\":13.78676,\"playlistIndex\":-1,\"hidden\":false,\"visibility\":\"visible\"}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "DebugHeartbeat": "{\"perfTimestamp\":17156.30000001192,\"state\":2,\"currentTime\":13.78676,\"playlistIndex\":-1,\"hidden\":false,\"visibility\":\"visible\"}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "DebugHeartbeat": "{\"perfTimestamp\":18155.30000001192,\"state\":2,\"currentTime\":10,\"playlistIndex\":-1,\"hidden\":false,\"visibility\":\"visible\"}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "StateChange": 3
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "StateChange": 1
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":10.438327948501588,\"loadedFraction\":0.033292127255312165,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "DebugHeartbeat": "{\"perfTimestamp\":19155.5,\"state\":1,\"currentTime\":10.625357211715698,\"playlistIndex\":-1,\"hidden\":false,\"visibility\":\"visible\"}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":10.688357175476074,\"loadedFraction\":0.033292127255312165,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":10.93702883215332,\"loadedFraction\":0.033292127255312165,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":11.187541799728393,\"loadedFraction\":0.033292127255312165,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":11.437443891281127,\"loadedFraction\":0.033292127255312165,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "DebugHeartbeat": "{\"perfTimestamp\":20156,\"state\":1,\"currentTime\":11.626354102996826,\"playlistIndex\":-1,\"hidden\":false,\"visibility\":\"visible\"}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":11.68735397329712,\"loadedFraction\":0.033292127255312165,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":11.937320868392945,\"loadedFraction\":0.033292127255312165,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":12.187308177383423,\"loadedFraction\":0.033292127255312165,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":12.437450969482422,\"loadedFraction\":0.033292127255312165,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "DebugHeartbeat": "{\"perfTimestamp\":21155.40000000596,\"state\":1,\"currentTime\":12.624940118255616,\"playlistIndex\":-1,\"hidden\":false,\"visibility\":\"visible\"}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":12.68693991607666,\"loadedFraction\":0.033292127255312165,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":12.936049977111816,\"loadedFraction\":0.033292127255312165,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "VideoState": "{\"currentTime\":13.188176965667724,\"loadedFraction\":0.033292127255312165,\"playlistIndex\":-1}"
+    },
+    {
+      "playerId": "Youtube1",
+      "generation": 1,
+      "StateChange": 2
+    }
+  ],
+  "ready": true,
+  "currentTime": 13.677236053405762,
+  "playerError": null,
+  "state": 1,
+  "pausedDelta": 0.0,
+  "seekPosition": 10.0,
+  "volume": 35.0,
+  "widgetDetachProgress": 2.1486349294281,
+  "duration": 1343.661,
+  "videoData": {
+    "video_id": "M7lc1UVf-VE",
+    "author": "Google for Developers",
+    "title": "YouTube Developers Live: Embedded Web Player Customization",
+    "isPlayable": true,
+    "errorCode": null,
+    "video_quality": "hd720",
+    "video_quality_features": [],
+    "backgroundable": false,
+    "eventId": "PO3IatrJIOb6-LAPpvqF2A0",
+    "cpn": "pCoVBFap_dpXbpUn",
+    "isLive": false,
+    "isWindowedLive": false,
+    "isManifestless": false,
+    "allowLiveDvr": false,
+    "isListed": true,
+    "isMultiChannelAudio": false,
+    "hasProgressBarBoundaries": false,
+    "isPremiere": false,
+    "itct": "CAAQu2kiEwja18Ovhq2XAxVmPR4AHSZ9AdvKAQQ6aaVq",
+    "playerResponseCpn": "",
+    "progressBarStartPositionUtcTimeMillis": null,
+    "progressBarEndPositionUtcTimeMillis": null,
+    "paidContentOverlayDurationMs": 0,
+    "isSeekable": null
+  },
+  "passed": true
+}

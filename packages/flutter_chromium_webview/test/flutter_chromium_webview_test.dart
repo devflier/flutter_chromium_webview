@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_chromium_webview/flutter_chromium_webview.dart';
 
@@ -249,5 +250,75 @@ void main() {
     expect(lastRequest!.targetDisposition, 1);
     expect(lastRequest!.userGesture, true);
     expect(lastRequest!.sourceBrowserId, 1);
+  });
+
+  testWidgets('Generation change forces resize and focus despite reused IDs', (tester) async {
+    ChromiumWebViewController.resetTestingState();
+    
+    int mockedTextureId = 123;
+    int mockedBrowserId = 1;
+    int createCalls = 0;
+    final log = <MethodCall>[];
+    
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+          const MethodChannel('flutter_chromium_webview'),
+          (MethodCall methodCall) async {
+            log.add(methodCall);
+            if (methodCall.method == 'createBrowser') {
+              createCalls++;
+              return {
+                'browserId': mockedBrowserId,
+                'textureId': mockedTextureId,
+                'popupTextureId': -1,
+              };
+            }
+            if (methodCall.method == 'disposeBrowser') {
+              return null;
+            }
+            return null;
+          },
+        );
+
+    final controller = ChromiumWebViewController();
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: ChromiumWebView(
+          controller: controller,
+          disposeController: false,
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+    
+    expect(createCalls, 1);
+    expect(controller.browserGeneration, 1);
+
+    int initialResizeCalls = log.where((m) => m.method == 'updateBrowserSize').length;
+    int initialFocusCalls = log.where((m) => m.method == 'setFocus').length;
+    
+    expect(initialResizeCalls, 1);
+    expect(initialFocusCalls, greaterThanOrEqualTo(1));
+    
+    // Clear log for next phase
+    log.clear();
+
+    // Simulate complete native recreation with IDENTICAL identifiers
+    await sendNativeEvent(mockedBrowserId, 'browserCrash', {});
+    await tester.pumpAndSettle();
+    
+    expect(createCalls, 2);
+    expect(controller.browserGeneration, 2);
+    expect(controller.browserId, mockedBrowserId);
+    expect(controller.textureId, mockedTextureId);
+
+    // The widget should force a new resize and focus call despite constraints and IDs being identical
+    int finalResizeCalls = log.where((m) => m.method == 'updateBrowserSize').length;
+    int finalFocusCalls = log.where((m) => m.method == 'setFocus').length;
+    
+    expect(finalResizeCalls, 1);
+    expect(finalFocusCalls, greaterThanOrEqualTo(1));
   });
 }

@@ -7,6 +7,7 @@ import 'input_test_page.dart';
 import 'popup_test_page.dart';
 import 'browser_ui_routes.dart';
 import 'youtube_test_page.dart';
+import 'stress_test_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -125,6 +126,12 @@ class _BrowserScreenState extends State<BrowserScreen> {
         return;
       }
       _controller.executeJavaScript("window.chromiumPostMessage('TestChannel', 'Hello from JS bridge loop!');");
+    });
+    
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        print('CRASH TEST CALLING loadRequest');_controller.loadRequest('chrome://crash');
+      }
     });
 
     _controller.onLoadError = (errorCode, errorText, failedUrl) {
@@ -346,6 +353,15 @@ class _BrowserScreenState extends State<BrowserScreen> {
                             builder: (_) => const YoutubeTestPage(),
                           ),
                         );
+                      } else if (page == 'stress') {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (_) => const StressTestPage(),
+                          ),
+                        );
+                      } else if (page == 'crash') {
+                        print('CRASH TEST CALLING loadRequest');_controller.loadRequest('chrome://crash');
                       } else {
                         _controller.loadRequest(
                           page == 'input' ? inputTestUrl : popupTestUrl,
@@ -358,6 +374,14 @@ class _BrowserScreenState extends State<BrowserScreen> {
                       PopupMenuItem(
                         value: 'youtube',
                         child: Text('YouTube test'),
+                      ),
+                      PopupMenuItem(
+                        value: 'stress',
+                        child: Text('Stress test'),
+                      ),
+                      PopupMenuItem(
+                        value: 'crash',
+                        child: Text('Crash test'),
                       ),
                     ],
                   ),

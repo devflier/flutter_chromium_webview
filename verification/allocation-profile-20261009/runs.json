@@ -1,0 +1,50 @@
+{
+  "runs": [
+    {
+      "workload": "static",
+      "label": "static",
+      "startedUtc": "2026-10-09T15:00:50Z",
+      "profilers": [
+        {
+          "template": "Allocations",
+          "pid": 14681,
+          "startedUtc": "2026-10-09T15:03:22Z",
+          "trace": "static-allocations.trace",
+          "log": "static-allocations.log",
+          "requestedSeconds": 60,
+          "exitCode": 0
+        },
+        {
+          "template": "Leaks",
+          "pid": 14681,
+          "startedUtc": "2026-10-09T15:05:22Z",
+          "trace": "static-leaks.trace",
+          "log": "static-leaks.log",
+          "requestedSeconds": 30,
+          "exitCode": 0
+        }
+      ],
+      "vmmap": [
+        {
+          "elapsedSeconds": 120.386,
+          "pid": 14681,
+          "file": "static-vmmap-120s.txt",
+          "exitCode": 0
+        },
+        {
+          "elapsedSeconds": 300.942,
+          "pid": 14681,
+          "file": "static-vmmap-300s.txt",
+          "exitCode": 0
+        },
+        {
+          "elapsedSeconds": 570.526,
+          "pid": 14681,
+          "file": "static-vmmap-550s.txt",
+          "exitCode": 0
+        }
+      ],
+      "profiledRendererPid": 14681
+    }
+  ]
+}

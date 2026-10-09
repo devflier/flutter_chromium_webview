@@ -33,3 +33,5 @@ namespace IPC {
         bool isPopup;
     } SurfacePortMessage;
 }
+
+#include "ResourceCounters.h"

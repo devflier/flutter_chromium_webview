@@ -51,6 +51,7 @@
     }
     
     _isConnected = YES;
+    g_counters.activeIpcConnections++;
     _readSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, _fd, 0, _ioQueue);
     dispatch_source_set_event_handler(_readSource, ^{
         [self handleRead];
@@ -84,11 +85,13 @@
         localMessage.requestId = self->_nextRequestId++;
         if (callback) {
             self->_pendingRequests[@(localMessage.requestId)] = [callback copy];
+            g_counters.pendingIpcRequests++;
             uint64_t requestId = localMessage.requestId;
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, timeout * NSEC_PER_SEC), self->_ioQueue, ^{
                 IpcResponseCallback pending = self->_pendingRequests[@(requestId)];
                 if (!pending) return;
                 [self->_pendingRequests removeObjectForKey:@(requestId)];
+                g_counters.pendingIpcRequests--;
                 IPC::Message error;
                 error.type = "error";
                 error.requestId = requestId;
@@ -138,6 +141,7 @@
                 IpcResponseCallback callback = self->_pendingRequests[@(msg.requestId)];
                 if (callback) {
                     [self->_pendingRequests removeObjectForKey:@(msg.requestId)];
+                    g_counters.pendingIpcRequests--;
                     dispatch_async(dispatch_get_main_queue(), ^{
                         callback(msg);
                     });
@@ -159,6 +163,7 @@
 - (void)disconnectInternal {
     if (!_isConnected) return;
     _isConnected = NO;
+    g_counters.activeIpcConnections--;
     if (_readSource) {
         dispatch_source_cancel(_readSource);
         _readSource = nil;
@@ -166,6 +171,7 @@
     
     // Fail pending
     NSDictionary* pending = [_pendingRequests copy];
+    g_counters.pendingIpcRequests -= static_cast<int>(_pendingRequests.count);
     [_pendingRequests removeAllObjects];
     
     dispatch_async(dispatch_get_main_queue(), ^{

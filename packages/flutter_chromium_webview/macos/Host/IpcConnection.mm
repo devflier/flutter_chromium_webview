@@ -22,6 +22,7 @@
         setsockopt(_fd, SOL_SOCKET, SO_NOSIGPIPE, &noSigPipe, sizeof(noSigPipe));
         _ioQueue = dispatch_queue_create("com.ppplayer.ipc.connection", DISPATCH_QUEUE_SERIAL);
         _readBuffer = [NSMutableData data];
+        g_counters.activeIpcConnections++;
     }
     return self;
 }
@@ -43,6 +44,7 @@
     dispatch_async(_ioQueue, ^{
         if (self->_isStopped) return;
         self->_isStopped = YES;
+        g_counters.activeIpcConnections--;
         if (self->_readSource) {
             dispatch_source_cancel(self->_readSource);
             self->_readSource = nil;

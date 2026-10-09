@@ -46,6 +46,18 @@ int main(int argc, char* argv[]) {
         CefRefPtr<ChromiumHostApp> app(new ChromiumHostApp(socketPath, expectedToken, parentPid));
 
         CefSettings settings;
+#if DEBUG
+        // Opt-in local diagnostics for allocation and video-quality profiling.
+        NSString* diagnosticPort = [[[NSProcessInfo processInfo] environment]
+            objectForKey:@"CEF_PROFILE_DEBUG_PORT"];
+        if (diagnosticPort.length > 0) {
+            NSScanner* scanner = [NSScanner scannerWithString:diagnosticPort];
+            int port = 0;
+            if ([scanner scanInt:&port] && scanner.isAtEnd && port >= 1024 && port <= 65535) {
+                settings.remote_debugging_port = port;
+            }
+        }
+#endif
         
         // Ensure we have the path to ChromiumWebViewHost.app, not the parent flutter app
         NSString* exePath = [[NSProcessInfo processInfo] arguments][0];

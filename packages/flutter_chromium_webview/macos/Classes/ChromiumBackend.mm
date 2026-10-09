@@ -37,6 +37,7 @@ static inline FlutterError* Error(NSString* code, NSString* message) {
 }
 @end
 
+
 namespace chromium_macos {
 
 class BrowserProxy {
@@ -129,27 +130,33 @@ static mach_port_t g_surface_receive_port = MACH_PORT_NULL;
 
 static void StartSurfacePortListener() {
     if (g_surface_receive_port != MACH_PORT_NULL) return;
-    mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &g_surface_receive_port);
-    mach_port_insert_right(mach_task_self(), g_surface_receive_port, g_surface_receive_port, MACH_MSG_TYPE_MAKE_SEND);
+    if (mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_RECEIVE, &g_surface_receive_port) != KERN_SUCCESS) return;
+    g_counters.activeMachReceiveRights++;
+    if (mach_port_insert_right(mach_task_self(), g_surface_receive_port, g_surface_receive_port, MACH_MSG_TYPE_MAKE_SEND) == KERN_SUCCESS)
+        g_counters.activeMachSendRights++;
     NSString *portName = [NSString stringWithFormat:@"dev.flier.chromiumwebview.surface.ipc.%d", getpid()];
     bootstrap_register(bootstrap_port, (char*)portName.UTF8String, g_surface_receive_port);
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         while (true) {
-            IPC::SurfacePortMessage msg = {0};
+            struct { IPC::SurfacePortMessage message; unsigned char trailer[MAX_TRAILER_SIZE]; } received = {};
+            auto& msg = received.message;
             // mach_msg needs enough space for the message + trailer
             msg.header.msgh_size = sizeof(msg);
-            kern_return_t kr = mach_msg(&msg.header, MACH_RCV_MSG, 0, sizeof(msg) + MAX_TRAILER_SIZE, g_surface_receive_port, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
+            kern_return_t kr = mach_msg(&msg.header, MACH_RCV_MSG, 0, sizeof(received), g_surface_receive_port, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
             if (kr == KERN_SUCCESS) {
                 mach_port_t surface_port = msg.port_desc.name;
                 uint64_t browserId = msg.browserId;
                 uint32_t width = msg.width;
                 uint32_t height = msg.height;
                 uint32_t slot = msg.surfaceSlot;
+                uint32_t generation = msg.generation;
                 bool isPopup = msg.isPopup;
                 
+                g_counters.activeMachSendRights++;
                 IOSurfaceRef surface = IOSurfaceLookupFromMachPort(surface_port);
                 mach_port_deallocate(mach_task_self(), surface_port);
+                g_counters.activeMachSendRights--;
                 
                 if (!surface) {
                     NSLog(@"[ChromiumBackend] Failed to lookup IOSurface from mach port");
@@ -161,7 +168,7 @@ static void StartSurfacePortListener() {
                     for (auto* core : cores) {
                         auto found = core->browsers_.find(browserId);
                         if (found != core->browsers_.end()) {
-                            found->second->OnSurfaceCreated(surface, slot, width, height, msg.generation, isPopup);
+                            found->second->OnSurfaceCreated(surface, slot, width, height, generation, isPopup);
                             return;
                         }
                     }
@@ -254,7 +261,7 @@ void Core::Detach() {
 }
 
 void Core::CloseAll(std::function<void()> done) {
-  NSLog(@"[Core] OnHostDisconnected, browsers count: %zu", browsers_.size()); [input_ setBrowserId:-1];
+  [input_ setBrowserId:-1];
   auto browsers = std::move(browsers_); browsers_.clear();
   if (browsers.empty()) { if (done) done(); return; }
   auto count = std::make_shared<size_t>(browsers.size());
@@ -294,7 +301,7 @@ void Core::OnHostMessage(const std::string& type, int64_t browserId, NSDictionar
 }
 
 void Core::OnHostDisconnected() {
-    NSLog(@"[Core] OnHostDisconnected, browsers count: %zu", browsers_.size()); [input_ setBrowserId:-1];
+    [input_ setBrowserId:-1];
     for (auto const& entry : browsers_) {
         [channel_ invokeMethod:@"browserCrash" arguments:@{@"browserId": @(entry.first)}];
     }
@@ -310,6 +317,40 @@ void Core::Handle(FlutterMethodCall* call, FlutterResult result) {
     result([@"macOS " stringByAppendingString:NSProcessInfo.processInfo.operatingSystemVersionString]); return;
   }
   if (detached_) { result(Error(@"DETACHED", @"Flutter view detached")); return; }
+#if DEBUG
+  if ([method isEqualToString:@"debugSoakWindow"]) {
+    NSWindow* window = view_.window;
+    if (!window) { result(Error(@"NO_VIEW", @"A Flutter window is required")); return; }
+    if ([String(args, @"action") isEqualToString:@"toggleFullscreen"]) [window toggleFullScreen:nil];
+    result(@{@"fullscreen": @((window.styleMask & NSWindowStyleMaskFullScreen) != 0)});
+    return;
+  }
+  if ([method isEqualToString:@"getRenderDiagnostics"]) {
+    IPC::Message request;
+    request.type = "getRenderDiagnostics";
+    request.payload = args;
+    [[ChromiumHostManager sharedManager].ipcClient sendMessage:request responseCallback:^(const IPC::Message& response) {
+      if (response.type != "renderDiagnostics") {
+        result(Error(@"DIAGNOSTICS_UNAVAILABLE", @"A Debug host with render diagnostics is required")); return;
+      }
+      result(response.payload);
+    }];
+    return;
+  }
+  if ([method isEqualToString:@"getResourceCounters"]) {
+    NSDictionary* client = g_counters.snapshot();
+    IPC::Message request;
+    request.type = "getResourceCounters";
+    [[ChromiumHostManager sharedManager].ipcClient sendMessage:request responseCallback:^(const IPC::Message& response) {
+      if (response.type != "resourceCounters") {
+        result(Error(@"DIAGNOSTICS_UNAVAILABLE", @"A Debug host with resource counters is required"));
+        return;
+      }
+      result(@{@"client": client, @"host": response.payload});
+    }];
+    return;
+  }
+#endif
   if ([method isEqualToString:@"getDiagnostics"]) {
     result(@{@"browsers": @(runtime.browser_count), @"textures": @(browsers_.size()),
       @"pumpRunning": @(runtime.PumpRunning()), @"focused": @([input_ focused])}); return;
@@ -384,7 +425,7 @@ void Core::Handle(FlutterMethodCall* call, FlutterResult result) {
   if ([method isEqualToString:@"disposeBrowser"]) {
     if (found == browsers_.end()) { result(nil); return; }
     auto proxy = found->second;
-    if ([input_ ownsBrowserId:id]) NSLog(@"[Core] OnHostDisconnected, browsers count: %zu", browsers_.size()); [input_ setBrowserId:-1];
+    if ([input_ ownsBrowserId:id]) [input_ setBrowserId:-1];
     browsers_.erase(found);
     std::weak_ptr<int> alive = lifetime_;
     proxy->Close([result, alive] { if (!alive.expired()) result(nil); }); return;
@@ -464,7 +505,7 @@ void Core::Handle(FlutterMethodCall* call, FlutterResult result) {
     if (Number(args, @"focused")) {
         [input_ setBrowserId:id];
     } else if ([input_ ownsBrowserId:id]) {
-        NSLog(@"[Core] OnHostDisconnected, browsers count: %zu", browsers_.size());
+        NSLog(@"[Core] WebView lost focus (browserId: %lld)", id);
         [input_ setBrowserId:-1];
     }
     

@@ -1,0 +1,36 @@
+Can't examine target process's malloc zone PartitionAlloc_0x120dd6ba0, so memory analysis will be incomplete or incorrect.
+Reason: failed to resolve canonical path for /Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Chromium Embedded Framework in dyld shared cache.
+
+Process:         ChromiumWebView Helper (Renderer) [12468]
+Path:            /Users/USER/*/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/ChromiumWebView Helper (Renderer).app/Contents/MacOS/ChromiumWebView Helper (Renderer)
+Load Address:    0x102928000
+Identifier:      com.example.ChromiumWebViewHost.cef-helper.renderer
+Version:         1.0 (1)
+Code Type:       ARM64
+Platform:        macOS
+Parent Process:  ChromiumWebViewHost [12459]
+Target Type:     live task
+
+Date/Time:       2026-10-09 11:44:02.230 -0300
+Launch Time:     2026-10-09 11:37:57.490 -0300
+OS Version:      macOS 27.0.1 (26A434)
+Report Version:  7
+Analysis Tool:   /usr/bin/leaks
+
+Physical footprint:         126.5M
+Physical footprint (peak):  129.6M
+Idle exit:                  untracked
+----
+
+leaks Report Version: 4.0
+Process 12468: 2142 nodes malloced for 278 KB
+Process 12468: 6 leaks for 144 total leaked bytes.
+
+    6 (144 bytes) << TOTAL >>
+      1 (32 bytes) ROOT LEAK: <Metaclass.data (metaclass_rw_v2_t) 0x7c170020a0> [32]  metaclass for __NSXPCInterfaceProxy_XTFontRegistryProtocol
+      1 (32 bytes) ROOT LEAK: <Metaclass.data (metaclass_rw_v2_t) 0x7c17002300> [32]  metaclass for __NSXPCInterfaceProxy_XTFontRegistryClientProtocol
+      1 (32 bytes) ROOT LEAK: <Metaclass.data (metaclass_rw_v2_t) 0x7c17002b00> [32]  metaclass for __NSXPCInterfaceProxy__LSDReadProtocol
+      1 (16 bytes) ROOT LEAK: <Class.data (class_rw_v2_t) 0x76ce001050> [16]  __NSXPCInterfaceProxy_XTFontRegistryProtocol
+      1 (16 bytes) ROOT LEAK: <Class.data (class_rw_v2_t) 0x76ce001180> [16]  __NSXPCInterfaceProxy_XTFontRegistryClientProtocol
+      1 (16 bytes) ROOT LEAK: <Class.data (class_rw_v2_t) 0x76ce001580> [16]  __NSXPCInterfaceProxy__LSDReadProtocol
+

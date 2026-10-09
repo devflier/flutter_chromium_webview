@@ -1,0 +1,37 @@
+00:00 +0: loading /Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/allocation_profile_test.dart
+The following plugins do not support Swift Package Manager for macos:
+  - flutter_chromium_webview
+This will become an error in a future version of Flutter. Please contact the plugin maintainers to request Swift Package Manager adoption.
+Plugin flutter_chromium_webview does not have Swift Package Manager support for macos. Consider adding Swift Package Manager compatibility to your plugin. See https://docs.flutter.dev/packages-and-plugins/swift-package-manager/for-plugin-authors for more information.
+Building macOS application...                                   
+✓ Built build/macos/Build/Products/Debug/flutter_chromium_webview_example.app
+Failed to foreground app; open returned 1
+00:00 +0: renderer allocation workload
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following JavaScriptException was thrown running a test:
+JavaScriptException(context_unavailable): Wait for the main document to load
+
+When the exception was thrown, this was the stack:
+#0      main.<anonymous closure>.finish (file:///Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/allocation_profile_test.dart:123:30)
+<asynchronous suspension>
+#1      main.<anonymous closure> (file:///Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/allocation_profile_test.dart:405:23)
+<asynchronous suspension>
+#2      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#3      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+The test description was:
+  renderer allocation workload
+════════════════════════════════════════════════════════════════════════════════════════════════════
+01:06 +0 -1: renderer allocation workload [E]
+  Test failed. See exception logs above.
+  The test description was: renderer allocation workload
+  
+01:06 +0 -1: (tearDownAll)
+01:06 +0 -1: Some tests failed.
+
+Failing tests:
+  /Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/integration_test/allocation_profile_test.dart: renderer allocation workload

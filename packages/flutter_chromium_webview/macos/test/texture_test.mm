@@ -1,9 +1,42 @@
 #import "../Classes/ChromiumTexture.h"
 #include <cassert>
+#import "../Classes/Protocol.h"
 #include <thread>
 
 int main() {
   @autoreleasepool {
+    ChromiumTexture* pooled = [[ChromiumTexture alloc] init];
+    auto surface = [] {
+      return IOSurfaceCreate((__bridge CFDictionaryRef)@{
+        (id)kIOSurfaceWidth: @2, (id)kIOSurfaceHeight: @2,
+        (id)kIOSurfaceBytesPerElement: @4,
+        (id)kIOSurfacePixelFormat: @(kCVPixelFormatType_32BGRA)});
+    };
+    for (uint32_t slot = 0; slot < 3; ++slot)
+      assert([pooled updateWithIOSurface:surface() slot:slot width:2 height:2 generation:1]);
+    [pooled selectSlot:0 generation:1];
+    CVPixelBufferRef oldLease = [pooled copyPixelBuffer];
+    assert(oldLease);
+    // A frame notification may precede the next Mach surface capability.
+    [pooled selectSlot:0 generation:2];
+    assert(![pooled copyPixelBuffer]);
+#if DEBUG
+    assert(g_counters.activeIOSurfaces.load() == 0);
+#endif
+    assert([pooled updateWithIOSurface:surface() slot:0 width:2 height:2 generation:2]);
+    assert(![pooled updateWithIOSurface:surface() slot:1 width:2 height:2 generation:1]);
+    CVPixelBufferRef newLease = [pooled copyPixelBuffer];
+    assert(newLease);
+    CVPixelBufferRelease(newLease);
+    // Invalid inputs also consume the transferred surface reference.
+    assert(![pooled updateWithIOSurface:surface() slot:3 width:2 height:2 generation:2]);
+    pooled = nil;
+    assert(CVPixelBufferGetWidth(oldLease) == 2);
+    CVPixelBufferRelease(oldLease);
+#if DEBUG
+    assert(g_counters.activeIOSurfaces.load() == 0);
+    assert(g_counters.activeFlutterTextures.load() == 0);
+#endif
     ChromiumTexture* texture = [[ChromiumTexture alloc] init];
     const uint8_t first[] = {1, 2, 3, 255};
     assert([texture updateBytes:first width:1 height:1]);

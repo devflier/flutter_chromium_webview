@@ -1,0 +1,63 @@
+<trace-toc>
+    <run number="1">
+        <info>
+            <target>
+                <device platform="macOS" model="MacBook Pro" memory-size="17179869184" name="Lucas’s MacBook Pro" os-version="27.0.1 (26A434)" uuid="933A4696-8527-5A7C-8957-280C14244A05" />
+                <process type="attached" return-exit-status="0" name="ChromiumWebView Helper (Renderer)" pid="12468" termination-reason="exit(0)" />
+                <environment /></target>
+            <summary>
+                <start-date>2026-10-09T11:40:11.716-03:00</start-date>
+                <end-date>2026-10-09T11:41:12.670-03:00</end-date>
+                <duration>60.954101</duration>
+                <end-reason>Time limit reached</end-reason>
+                <instruments-version>27.0 (27A266a)</instruments-version>
+                <template-name>Allocations</template-name>
+                <recording-mode>Deferred</recording-mode>
+                <time-limit>1 minute</time-limit>
+                <intruments-recording-settings>
+                    <instrument name="Allocations">
+                        <options>
+                            <option key="Record" value="Heap and VM allocations Identities of virtual C++ objects" />
+                            <option key="When stopping" value="Immediately discard unrecorded data" />
+                            <option key="Freed memory" value="Keep events" />
+                            <option key="Type Filters" value="Record all types" />
+                        </options>
+                    </instrument>
+                </intruments-recording-settings>
+            </summary>
+        </info>
+        <processes>
+            <process name="kernel" pid="0" path="/System/Library/Kernels/kernel.release.t6000" />
+            <process name="ChromiumWebView Helper (Renderer)" pid="12468" path="/Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/ChromiumWebView Helper (Renderer).app/Contents/MacOS/ChromiumWebView Helper (Renderer)" />
+        </processes>
+        <data>
+            <table schema="os-log" category="PointsOfInterest" target-pid="SINGLE" documentation="Holds a message from the OS's Unified Logging and Tracing component." />
+            <table schema="os-signpost-arg" category="PointsOfInterest" target-pid="SINGLE" documentation="Holds a signpost metadata argument from the OS's Unified Logging and Tracing component." />
+            <table schema="tick" frequency="10" documentation="Provides modelers with a regular reference time for modeling fixed time-based statistics. The ticks are evenly spaced with a configurable frequency specifying the number of events to generate per second, so a tick schema with a frequency of 10 will generate a row every 100ms." />
+            <table swift-table="&quot;PointsOfInterestEvents(excludeOSLogs: false, mustTargetAllProcesses: false)&quot;" schema="PointsOfInterestEvents" />
+            <table swift-table="&quot;OSSignpostIntervals(layoutScope: InstrumentsPlugIn.OSSignpostLayoutScope.name, categories: Set([\&quot;PointsOfInterest\&quot;]), mustTargetAllProcesses: false)&quot;" schema="OSSignpostIntervals" />
+            <table schema="dyld-library-load" target-pid="SINGLE" />
+            <table codes="&quot;0x1f,0x05&quot;" target="SINGLE" schema="kdebug-strings" documentation="Associates numeric arguments with strings in kdebug trace points." />
+            <table codes="&quot;0x07,0x00&quot; &quot;0x1f,0x05&quot;" target="SINGLE" schema="kdebug" documentation="Tracing the kernel and some system frameworks." />
+            <table schema="os-signpost" category="PointsOfInterest" target-pid="SINGLE" documentation="Holds a signpost event from the OS's Unified Logging and Tracing component." />
+            <table target-pid="SINGLE" dynamic-tracing-enabled-subsystems="&quot;com.apple.neappprivacy&quot;" category="PointsOfInterest" schema="os-signpost" documentation="Holds a signpost event from the OS's Unified Logging and Tracing component." />
+            <table schema="process-info" documentation="Associates processes with their process names." />
+            <table schema="os-signpost" subsystem="&quot;com.apple.StateReporting.Transition&quot; &quot;com.apple.StateReporting.Heartbeat&quot; &quot;com.apple.StateReporting.Volatile&quot;" target-pid="ALL" documentation="Holds a signpost event from the OS's Unified Logging and Tracing component." />
+            <table swift-table="&quot;StateReportingIntervals()&quot;" schema="StateReportingIntervals" documentation="Tracks named application states, volatile updates, and rate-limit windows reported via the State Reporting API, per process and domain" />
+            <table schema="thread-info" documentation="Associates threads with their owning process." />
+        </data>
+        <tracks>
+            <track name="Allocations">
+                <details>
+                    <detail name="Statistics" kind="table" />
+                    <detail name="Allocations List" kind="table" />
+                </details>
+            </track>
+            <track name="VM Tracker">
+                <details>
+                    <detail name="Regions Map" kind="table" />
+                </details>
+            </track>
+        </tracks>
+    </run>
+</trace-toc>

@@ -89,6 +89,7 @@ void SendSurfacePort(mach_port_t surface_port, uint32_t slot, int64_t browserId,
         return;
     }
 
+    g_counters.activeMachSendRights++;
     IPC::SurfacePortMessage msg = {0};
     msg.header.msgh_bits = MACH_MSGH_BITS(MACH_MSG_TYPE_COPY_SEND, 0) | MACH_MSGH_BITS_COMPLEX;
     msg.header.msgh_remote_port = server_port;
@@ -109,6 +110,7 @@ void SendSurfacePort(mach_port_t surface_port, uint32_t slot, int64_t browserId,
 
     mach_msg(&msg.header, MACH_SEND_MSG, sizeof(msg), 0, MACH_PORT_NULL, MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
     mach_port_deallocate(mach_task_self(), server_port);
+    g_counters.activeMachSendRights--;
 }
 
 struct FrameMetadata {
@@ -122,12 +124,30 @@ struct FrameMetadata {
     int32_t payloadSize;
 };
 
+#if DEBUG
+#import <objc/runtime.h>
+// The token follows the actual Metal object, including command-buffer retains.
+@interface ChromiumMetalResourceToken : NSObject
+@end
+@implementation ChromiumMetalResourceToken
+- (instancetype)init { self = [super init]; if (self) g_counters.activeMetalTextures++; return self; }
+- (void)dealloc { g_counters.activeMetalTextures--; }
+@end
+static void TrackMetalTexture(id texture) {
+    static char key;
+    if (texture) objc_setAssociatedObject(texture, &key, [[ChromiumMetalResourceToken alloc] init], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+#else
+static void TrackMetalTexture(id) {}
+#endif
+
 HostBrowserClient::HostBrowserClient(std::function<void(const IPC::Message&)> on_message) : on_message_(on_message) {
     id<MTLDevice> device = MTLCreateSystemDefaultDevice();
     metal_device_ = (__bridge_retained void*)device;
     if (device) {
         command_queue_ = (__bridge_retained void*)[device newCommandQueue];
     }
+
 }
 
 HostBrowserClient::~HostBrowserClient() {
@@ -139,15 +159,34 @@ HostBrowserClient::~HostBrowserClient() {
         id<MTLDevice> device = (__bridge_transfer id<MTLDevice>)metal_device_;
         device = nil;
     }
+    g_counters.activeBrowsers -= static_cast<int>(_sessions.size());
+    g_counters.pendingIpcRequests -= static_cast<int>(pending_js_.size());
     for (auto& pair : _sessions) {
         for (auto surface : pair.second.io_surfaces) {
-            if (surface) CFRelease(surface);
+            if (surface) { CFRelease(surface); g_counters.activeIOSurfaces--; }
         }
     }
 }
 
+#if DEBUG
+NSDictionary* HostBrowserClient::RenderDiagnostics(int64_t browserId) {
+    auto* session = GetSession(browserId);
+    if (!session) return @{@"hostPid": @(getpid()), @"browserPresent": @NO};
+    return @{@"hostPid": @(getpid()), @"browserPresent": @YES,
+        @"surfaceGeneration": @(session->generation),
+        @"frameSequence": @(session->frameSequence),
+        @"softwareFrames": @(session->softwareFrames),
+        @"acceleratedCallbacks": @(session->acceleratedFrames),
+        @"completedMetalFrames": @(session->completedMetalFrames),
+        @"failedMetalFrames": @(session->failedMetalFrames),
+        @"droppedFrames": NSNull.null};
+}
+#endif
+
 void HostBrowserClient::CreateBrowser(int64_t browser_id, const std::string& url, int width, int height, double scale_factor, uint64_t request_id, const std::string& javascriptChannels) {
     CEF_REQUIRE_UI_THREAD();
+    if (width <= 0) width = 1;
+    if (height <= 0) height = 1;
     NSLog(@"[CEFHost] CreateBrowser called for %lld, url: %s", browser_id, url.c_str());
     
     BrowserSession session;
@@ -163,6 +202,7 @@ void HostBrowserClient::CreateBrowser(int64_t browser_id, const std::string& url
     
 
     _sessions[browser_id] = session;
+    g_counters.activeBrowsers++;
 
     CefWindowInfo window_info;
     window_info.SetAsWindowless(0); // Using 0 for parent view
@@ -186,6 +226,7 @@ void HostBrowserClient::CreateBrowser(int64_t browser_id, const std::string& url
     auto& created = _sessions.at(browser_id);
     if (!browser) {
         _sessions.erase(browser_id);
+        g_counters.activeBrowsers--;
         IPC::Message error;
         error.type = "error";
         error.requestId = request_id;
@@ -211,10 +252,14 @@ void HostBrowserClient::CreateBrowser(int64_t browser_id, const std::string& url
     created.io_surfaces.clear();
     for (int i = 0; i < 3; i++) {
         IOSurfaceRef surface = IOSurfaceCreate((__bridge CFDictionaryRef)surfaceProps);
+        if (surface) g_counters.activeIOSurfaces++;
         created.io_surfaces.push_back(surface);
-        mach_port_t port = IOSurfaceCreateMachPort(surface);
+        mach_port_t port = surface ? IOSurfaceCreateMachPort(surface) : MACH_PORT_NULL;
+        if (port == MACH_PORT_NULL) continue;
+        g_counters.activeMachSendRights++;
         SendSurfacePort(port, i, browser_id, width, height, created.generation, false);
         mach_port_deallocate(mach_task_self(), port);
+        g_counters.activeMachSendRights--;
     }
     created.current_surface_slot = 0;
 }
@@ -269,6 +314,8 @@ void HostBrowserClient::CloseBrowser(int64_t browser_id) {
 
 void HostBrowserClient::ResizeBrowser(int64_t browser_id, int width, int height, double scale_factor) {
     CEF_REQUIRE_UI_THREAD();
+    if (width <= 0) width = 1;
+    if (height <= 0) height = 1;
     NSLog(@"[CEFHost] ResizeBrowser called for %lld, width=%d, height=%d, scale=%f", browser_id, width, height, scale_factor);
     auto it = _sessions.find(browser_id);
     if (it != _sessions.end()) {
@@ -291,7 +338,10 @@ void HostBrowserClient::ResizeBrowser(int64_t browser_id, int width, int height,
         it->second.generation++;
         
         for (auto surface : it->second.io_surfaces) {
-            if (surface) CFRelease(surface);
+            if (surface) {
+                CFRelease(surface);
+                g_counters.activeIOSurfaces--;
+            }
         }
         it->second.io_surfaces.clear();
         
@@ -303,10 +353,14 @@ void HostBrowserClient::ResizeBrowser(int64_t browser_id, int width, int height,
         };
         for (int i = 0; i < 3; i++) {
             IOSurfaceRef surface = IOSurfaceCreate((__bridge CFDictionaryRef)surfaceProps);
+            if (surface) g_counters.activeIOSurfaces++;
             it->second.io_surfaces.push_back(surface);
-            mach_port_t port = IOSurfaceCreateMachPort(surface);
+            mach_port_t port = surface ? IOSurfaceCreateMachPort(surface) : MACH_PORT_NULL;
+            if (port == MACH_PORT_NULL) continue;
+            g_counters.activeMachSendRights++;
             SendSurfacePort(port, i, browser_id, width, height, it->second.generation, false);
             mach_port_deallocate(mach_task_self(), port);
+            g_counters.activeMachSendRights--;
         }
         it->second.current_surface_slot = 0;
         
@@ -355,12 +409,16 @@ void HostBrowserClient::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
         if (it != _sessions.end()) {
 
             for (auto surface : it->second.io_surfaces) {
-                if (surface) CFRelease(surface);
+                if (surface) {
+                    CFRelease(surface);
+                    g_counters.activeIOSurfaces--;
+                }
             }
             it->second.io_surfaces.clear();
             
             _sessions.erase(it);
-        }
+            g_counters.activeBrowsers--;
+                }
     }
 }
 
@@ -392,7 +450,6 @@ void HostBrowserClient::OnPaint(CefRefPtr<CefBrowser> browser,
                                 const void* buffer,
                                 int width, int height) {
     if (type == PET_POPUP) return; // Ignore popups for now in this simplest implementation
-    NSLog(@"[CEFHost] OnPaint called for %d x %d", width, height);
     
     int64_t id = GetBrowserId(browser);
     if (id == -1) return;
@@ -408,6 +465,7 @@ void HostBrowserClient::OnPaint(CefRefPtr<CefBrowser> browser,
     
     if (!session->io_surfaces.empty()) {
         IOSurfaceRef current_surf = session->io_surfaces[session->current_surface_slot];
+        if (!current_surf) return;
         IOSurfaceLock(current_surf, 0, nil);
         void* surface_dst = IOSurfaceGetBaseAddress(current_surf);
         size_t stride = IOSurfaceGetBytesPerRow(current_surf);
@@ -442,7 +500,7 @@ void HostBrowserClient::OnPaint(CefRefPtr<CefBrowser> browser,
         mach_timebase_info_data_t timebase;
         mach_timebase_info(&timebase);
         double elapsedMs = (double)(now - session->lastPrintTime) * timebase.numer / timebase.denom / 1e6;
-        NSLog(@"[Telemetry] renderMode=software, softwareFrames=%llu, acceleratedFrames=%llu, droppedFrames=0, elapsedMs=%.2f",
+        NSLog(@"[Telemetry] renderMode=software, softwareFrames=%llu, acceleratedFrames=%llu, droppedFrames=unmeasured, elapsedMs=%.2f",
               session->softwareFrames, session->acceleratedFrames, elapsedMs);
         session->lastPrintTime = now;
         session->totalGpuBlitTimeMs = 0;
@@ -454,7 +512,6 @@ void HostBrowserClient::OnAcceleratedPaint(CefRefPtr<CefBrowser> browser,
                                            const RectList& dirtyRects,
                                            const CefAcceleratedPaintInfo& info) {
     if (type == PET_POPUP) return;
-    NSLog(@"[CEFHost] OnAcceleratedPaint called for %d x %d", IOSurfaceGetWidth((IOSurfaceRef)info.shared_texture_io_surface), IOSurfaceGetHeight((IOSurfaceRef)info.shared_texture_io_surface));
     
     int64_t b_id = GetBrowserId(browser);
     if (b_id == -1) return;
@@ -478,6 +535,7 @@ void HostBrowserClient::OnAcceleratedPaint(CefRefPtr<CefBrowser> browser,
                                                                                        height:IOSurfaceGetHeight(cefSurface)
                                                                                     mipmapped:NO];
     id<MTLTexture> source = [device newTextureWithDescriptor:sourceDesc iosurface:cefSurface plane:0];
+    TrackMetalTexture(source);
     if (!source) {
         NSLog(@"[CEFHost] Failed to create source texture from CEF IOSurface. Format: %d", IOSurfaceGetPixelFormat(cefSurface));
         return;
@@ -486,11 +544,13 @@ void HostBrowserClient::OnAcceleratedPaint(CefRefPtr<CefBrowser> browser,
     uint32_t slot = session->current_surface_slot;
     IOSurfaceRef destinationSurface = session->io_surfaces[slot];
     
+    if (!destinationSurface) return;
     MTLTextureDescriptor* destinationDesc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm
                                                                                              width:IOSurfaceGetWidth(destinationSurface)
                                                                                             height:IOSurfaceGetHeight(destinationSurface)
                                                                                          mipmapped:NO];
     id<MTLTexture> destination = [device newTextureWithDescriptor:destinationDesc iosurface:destinationSurface plane:0];
+    TrackMetalTexture(destination);
     if (!destination) {
         NSLog(@"[CEFHost] Failed to create destination texture. Format: %d", IOSurfaceGetPixelFormat(destinationSurface));
         return;
@@ -525,6 +585,10 @@ void HostBrowserClient::OnAcceleratedPaint(CefRefPtr<CefBrowser> browser,
     
     [commandBuffer commit];
     [commandBuffer waitUntilCompleted];
+#if DEBUG
+    if (commandBuffer.status == MTLCommandBufferStatusCompleted) session->completedMetalFrames++;
+    else session->failedMetalFrames++;
+#endif
     
     uint64_t end_time = mach_absolute_time();
     mach_timebase_info_data_t timebase;
@@ -553,7 +617,7 @@ void HostBrowserClient::OnAcceleratedPaint(CefRefPtr<CefBrowser> browser,
         mach_timebase_info(&timebase);
         double elapsedMs = (double)(now - session->lastPrintTime) * timebase.numer / timebase.denom / 1e6;
         double avgBlitMs = session->totalGpuBlitTimeMs / 60.0;
-        NSLog(@"[Telemetry] renderMode=accelerated, softwareFrames=%llu, acceleratedFrames=%llu, droppedFrames=0, gpuBlitTime=%.2fms, elapsedMs=%.2f",
+        NSLog(@"[Telemetry] renderMode=accelerated, softwareFrames=%llu, acceleratedFrames=%llu, droppedFrames=unmeasured, gpuBlitTime=%.2fms, elapsedMs=%.2f",
               session->softwareFrames, session->acceleratedFrames, avgBlitMs, elapsedMs);
         session->lastPrintTime = now;
         session->totalGpuBlitTimeMs = 0;

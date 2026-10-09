@@ -8,6 +8,7 @@ void HostBrowserClient::FailJavaScript(uint64_t requestId, const char* code, con
     if (found == pending_js_.end()) return;
     auto request = found->second;
     pending_js_.erase(found);
+    g_counters.pendingIpcRequests--;
     if (auto* session = GetSession(request.browserId); session && session->browser) {
         auto cancel = CefProcessMessage::Create(chromium_bridge::kCancel);
         cancel->GetArgumentList()->SetString(0, std::to_string(requestId));
@@ -39,6 +40,7 @@ void HostBrowserClient::EvaluateJavaScript(const IPC::Message& message) {
     pending_js_[message.requestId] = {browserId,
         [operation isKindOfClass:NSString.class] ? [operation UTF8String] : std::to_string(message.requestId),
         session ? session->context_token : ""};
+    g_counters.pendingIpcRequests++;
     if (!session || !session->browser || session->browser->GetHost()->IsReadyToBeClosed()) {
         FailJavaScript(message.requestId, "browser_closed", "Browser session is no longer available"); return;
     }
@@ -85,8 +87,17 @@ bool HostBrowserClient::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<
 void HostBrowserClient::OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser, TerminationStatus,
                                                  int, const CefString&) {
     auto id = GetBrowserId(browser);
+    NSLog(@"[ChromiumBackend] OnRenderProcessTerminated called for browserId %lld", id);
     if (auto* session = GetSession(id)) session->renderer_gone = true;
     InvalidateJavaScript(id, "renderer_gone", "Renderer process terminated");
+
+    IPC::Message event;
+    event.type = "event";
+    event.payload = @{
+        @"name": @"browserCrash",
+        @"args": @{@"browserId": @(id)}
+    };
+    if (on_message_) on_message_(event);
 }
 
 bool HostBrowserClient::HandleJavaScriptMessage(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
@@ -129,6 +140,7 @@ bool HostBrowserClient::HandleJavaScriptMessage(CefRefPtr<CefBrowser> browser, C
         FailJavaScript(requestId, "invalid_result", "Renderer returned a malformed result"); return true;
     }
     pending_js_.erase(pending);
+    g_counters.pendingIpcRequests--;
     IPC::Message response;
     response.type = "javascriptResult";
     response.requestId = requestId;

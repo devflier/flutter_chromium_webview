@@ -1,0 +1,83 @@
+Can't examine target process's malloc zone PartitionAlloc_0x12105eba0, so memory analysis will be incomplete or incorrect.
+Reason: failed to resolve canonical path for /Users/veneno/Projects/packages/flutter_chromium_webview/packages/flutter_chromium_webview/example/build/macos/Build/Products/Debug/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/Chromium Embedded Framework.framework/Versions/A/Chromium Embedded Framework in dyld shared cache.
+
+Process:         ChromiumWebView Helper (Renderer) [10633]
+Path:            /Users/USER/*/flutter_chromium_webview_example.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/Frameworks/ChromiumWebView Helper (Renderer).app/Contents/MacOS/ChromiumWebView Helper (Renderer)
+Load Address:    0x102b30000
+Identifier:      com.example.ChromiumWebViewHost.cef-helper.renderer
+Version:         1.0 (1)
+Code Type:       ARM64
+Platform:        macOS
+Parent Process:  ChromiumWebViewHost [10624]
+Target Type:     live task
+
+Date/Time:       2026-10-09 11:32:37.224 -0300
+Launch Time:     2026-10-09 11:25:19.331 -0300
+OS Version:      macOS 27.0.1 (26A434)
+Report Version:  7
+Analysis Tool:   /usr/bin/vmmap
+
+Physical footprint:         116.1M
+Physical footprint (peak):  124.0M
+Idle exit:                  untracked
+----
+
+ReadOnly portion of Libraries: Total=3.1G resident=529.0M(17%) swapped_out_or_unallocated=2.6G(83%)
+Writable regions: Total=711.4M written=94.7M(13%) resident=104.8M(15%) swapped_out=7712K(1%) unallocated=599.1M(84%)
+
+                                VIRTUAL RESIDENT    DIRTY  SWAPPED VOLATILE   NONVOL    EMPTY   REGION 
+REGION TYPE                        SIZE     SIZE     SIZE     SIZE     SIZE     SIZE     SIZE    COUNT (non-coalesced) 
+===========                     ======= ========    =====  ======= ========   ======    =====  ======= 
+Activity Tracing                   256K      32K      32K       0K       0K      32K       0K        1 
+App-Specific Tag 14               48.0G    62.6M    58.5M    6000K       0K       0K       0K     1182 
+App-Specific Tag 16                1.4T    38.0M    33.7M     512K       0K       0K       0K      365 
+App-Specific Tag 16 (reserved)     320K       0K       0K       0K       0K       0K       0K        5         reserved VM address space (unallocated)
+App-Specific Tag 2                 320K       0K       0K      80K       0K       0K       0K        2 
+ColorSync                           16K       0K       0K      16K       0K       0K       0K        1 
+Deferred Reclaim                  64.0M      16K      16K       0K       0K       0K       0K        1 
+Dispatch Continuations            64.0M     160K     160K      32K       0K       0K       0K        1 
+Guard                            385.0G       0K       0K       0K       0K       0K       0K        1 
+IOKit                               64K      16K      16K       0K       0K       0K       0K        4 
+IOSurface                         4608K       0K       0K       0K       0K       0K       0K        8 
+Mach Message                       256K     144K     144K      80K       0K       0K       0K        6 
+Malloc Guard Page                 3888K       0K       0K       0K       0K       0K       0K        4         see MALLOC ZONE table below
+Malloc Metadata                    416K      80K      80K     320K       0K       0K       0K        5         see MALLOC ZONE table below
+Malloc Metadata metadata          1184K     224K     224K      64K       0K       0K       0K        2         see MALLOC ZONE table below
+Malloc Small                      12.8M     368K     368K     320K       0K       0K       0K        8         see MALLOC ZONE table below
+Malloc Small (empty)              11.2M      96K      96K       0K       0K       0K       0K        6         see MALLOC ZONE table below
+Malloc Tiny                       4096K      80K      80K      16K       0K       0K       0K        1         see MALLOC ZONE table below
+OS Alloc Once                       32K      16K      16K       0K       0K       0K       0K        1 
+PROTECTED_MEMORY                    16K      16K      16K       0K       0K       0K       0K        1 
+Stack                            145.0M     944K     944K      48K       0K       0K       0K       26 
+Stack Guard                       56.4M       0K       0K       0K       0K       0K       0K       26 
+Untagged                          1120K      16K      16K      32K       0K       0K       0K       15 
+__AUTH                            6592K    2940K     115K      66K       0K       0K       0K      686 
+__AUTH_CONST                      99.4M    36.6M       0K       0K       0K       0K       0K     1040 
+__CTF                               824      824       0K       0K       0K       0K       0K        1 
+__DATA                            43.5M    12.3M    1679K    1294K       0K       0K       0K     1050 
+__DATA_CONST                      47.8M    23.6M    3959K    7252K       0K       0K       0K     1047 
+__DATA_DIRTY                      14.6M    4191K     560K     199K       0K       0K       0K      930 
+__FONT_DATA                        2352     2352       0K       0K       0K       0K       0K        1 
+__LINKEDIT                         1.6G    69.4M       0K       0K       0K       0K       0K        4 
+__OBJC_RO                        118.0M    72.3M       0K       0K       0K       0K       0K        1 
+__OBJC_RW                         2735K    2287K      15K      32K       0K       0K       0K        1 
+__TEXT                             1.5G   459.6M       0K       0K       0K       0K       0K     1134 
+__TPRO_CONST                       132K     100K      96K       0K       0K       0K       0K        4 
+mapped file                       65.4M    6064K       0K       0K       0K       0K       0K       13 
+page table in kernel              1186K    1186K    1186K       0K       0K       0K       0K        1 
+shared memory                     9504K     960K     960K     336K       0K       0K       0K       38 
+unused but dirty shlib __DATA      191K      56K      56K     135K       0K       0K       0K      179 
+===========                     ======= ========    =====  ======= ========   ======    =====  ======= 
+TOTAL                              1.8T   793.8M   102.7M    16.4M       0K      32K       0K     7802 
+TOTAL, minus reserved VM space     1.8T   793.8M   102.7M    16.4M       0K      32K       0K     7802 
+
+                                          VIRTUAL   RESIDENT      DIRTY    SWAPPED ALLOCATION      BYTES DIRTY+SWAP          REGION
+MALLOC ZONE                                  SIZE       SIZE       SIZE       SIZE      COUNT  ALLOCATED  FRAG SIZE  % FRAG   COUNT
+===========                               =======  =========  =========  =========  =========  =========  =========  ======  ======
+DefaultMallocZone_0x1030e4000               29.0M       640K       640K       400K       1413       266K       774K     75%      12
+LSBindingEvaluator_0x107e54000                96K        96K        96K         0K          0         0K        96K    100%       3
+objc-class_rw_t_0x103190000                   32K        32K        32K         0K        730        17K        15K     47%       2
+DefaultPurgeableMallocZone_0x1031b0000         0K         0K         0K         0K          0         0K         0K      0%       0
+===========                               =======  =========  =========  =========  =========  =========  =========  ======  ======
+TOTAL                                       29.2M       768K       768K       400K       2143       283K       885K     76%      17
+

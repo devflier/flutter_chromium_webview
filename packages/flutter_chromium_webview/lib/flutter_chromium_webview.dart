@@ -418,6 +418,12 @@ class ChromiumWebViewController extends ChangeNotifier {
         print('[Flutter] ChromiumWebViewController _dispatchEvent handling browserCrash');
         // The underlying native browser crashed.
         // Reset internal state and transparently trigger recreation.
+        final oldId = _browserId;
+        if (oldId != null) {
+          _controllers.remove(oldId);
+          _pendingEvents.remove(oldId);
+          _platform.disposeBrowser(oldId);
+        }
         _browserId = null;
         _textureId = null;
         _popupTextureId = null;
@@ -609,6 +615,11 @@ class ChromiumWebViewController extends ChangeNotifier {
   /// Native browser identifier for diagnostics, or null before creation/after disposal.
   int? get browserId => _isDisposed ? null : _browserId;
 
+  int _browserGeneration = 0;
+
+  /// Native browser instance generation for diagnostics and lifecycle checks.
+  int get browserGeneration => _browserGeneration;
+
   int? _popupTextureId;
 
   /// The Flutter texture ID used for rendering the browser's HTML popup buffer.
@@ -754,6 +765,7 @@ class ChromiumWebViewController extends ChangeNotifier {
       );
       final newBrowserId = result.browserId;
       _browserId = newBrowserId;
+      _browserGeneration++;
       _textureId = result.textureId >= 0 ? result.textureId : null;
       _usesPlatformView = result.textureId < 0;
       _popupTextureId = result.popupTextureId >= 0
@@ -1131,7 +1143,7 @@ class _ChromiumWebViewState extends State<ChromiumWebView> {
   final OverlayPortalController _popupOverlay = OverlayPortalController();
   Size? _currentSize;
   double? _currentDpr;
-  int? _lastTextureId;
+  int? _lastBrowserGeneration;
   int _buttons = 0;
   final Map<int, (Duration, Offset, int)> _clicks = {};
   final Map<int, int> _pressedClickCounts = {};
@@ -1206,13 +1218,14 @@ class _ChromiumWebViewState extends State<ChromiumWebView> {
   @override
   void didUpdateWidget(covariant ChromiumWebView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.controller != widget.controller) {
+    if (!identical(oldWidget.controller, widget.controller)) {
       oldWidget.controller.removeListener(_syncPopup);
       widget.controller.addListener(_syncPopup);
       _syncPopup();
       _detachFocusCallback(oldWidget.controller);
       _send(oldWidget.controller.setFocus(false));
       if (oldWidget.disposeController) _send(oldWidget.controller.dispose());
+      _lastBrowserGeneration = null;
       _currentSize = null;
       _currentDpr = null;
       _buttons = 0;
@@ -1424,11 +1437,13 @@ class _ChromiumWebViewState extends State<ChromiumWebView> {
           return LayoutBuilder(
             builder: (context, constraints) {
               final textureId = widget.controller.textureId;
+              final generation = widget.controller.browserGeneration;
 
-              if (_lastTextureId != textureId) {
-                _lastTextureId = textureId;
+              if (_lastBrowserGeneration != generation) {
+                _lastBrowserGeneration = generation;
                 _currentSize = null;
                 _currentDpr = null;
+                _send(widget.controller.setFocus(_focus.hasFocus));
               }
 
               if (textureId == null) {
@@ -1436,11 +1451,10 @@ class _ChromiumWebViewState extends State<ChromiumWebView> {
               }
               final size = constraints.biggest;
               final dpr = MediaQuery.devicePixelRatioOf(context);
-              print('[ChromiumWebView] LayoutBuilder size=$size dpr=$dpr currentSize=$_currentSize lastTextureId=$_lastTextureId textureId=$textureId');
+              
               if (size.isFinite &&
                   !size.isEmpty &&
                   (size != _currentSize || dpr != _currentDpr)) {
-                print('[ChromiumWebView] Sending updateBrowserSize(${size.width}, ${size.height}, $dpr)');
                 _currentSize = size;
                 _currentDpr = dpr;
                 _send(

@@ -1,0 +1,4718 @@
+[
+  {
+    "pid": 12459,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 44.04022216796875
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 43.0581750869751
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 39.436492919921875
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 38.45451354980469
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 40.08709716796875
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 4.190445899963379
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "gpu",
+    "attribute": "size",
+    "MiB": 1.06243896484375
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "gpu",
+    "attribute": "effective_size",
+    "MiB": 1.06243896484375
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 3.98431396484375
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 1.5072040557861328
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 44.24763488769531
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 43.26828861236572
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 39.64820861816406
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 38.668907165527344
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 40.29450988769531
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 4.188474655151367
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "gpu",
+    "attribute": "size",
+    "MiB": 1.06243896484375
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "gpu",
+    "attribute": "effective_size",
+    "MiB": 1.06243896484375
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 8.14056396484375
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 3.460329055786133
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 4,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": null,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 45.00115966796875
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 4,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": null,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 44.02616024017334
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 4,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": null,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 39.948699951171875
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 4,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": null,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 38.973785400390625
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 4,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": null,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 41.04803466796875
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 4,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": null,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 4.60856819152832
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 4,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": null,
+    "category": "gpu",
+    "attribute": "size",
+    "MiB": 1.06243896484375
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 4,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": null,
+    "category": "gpu",
+    "attribute": "effective_size",
+    "MiB": 1.06243896484375
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 4,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": null,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 8.21868896484375
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 4,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": null,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 3.491579055786133
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 6,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": null,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 47.065765380859375
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 6,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": null,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 45.998064041137695
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 6,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": null,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 38.8035888671875
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 6,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": null,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 37.73594665527344
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 6,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": null,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 43.112640380859375
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 6,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": null,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 7.568180084228516
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 6,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": null,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 6.375
+  },
+  {
+    "pid": 12459,
+    "dumpIndex": 6,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": null,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 3.113062858581543
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 15.691986083984375
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 15.591732025146484
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 13.932601928710938
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 13.832412719726562
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 14.691986083984375
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 1.647233009338379
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "skia",
+    "attribute": "size",
+    "MiB": 5.006498336791992
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "skia",
+    "attribute": "effective_size",
+    "MiB": 5.006498336791992
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "gpu",
+    "attribute": "size",
+    "MiB": 34.975544929504395
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "gpu",
+    "attribute": "effective_size",
+    "MiB": 20.95726490020752
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 6.125
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.5171871185302734
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 16.4290771484375
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 16.328852653503418
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 14.130538940429688
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 14.030349731445312
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 15.4290771484375
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 2.1586074829101562
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "skia",
+    "attribute": "size",
+    "MiB": 0.2199697494506836
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "skia",
+    "attribute": "effective_size",
+    "MiB": 0.2199697494506836
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "gpu",
+    "attribute": "size",
+    "MiB": 15.623466491699219
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "gpu",
+    "attribute": "effective_size",
+    "MiB": 6.183250427246094
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 4.09375
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.5640621185302734
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 16.876068115234375
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 16.72468376159668
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 13.58441162109375
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 13.433072090148926
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 15.876068115234375
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 3.0965843200683594
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "skia",
+    "attribute": "size",
+    "MiB": 0.2711200714111328
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "skia",
+    "attribute": "effective_size",
+    "MiB": 0.2711200714111328
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "gpu",
+    "attribute": "size",
+    "MiB": 20.80864715576172
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "gpu",
+    "attribute": "effective_size",
+    "MiB": 12.180931091308594
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 4.109375
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.5718746185302734
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 14.65692138671875
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 14.501508712768555
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 10.76519775390625
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 10.609822273254395
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 13.65692138671875
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 3.6261777877807617
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "skia",
+    "attribute": "size",
+    "MiB": 0.15928173065185547
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "skia",
+    "attribute": "effective_size",
+    "MiB": 0.15928173065185547
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "gpu",
+    "attribute": "size",
+    "MiB": 1.8992795944213867
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "gpu",
+    "attribute": "effective_size",
+    "MiB": 0.4463987350463867
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 2.15625
+  },
+  {
+    "pid": 12461,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.3454856872558594
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 5.0043182373046875
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 5.004279136657715
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 3.3342742919921875
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 3.3342742919921875
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 3.9574432373046875
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 1.3206634521484375
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 0.703125
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.3392353057861328
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 4.993499755859375
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 4.993494987487793
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 2.9158172607421875
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 2.9158172607421875
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 3.946624755859375
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 1.6420974731445312
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 0.765625
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.3704853057861328
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 5.0926971435546875
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 5.092660903930664
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 3.0519866943359375
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 3.0519866943359375
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 4.0458221435546875
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 1.6211910247802734
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 0.78125
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.3782978057861328
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 5.2103424072265625
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 5.210298538208008
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 3.0095367431640625
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 3.0095367431640625
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 4.1634674072265625
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 1.758589744567871
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 0.640625
+  },
+  {
+    "pid": 12462,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.3083763122558594
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 2.5738067626953125
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 2.5738000869750977
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 1.7545623779296875
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 1.7545623779296875
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 1.5269317626953125
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 0.4860191345214844
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 0.5
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.2376728057861328
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 2.8297882080078125
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 2.829758644104004
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 1.736602783203125
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 1.736602783203125
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 1.7829132080078125
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 0.6887474060058594
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 0.578125
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.2767353057861328
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 2.829498291015625
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 2.8294715881347656
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 1.74127197265625
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 1.74127197265625
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 1.782623291015625
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 0.6855840682983398
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 0.578125
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.2767353057861328
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 2.8632049560546875
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 2.863144874572754
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 1.72625732421875
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 1.72625732421875
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 1.8163299560546875
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 0.721217155456543
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 0.453125
+  },
+  {
+    "pid": 12463,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.21462631225585938
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 66.49485778808594
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 53.59893608093262
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 45.4056339263916
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 32.509761810302734
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 65.41673278808594
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 20.747254371643066
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "partition_alloc",
+    "attribute": "size",
+    "MiB": 10.6875
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "partition_alloc",
+    "attribute": "effective_size",
+    "MiB": 6.394559860229492
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "partition_alloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 6.42645263671875
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "partition_alloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 2.1335372924804688
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "partition_alloc/partitions/array_buffer",
+    "attribute": "size",
+    "MiB": 0.859375
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "partition_alloc/partitions/array_buffer",
+    "attribute": "effective_size",
+    "MiB": 0.3426246643066406
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "partition_alloc/partitions/buffer",
+    "attribute": "size",
+    "MiB": 9.828125
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "partition_alloc/partitions/buffer",
+    "attribute": "effective_size",
+    "MiB": 3.918397903442383
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "blink_gc",
+    "attribute": "size",
+    "MiB": 10.99884033203125
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "blink_gc",
+    "attribute": "effective_size",
+    "MiB": 7.672300338745117
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "blink_objects",
+    "attribute": "size",
+    "MiB": 3.3265228271484375
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "blink_objects",
+    "attribute": "effective_size",
+    "MiB": 3.3265228271484375
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "v8",
+    "attribute": "size",
+    "MiB": 29.64431381225586
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "v8",
+    "attribute": "effective_size",
+    "MiB": 29.64431381225586
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "web_cache",
+    "attribute": "size",
+    "MiB": 4.5892791748046875
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "web_cache",
+    "attribute": "effective_size",
+    "MiB": 4.5892791748046875
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "skia",
+    "attribute": "size",
+    "MiB": 0.2871818542480469
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "skia",
+    "attribute": "effective_size",
+    "MiB": 0.2871818542480469
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "gpu",
+    "attribute": "size",
+    "MiB": 3.6871337890625
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "gpu",
+    "attribute": "effective_size",
+    "MiB": 3.6871337890625
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 5.5777587890625
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.9368915557861328
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 86.86488342285156
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 40.40760898590088
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 80.27488708496094
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 33.81767749786377
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 85.78675842285156
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 6.508173942565918
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "partition_alloc",
+    "attribute": "size",
+    "MiB": 8.390625
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "partition_alloc",
+    "attribute": "effective_size",
+    "MiB": 4.097674369812012
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "partition_alloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 6.858978271484375
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "partition_alloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 2.5660629272460938
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "partition_alloc/partitions/array_buffer",
+    "attribute": "size",
+    "MiB": 0.875
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "partition_alloc/partitions/array_buffer",
+    "attribute": "effective_size",
+    "MiB": 0.1597137451171875
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "partition_alloc/partitions/buffer",
+    "attribute": "size",
+    "MiB": 7.515625
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "partition_alloc/partitions/buffer",
+    "attribute": "effective_size",
+    "MiB": 1.3718976974487305
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "blink_gc",
+    "attribute": "size",
+    "MiB": 11.499183654785156
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "blink_gc",
+    "attribute": "effective_size",
+    "MiB": 7.823220252990723
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "blink_objects",
+    "attribute": "size",
+    "MiB": 3.6759185791015625
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "blink_objects",
+    "attribute": "effective_size",
+    "MiB": 3.6759185791015625
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "v8",
+    "attribute": "size",
+    "MiB": 19.740062713623047
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "v8",
+    "attribute": "effective_size",
+    "MiB": 19.740062713623047
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "web_cache",
+    "attribute": "size",
+    "MiB": 4.5892791748046875
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "web_cache",
+    "attribute": "effective_size",
+    "MiB": 4.5892791748046875
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "skia",
+    "attribute": "size",
+    "MiB": 0.2871818542480469
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "skia",
+    "attribute": "effective_size",
+    "MiB": 0.2871818542480469
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "gpu",
+    "attribute": "size",
+    "MiB": 1.56219482421875
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "gpu",
+    "attribute": "effective_size",
+    "MiB": 1.56219482421875
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 3.48406982421875
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.9447040557861328
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 64.91136169433594
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 39.85206317901611
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 59.54286193847656
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 34.483598709106445
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 63.83323669433594
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 5.279300689697266
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "partition_alloc",
+    "attribute": "size",
+    "MiB": 9.15625
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "partition_alloc",
+    "attribute": "effective_size",
+    "MiB": 4.8631134033203125
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "partition_alloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 7.5854644775390625
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "partition_alloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 3.292367935180664
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "partition_alloc/partitions/array_buffer",
+    "attribute": "size",
+    "MiB": 1.5
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "partition_alloc/partitions/array_buffer",
+    "attribute": "effective_size",
+    "MiB": 0.25731849670410156
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "partition_alloc/partitions/buffer",
+    "attribute": "size",
+    "MiB": 7.65625
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "partition_alloc/partitions/buffer",
+    "attribute": "effective_size",
+    "MiB": 1.3134269714355469
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "blink_gc",
+    "attribute": "size",
+    "MiB": 12.92071533203125
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "blink_gc",
+    "attribute": "effective_size",
+    "MiB": 6.793352127075195
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "blink_objects",
+    "attribute": "size",
+    "MiB": 6.127288818359375
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "blink_objects",
+    "attribute": "effective_size",
+    "MiB": 6.127288818359375
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "v8",
+    "attribute": "size",
+    "MiB": 27.673503875732422
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "v8",
+    "attribute": "effective_size",
+    "MiB": 27.673503875732422
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "web_cache",
+    "attribute": "size",
+    "MiB": 4.4930572509765625
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "web_cache",
+    "attribute": "effective_size",
+    "MiB": 4.4930572509765625
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "skia",
+    "attribute": "size",
+    "MiB": 0.4391632080078125
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "skia",
+    "attribute": "effective_size",
+    "MiB": 0.4391632080078125
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "gpu",
+    "attribute": "size",
+    "MiB": 1.56219482421875
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "gpu",
+    "attribute": "effective_size",
+    "MiB": 1.56219482421875
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 3.49969482421875
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.9525165557861328
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 43.372894287109375
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 42.3003454208374
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 19.549453735351562
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 18.47694969177246
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 42.294769287109375
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 23.231226921081543
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "partition_alloc",
+    "attribute": "size",
+    "MiB": 8.5625
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "partition_alloc",
+    "attribute": "effective_size",
+    "MiB": 4.269369125366211
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "partition_alloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 6.936767578125
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "partition_alloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 2.643671989440918
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "partition_alloc/partitions/array_buffer",
+    "attribute": "size",
+    "MiB": 0.96875
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "partition_alloc/partitions/array_buffer",
+    "attribute": "effective_size",
+    "MiB": 0.18392276763916016
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "partition_alloc/partitions/buffer",
+    "attribute": "size",
+    "MiB": 7.59375
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "partition_alloc/partitions/buffer",
+    "attribute": "effective_size",
+    "MiB": 1.4417743682861328
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "blink_gc",
+    "attribute": "size",
+    "MiB": 13.07696533203125
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "blink_gc",
+    "attribute": "effective_size",
+    "MiB": 8.376832008361816
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "blink_objects",
+    "attribute": "size",
+    "MiB": 4.7000732421875
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "blink_objects",
+    "attribute": "effective_size",
+    "MiB": 4.7000732421875
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "v8",
+    "attribute": "size",
+    "MiB": 29.251628875732422
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "v8",
+    "attribute": "effective_size",
+    "MiB": 29.251628875732422
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "web_cache",
+    "attribute": "size",
+    "MiB": 4.4930572509765625
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "web_cache",
+    "attribute": "effective_size",
+    "MiB": 4.4930572509765625
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "skia",
+    "attribute": "size",
+    "MiB": 0.4409313201904297
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "skia",
+    "attribute": "effective_size",
+    "MiB": 0.4409313201904297
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "gpu",
+    "attribute": "size",
+    "MiB": 1.31231689453125
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "gpu",
+    "attribute": "effective_size",
+    "MiB": 1.31231689453125
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 2.84356689453125
+  },
+  {
+    "pid": 12468,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.706812858581543
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 9.391021728515625
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 9.303471565246582
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 7.1770172119140625
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 7.08951473236084
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 8.312896728515625
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 1.959803581237793
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "partition_alloc",
+    "attribute": "size",
+    "MiB": 1.4375
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "partition_alloc",
+    "attribute": "effective_size",
+    "MiB": 1.401820182800293
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "partition_alloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 1.0756683349609375
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "partition_alloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 1.0399885177612305
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "partition_alloc/partitions/buffer",
+    "attribute": "size",
+    "MiB": 1.4375
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "partition_alloc/partitions/buffer",
+    "attribute": "effective_size",
+    "MiB": 0.3618316650390625
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "blink_gc",
+    "attribute": "size",
+    "MiB": 1.328125
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "blink_gc",
+    "attribute": "effective_size",
+    "MiB": 0.7125968933105469
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "blink_objects",
+    "attribute": "size",
+    "MiB": 0.6155242919921875
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "blink_objects",
+    "attribute": "effective_size",
+    "MiB": 0.6155242919921875
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "v8",
+    "attribute": "size",
+    "MiB": 4.664058685302734
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "v8",
+    "attribute": "effective_size",
+    "MiB": 4.664058685302734
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "web_cache",
+    "attribute": "size",
+    "MiB": 0.03567981719970703
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "web_cache",
+    "attribute": "effective_size",
+    "MiB": 0.03567981719970703
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "skia",
+    "attribute": "size",
+    "MiB": 0.0015687942504882812
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "skia",
+    "attribute": "effective_size",
+    "MiB": 0.0015687942504882812
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "gpu",
+    "attribute": "size",
+    "MiB": 0.12493896484375
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "gpu",
+    "attribute": "effective_size",
+    "MiB": 0.12493896484375
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 1.74993896484375
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.8275165557861328
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 10.020858764648438
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 9.933300018310547
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 6.8453826904296875
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 6.757880210876465
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 8.942733764648438
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 2.8338050842285156
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "partition_alloc",
+    "attribute": "size",
+    "MiB": 1.671875
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "partition_alloc",
+    "attribute": "effective_size",
+    "MiB": 1.6361885070800781
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "partition_alloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 0.5460205078125
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "partition_alloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 0.510340690612793
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "partition_alloc/partitions/buffer",
+    "attribute": "size",
+    "MiB": 1.671875
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "partition_alloc/partitions/buffer",
+    "attribute": "effective_size",
+    "MiB": 1.1258478164672852
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "blink_gc",
+    "attribute": "size",
+    "MiB": 1.328125
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "blink_gc",
+    "attribute": "effective_size",
+    "MiB": 1.0191841125488281
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "blink_objects",
+    "attribute": "size",
+    "MiB": 0.308929443359375
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "blink_objects",
+    "attribute": "effective_size",
+    "MiB": 0.308929443359375
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "v8",
+    "attribute": "size",
+    "MiB": 4.101558685302734
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "v8",
+    "attribute": "effective_size",
+    "MiB": 4.101558685302734
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "web_cache",
+    "attribute": "size",
+    "MiB": 0.03567981719970703
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "web_cache",
+    "attribute": "effective_size",
+    "MiB": 0.03567981719970703
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "skia",
+    "attribute": "size",
+    "MiB": 0.0015687942504882812
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "skia",
+    "attribute": "effective_size",
+    "MiB": 0.0015687942504882812
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "gpu",
+    "attribute": "size",
+    "MiB": 0.12493896484375
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "gpu",
+    "attribute": "effective_size",
+    "MiB": 0.12493896484375
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 1.76556396484375
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.8353290557861328
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 9.511062622070312
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 9.423493385314941
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 6.9957427978515625
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 6.90824031829834
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 8.432937622070312
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 2.2301626205444336
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "partition_alloc",
+    "attribute": "size",
+    "MiB": 1.609375
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "partition_alloc",
+    "attribute": "effective_size",
+    "MiB": 1.5736770629882812
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "partition_alloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 1.247650146484375
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "partition_alloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 1.211970329284668
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "partition_alloc/partitions/buffer",
+    "attribute": "size",
+    "MiB": 1.609375
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "partition_alloc/partitions/buffer",
+    "attribute": "effective_size",
+    "MiB": 0.3617067337036133
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "blink_gc",
+    "attribute": "size",
+    "MiB": 1.328125
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "blink_gc",
+    "attribute": "effective_size",
+    "MiB": 0.6199235916137695
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "blink_objects",
+    "attribute": "size",
+    "MiB": 0.7081985473632812
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "blink_objects",
+    "attribute": "effective_size",
+    "MiB": 0.7081985473632812
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "v8",
+    "attribute": "size",
+    "MiB": 4.976558685302734
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "v8",
+    "attribute": "effective_size",
+    "MiB": 4.976558685302734
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "web_cache",
+    "attribute": "size",
+    "MiB": 0.03567981719970703
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "web_cache",
+    "attribute": "effective_size",
+    "MiB": 0.03567981719970703
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "skia",
+    "attribute": "size",
+    "MiB": 0.0015687942504882812
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "skia",
+    "attribute": "effective_size",
+    "MiB": 0.0015687942504882812
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "gpu",
+    "attribute": "size",
+    "MiB": 0.12493896484375
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "gpu",
+    "attribute": "effective_size",
+    "MiB": 0.12493896484375
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 1.78118896484375
+  },
+  {
+    "pid": 12470,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.8431415557861328
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 5.3684234619140625
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 5.309720039367676
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 4.3399200439453125
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 4.281280517578125
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 4.2902984619140625
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 0.8219194412231445
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "partition_alloc",
+    "attribute": "size",
+    "MiB": 0.609375
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "partition_alloc",
+    "attribute": "effective_size",
+    "MiB": 0.6093645095825195
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "partition_alloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 0.4302215576171875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "partition_alloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 0.4302215576171875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "partition_alloc/partitions/buffer",
+    "attribute": "size",
+    "MiB": 0.609375
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "partition_alloc/partitions/buffer",
+    "attribute": "effective_size",
+    "MiB": 0.17914295196533203
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "blink_gc",
+    "attribute": "size",
+    "MiB": 0.875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "blink_gc",
+    "attribute": "effective_size",
+    "MiB": 0.6852493286132812
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "blink_objects",
+    "attribute": "size",
+    "MiB": 0.18975067138671875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "blink_objects",
+    "attribute": "effective_size",
+    "MiB": 0.18975067138671875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "v8",
+    "attribute": "size",
+    "MiB": 2.7617645263671875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "v8",
+    "attribute": "effective_size",
+    "MiB": 2.7617645263671875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 0.46875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.1868915557861328
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 6.08917236328125
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 6.0304975509643555
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 4.36236572265625
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 4.3037261962890625
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 5.01104736328125
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 1.4210433959960938
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "partition_alloc",
+    "attribute": "size",
+    "MiB": 0.609375
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "partition_alloc",
+    "attribute": "effective_size",
+    "MiB": 0.6093645095825195
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "partition_alloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 0.4302215576171875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "partition_alloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 0.4302215576171875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "partition_alloc/partitions/buffer",
+    "attribute": "size",
+    "MiB": 0.609375
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "partition_alloc/partitions/buffer",
+    "attribute": "effective_size",
+    "MiB": 0.17914295196533203
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "blink_gc",
+    "attribute": "size",
+    "MiB": 0.875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "blink_gc",
+    "attribute": "effective_size",
+    "MiB": 0.6852493286132812
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "blink_objects",
+    "attribute": "size",
+    "MiB": 0.18975067138671875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "blink_objects",
+    "attribute": "effective_size",
+    "MiB": 0.18975067138671875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "v8",
+    "attribute": "size",
+    "MiB": 2.7617645263671875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "v8",
+    "attribute": "effective_size",
+    "MiB": 2.7617645263671875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 0.546875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.2259540557861328
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 6.6656341552734375
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 6.606943130493164
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 4.36505126953125
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 4.3064117431640625
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 5.5875091552734375
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 1.9284515380859375
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "partition_alloc",
+    "attribute": "size",
+    "MiB": 0.609375
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "partition_alloc",
+    "attribute": "effective_size",
+    "MiB": 0.6093645095825195
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "partition_alloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 0.4302215576171875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "partition_alloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 0.4302215576171875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "partition_alloc/partitions/buffer",
+    "attribute": "size",
+    "MiB": 0.609375
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "partition_alloc/partitions/buffer",
+    "attribute": "effective_size",
+    "MiB": 0.17914295196533203
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "blink_gc",
+    "attribute": "size",
+    "MiB": 0.875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "blink_gc",
+    "attribute": "effective_size",
+    "MiB": 0.6852493286132812
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "blink_objects",
+    "attribute": "size",
+    "MiB": 0.18975067138671875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "blink_objects",
+    "attribute": "effective_size",
+    "MiB": 0.18975067138671875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "v8",
+    "attribute": "size",
+    "MiB": 2.7617645263671875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "v8",
+    "attribute": "effective_size",
+    "MiB": 2.7617645263671875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 0.5625
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.2337665557861328
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 6.64105224609375
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 6.582379341125488
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 4.3248443603515625
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 4.266204833984375
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 5.56292724609375
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 1.9401683807373047
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "partition_alloc",
+    "attribute": "size",
+    "MiB": 0.609375
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "partition_alloc",
+    "attribute": "effective_size",
+    "MiB": 0.6093645095825195
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "partition_alloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 0.4302215576171875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "partition_alloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 0.4302215576171875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "partition_alloc/partitions/buffer",
+    "attribute": "size",
+    "MiB": 0.609375
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "partition_alloc/partitions/buffer",
+    "attribute": "effective_size",
+    "MiB": 0.17914295196533203
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "blink_gc",
+    "attribute": "size",
+    "MiB": 0.875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "blink_gc",
+    "attribute": "effective_size",
+    "MiB": 0.6852493286132812
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "blink_objects",
+    "attribute": "size",
+    "MiB": 0.18975067138671875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "blink_objects",
+    "attribute": "effective_size",
+    "MiB": 0.18975067138671875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "v8",
+    "attribute": "size",
+    "MiB": 2.7617645263671875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "v8",
+    "attribute": "effective_size",
+    "MiB": 2.7617645263671875
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 0.5625
+  },
+  {
+    "pid": 12471,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.24587535858154297
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 2.06878662109375
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 2.0687551498413086
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 1.3052978515625
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 1.3052978515625
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 1.02191162109375
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 0.3771247863769531
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 0.234375
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.11267280578613281
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 2.30096435546875
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 2.300919532775879
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 1.2978363037109375
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 1.2978363037109375
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 1.25408935546875
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 0.5467128753662109
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 0.3125
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.1439228057861328
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 2.3113555908203125
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 2.3113317489624023
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 1.2964324951171875
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 1.2964324951171875
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 1.2644805908203125
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 0.5552253723144531
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 0.3125
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.1439228057861328
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 2.5613555908203125
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 2.5613279342651367
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 1.2976837158203125
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 1.2976837158203125
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 1.5144805908203125
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 0.7471685409545898
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 0.3125
+  },
+  {
+    "pid": 12482,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.14431381225585938
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 6.0742034912109375
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 6.074153900146484
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 4.8200836181640625
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 4.8200836181640625
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 5.0742034912109375
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 1.0476293563842773
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "gpu",
+    "attribute": "size",
+    "MiB": 0.12493896484375
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "gpu",
+    "attribute": "effective_size",
+    "MiB": 0.12493896484375
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 0.37493896484375
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.12048530578613281
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 6.2195281982421875
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 6.219481468200684
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 4.80938720703125
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 4.80938720703125
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 5.2195281982421875
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 1.1833906173706055
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "gpu",
+    "attribute": "size",
+    "MiB": 0.12493896484375
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "gpu",
+    "attribute": "effective_size",
+    "MiB": 0.12493896484375
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 0.45306396484375
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.1517353057861328
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 6.2196502685546875
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 6.219611167907715
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 4.8084564208984375
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 4.8084564208984375
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 5.2196502685546875
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 1.1842784881591797
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "gpu",
+    "attribute": "size",
+    "MiB": 0.12493896484375
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "gpu",
+    "attribute": "effective_size",
+    "MiB": 0.12493896484375
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 0.46868896484375
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.1595478057861328
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 6.3602752685546875
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 6.360258102416992
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 4.8086090087890625
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 4.8086090087890625
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 5.3602752685546875
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 1.3076915740966797
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "gpu",
+    "attribute": "size",
+    "MiB": 0.12493896484375
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "gpu",
+    "attribute": "effective_size",
+    "MiB": 0.12493896484375
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 0.46868896484375
+  },
+  {
+    "pid": 12483,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.15993881225585938
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 2.2138671875
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 2.213838577270508
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 1.3367462158203125
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 1.3367462158203125
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 1.1513671875
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 0.4561491012573242
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 1.421875
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 0,
+    "traceTimestampMicroseconds": 75008130064,
+    "approxHarnessMinute": 8.120233333333333,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 0.7064228057861328
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 2.559112548828125
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 2.5590810775756836
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 1.51959228515625
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 1.51959228515625
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 1.496612548828125
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 0.60791015625
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 5.640625
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 1,
+    "traceTimestampMicroseconds": 75421108144,
+    "approxHarnessMinute": 15.0117,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 2.956422805786133
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 2.809051513671875
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 2.8090286254882812
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 1.708648681640625
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 1.708648681640625
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 1.746551513671875
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 0.6841707229614258
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 5.8125
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 2,
+    "traceTimestampMicroseconds": 75661826408,
+    "approxHarnessMinute": 19.023466666666664,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 3.128297805786133
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc",
+    "attribute": "size",
+    "MiB": 3.0089111328125
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc",
+    "attribute": "effective_size",
+    "MiB": 3.0088796615600586
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/allocated_objects",
+    "attribute": "size",
+    "MiB": 1.8902435302734375
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/allocated_objects",
+    "attribute": "effective_size",
+    "MiB": 1.8902435302734375
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/partitions/allocator",
+    "attribute": "size",
+    "MiB": 1.9464111328125
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "malloc/partitions/allocator",
+    "attribute": "effective_size",
+    "MiB": 0.7236299514770508
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "shared_memory",
+    "attribute": "size",
+    "MiB": 5.703125
+  },
+  {
+    "pid": 13094,
+    "dumpIndex": 3,
+    "traceTimestampMicroseconds": 75722084788,
+    "approxHarnessMinute": 20.025583333333334,
+    "category": "shared_memory",
+    "attribute": "effective_size",
+    "MiB": 3.0896263122558594
+  }
+]

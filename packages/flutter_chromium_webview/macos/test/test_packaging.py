@@ -21,6 +21,13 @@ embed = load("embed_cef")
 
 
 class DistributionTests(unittest.TestCase):
+    def test_debug_renderer_is_attachable_but_release_is_not(self):
+        for configuration, expected in (("Debug", True), ("Release", False), ("Profile", False)):
+            with self.subTest(configuration=configuration), patch.dict(embed.os.environ, {"CONFIGURATION": configuration}):
+                values = embed.plistlib.loads(embed.renderer_entitlements().read_bytes())
+                self.assertTrue(values["com.apple.security.cs.allow-jit"])
+                self.assertEqual(bool(values.get("com.apple.security.get-task-allow")), expected)
+
     def test_cached_archive_must_match_checksum(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "archive"

@@ -43,6 +43,7 @@
 }
 
 - (void)transitionToState:(HostState)newState {
+    if (newState == HostStateReady && _state != HostStateReady) g_counters.hostGeneration++;
     _state = newState;
 }
 

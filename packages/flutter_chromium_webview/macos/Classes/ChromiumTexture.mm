@@ -1,6 +1,7 @@
 #import "ChromiumTexture.h"
 #include <cstring>
 #include <mutex>
+#import "Protocol.h"
 
 @implementation ChromiumTexture {
   std::mutex _mutex;
@@ -17,6 +18,7 @@
     _activeFrame = nullptr;
     _generation = 0;
     _activeSlot = -1;
+    g_counters.activeFlutterTextures++;
   }
   return self;
 }
@@ -40,7 +42,10 @@
     std::memcpy(output + row * stride, static_cast<const uint8_t*>(bytes) + row * sourceStride, sourceStride);
   CVPixelBufferUnlockBaseAddress(next, 0);
   std::lock_guard<std::mutex> lock(_mutex);
-  if (_frames[0]) CVPixelBufferRelease(_frames[0]);
+  for (auto& frame : _frames) {
+    if (frame) { CVPixelBufferRelease(frame); g_counters.activeIOSurfaces--; frame = nullptr; }
+  }
+  g_counters.activeIOSurfaces++;
   _frames[0] = next;
   if (_activeFrame) CVPixelBufferRelease(_activeFrame);
   _activeFrame = CVPixelBufferRetain(_frames[0]);
@@ -48,7 +53,10 @@
 }
 
 - (BOOL)updateWithIOSurface:(IOSurfaceRef)ioSurface slot:(uint32_t)slot width:(int)width height:(int)height generation:(uint32_t)generation {
-  if (width <= 0 || height <= 0 || width > 16384 || height > 16384 || slot >= 3) return NO;
+  if (width <= 0 || height <= 0 || width > 16384 || height > 16384 || slot >= 3) {
+    if (ioSurface) CFRelease(ioSurface);
+    return NO;
+  }
   
   if (!ioSurface) {
       NSLog(@"[ChromiumTexture] updateWithIOSurface called with null surface");
@@ -71,7 +79,16 @@
   }
   
   std::lock_guard<std::mutex> lock(_mutex);
-  if (_frames[slot]) CVPixelBufferRelease(_frames[slot]);
+  if (generation < _generation) { CVPixelBufferRelease(next); return NO; }
+  if (generation > _generation) {
+    for (auto& frame : _frames) {
+      if (frame) { CVPixelBufferRelease(frame); g_counters.activeIOSurfaces--; frame = nullptr; }
+    }
+    if (_activeFrame) { CVPixelBufferRelease(_activeFrame); _activeFrame = nullptr; }
+    _generation = generation;
+  }
+  if (_frames[slot]) { CVPixelBufferRelease(_frames[slot]); g_counters.activeIOSurfaces--; }
+  g_counters.activeIOSurfaces++;
   _frames[slot] = next;
   
   if (generation >= _generation) {
@@ -89,6 +106,12 @@
   if (generation < _generation) {
     return;
   }
+  if (generation > _generation) {
+    for (auto& frame : _frames) {
+      if (frame) { CVPixelBufferRelease(frame); g_counters.activeIOSurfaces--; frame = nullptr; }
+    }
+    if (_activeFrame) { CVPixelBufferRelease(_activeFrame); _activeFrame = nullptr; }
+  }
   _generation = generation;
   if (slot < 3) {
     _activeSlot = slot;
@@ -105,8 +128,9 @@
 }
 - (void)dealloc {
   for (int i = 0; i < 3; i++) {
-    if (_frames[i]) CVPixelBufferRelease(_frames[i]);
+    if (_frames[i]) { CVPixelBufferRelease(_frames[i]); g_counters.activeIOSurfaces--; }
   }
   if (_activeFrame) CVPixelBufferRelease(_activeFrame);
+  g_counters.activeFlutterTextures--;
 }
 @end

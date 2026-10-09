@@ -1,0 +1,26 @@
+[
+  {
+    "template": "Allocations",
+    "pid": 12468,
+    "elapsedSeconds": 126.675,
+    "startUtc": "2026-10-09T14:40:09Z",
+    "trace": "youtube-120s-allocations.trace",
+    "exitCode": 0
+  },
+  {
+    "template": "Leaks",
+    "pid": 12468,
+    "elapsedSeconds": 270.864,
+    "startUtc": "2026-10-09T14:42:33Z",
+    "trace": "youtube-270s-leaks.trace",
+    "exitCode": 0
+  },
+  {
+    "template": "Allocations",
+    "pid": 12468,
+    "elapsedSeconds": 1020.594,
+    "startUtc": "2026-10-09T14:55:03Z",
+    "trace": "youtube-1020s-allocations.trace",
+    "exitCode": 0
+  }
+]

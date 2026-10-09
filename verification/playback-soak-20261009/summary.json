@@ -1,0 +1,176 @@
+{
+  "requestedSeconds": 1800,
+  "actualMinutes": 30.01835,
+  "liveGatesPassed": true,
+  "failure": null,
+  "hostPids": [
+    8463
+  ],
+  "samples": 62,
+  "completedInteractions": 9,
+  "returnedToIdleBaseline": true,
+  "droppedFramesMeasured": false,
+  "warmupExcludedMinutes": 5,
+  "trendsAfter5Minutes": {
+    "hostRssMiB": {
+      "startMinute": 5.01755,
+      "endMinute": 30.01835,
+      "samples": 52,
+      "slopePerMinute": 0.12001745259886075,
+      "rSquared": 0.6592845061663146,
+      "min": 188.59375,
+      "max": 191.578125,
+      "start": 188.59375,
+      "end": 191.515625
+    },
+    "totalRssMiB": {
+      "startMinute": 5.01755,
+      "endMinute": 30.01835,
+      "samples": 52,
+      "slopePerMinute": 3.6627943110718695,
+      "rSquared": 0.9769501191767778,
+      "min": 1140.140625,
+      "max": 1227.0,
+      "start": 1140.140625,
+      "end": 1227.0
+    },
+    "numericDescriptors": {
+      "startMinute": 5.01755,
+      "endMinute": 30.01835,
+      "samples": 52,
+      "slopePerMinute": 0.0,
+      "rSquared": null,
+      "min": 129,
+      "max": 129,
+      "start": 129,
+      "end": 129
+    },
+    "processCount": {
+      "startMinute": 5.01755,
+      "endMinute": 30.01835,
+      "samples": 52,
+      "slopePerMinute": 0.0,
+      "rSquared": null,
+      "min": 9,
+      "max": 9,
+      "start": 9,
+      "end": 9
+    }
+  },
+  "trendsLast10Minutes": {
+    "hostRssMiB": {
+      "startMinute": 20.5186,
+      "endMinute": 30.01835,
+      "samples": 21,
+      "slopePerMinute": 0.019003596422953694,
+      "rSquared": 0.7588667992942446,
+      "min": 191.328125,
+      "max": 191.578125,
+      "start": 191.328125,
+      "end": 191.515625
+    },
+    "totalRssMiB": {
+      "startMinute": 20.5186,
+      "endMinute": 30.01835,
+      "samples": 21,
+      "slopePerMinute": 3.595231614397988,
+      "rSquared": 0.8047974439249627,
+      "min": 1196.203125,
+      "max": 1227.0,
+      "start": 1196.484375,
+      "end": 1227.0
+    },
+    "numericDescriptors": {
+      "startMinute": 20.5186,
+      "endMinute": 30.01835,
+      "samples": 21,
+      "slopePerMinute": 0.0,
+      "rSquared": null,
+      "min": 129,
+      "max": 129,
+      "start": 129,
+      "end": 129
+    },
+    "processCount": {
+      "startMinute": 20.5186,
+      "endMinute": 30.01835,
+      "samples": 21,
+      "slopePerMinute": 0.0,
+      "rSquared": null,
+      "min": 9,
+      "max": 9,
+      "start": 9,
+      "end": 9
+    }
+  },
+  "checkpoints": [
+    {
+      "elapsedMinutes": 0.007033333333333333,
+      "label": "0 min",
+      "hostPid": 8463,
+      "hostRssMiB": 151.875,
+      "totalRssMiB": 1083.5625,
+      "hostCpuPercent": 5.2,
+      "totalCpuPercent": 40.7,
+      "numericDescriptors": 124,
+      "lsofRows": 189,
+      "processCount": 9,
+      "surfaceGeneration": 2,
+      "completedMetalFrames": 87,
+      "softwareFrames": 0,
+      "failedMetalFrames": 0,
+      "checkpointMinute": 0
+    },
+    {
+      "elapsedMinutes": 5.01755,
+      "label": "300s",
+      "hostPid": 8463,
+      "hostRssMiB": 188.59375,
+      "totalRssMiB": 1140.140625,
+      "hostCpuPercent": 6.3,
+      "totalCpuPercent": 33.0,
+      "numericDescriptors": 129,
+      "lsofRows": 196,
+      "processCount": 9,
+      "surfaceGeneration": 3,
+      "completedMetalFrames": 9138,
+      "softwareFrames": 0,
+      "failedMetalFrames": 0,
+      "checkpointMinute": 5
+    },
+    {
+      "elapsedMinutes": 15.109333333333332,
+      "label": "906s",
+      "hostPid": 8463,
+      "hostRssMiB": 191.421875,
+      "totalRssMiB": 1178.875,
+      "hostCpuPercent": 4.6,
+      "totalCpuPercent": 33.9,
+      "numericDescriptors": 129,
+      "lsofRows": 196,
+      "processCount": 9,
+      "surfaceGeneration": 4,
+      "completedMetalFrames": 27227,
+      "softwareFrames": 0,
+      "failedMetalFrames": 0,
+      "checkpointMinute": 15
+    },
+    {
+      "elapsedMinutes": 30.009516666666666,
+      "label": "1800s",
+      "hostPid": 8463,
+      "hostRssMiB": 191.515625,
+      "totalRssMiB": 1222.234375,
+      "hostCpuPercent": 5.4,
+      "totalCpuPercent": 29.0,
+      "numericDescriptors": 129,
+      "lsofRows": 196,
+      "processCount": 9,
+      "surfaceGeneration": 5,
+      "completedMetalFrames": 53956,
+      "softwareFrames": 0,
+      "failedMetalFrames": 0,
+      "checkpointMinute": 30
+    }
+  ]
+}

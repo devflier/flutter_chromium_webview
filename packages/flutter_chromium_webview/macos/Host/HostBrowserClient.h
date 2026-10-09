@@ -35,6 +35,10 @@ public:
         std::vector<IOSurfaceRef> io_surfaces;
         uint32_t current_surface_slot = 0;
         
+#if DEBUG
+        uint64_t completedMetalFrames = 0;
+        uint64_t failedMetalFrames = 0;
+#endif
         // Telemetry
         uint64_t softwareFrames = 0;
         uint64_t acceleratedFrames = 0;
@@ -55,7 +59,10 @@ public:
                                           CefProcessId source_process,
                                           CefRefPtr<CefProcessMessage> message) override;
 
-    CefRefPtr<CefRequestHandler> GetRequestHandler() override { return this; }
+    CefRefPtr<CefRequestHandler> GetRequestHandler() override {
+        NSLog(@"[CEFHost] GetRequestHandler called");
+        return this;
+    }
     
     CefRefPtr<CefResourceRequestHandler> GetResourceRequestHandler(
         CefRefPtr<CefBrowser> browser,
@@ -73,6 +80,9 @@ public:
     void EvaluateJavaScript(const IPC::Message& request);
     void CancelJavaScript(int64_t browserId, const std::string& operationId);
     size_t PendingJavaScriptCount() const { return pending_js_.size(); }
+#if DEBUG
+    NSDictionary* RenderDiagnostics(int64_t browserId);
+#endif
 
     // CefLifeSpanHandler methods:
     virtual void OnAfterCreated(CefRefPtr<CefBrowser> browser) override;

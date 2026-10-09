@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
   s.requires_arc = true
   s.frameworks = 'Cocoa', 'CoreVideo', 'IOSurface', 'Metal'
   s.libraries = 'c++'
-  s.preserve_paths = 'cef/**/*', 'scripts/**/*', 'Helpers/**/*', 'CMakeLists.txt', '../native/**/*'
+  s.preserve_paths = 'cef/**/*', 'scripts/**/*', 'Helpers/**/*', 'Host/**/*', 'CMakeLists.txt', '../native/**/*'
   s.vendored_libraries = 'cef/build/lib/libcef_dll_wrapper.a'
   # CocoaPods skips prepare_command for development/path pods. See Podfile setup
   # in MACOS.md; the example prepares explicitly before pod installation.

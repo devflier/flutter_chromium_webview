@@ -28,6 +28,11 @@ def sign(path, identity, entitlements=None):
     subprocess.run(command + [str(path)], check=True)
 
 
+def renderer_entitlements():
+    name = "RendererDebug.entitlements" if os.environ.get("CONFIGURATION", "Release").lower() == "debug" else "Renderer.entitlements"
+    return ROOT / "Helpers" / name
+
+
 def embed():
     if sys.platform != "darwin":
         raise RuntimeError("CEF embedding requires macOS")
@@ -40,6 +45,13 @@ def embed():
     if app.suffix != ".app" or not contents.is_dir():
         raise RuntimeError(f"Expected built Runner app: {app}")
         
+    project = Path(os.environ["PROJECT_DIR"])
+    entitlements = os.environ.get("CODE_SIGN_ENTITLEMENTS")
+    if entitlements:
+        values = plistlib.loads((project / entitlements).read_bytes())
+        if values.get("com.apple.security.app-sandbox"):
+            raise RuntimeError("This CEF backend targets direct distribution, not Apple's App Sandbox; see MACOS.md")
+
     identity = os.environ.get("EXPANDED_CODE_SIGN_IDENTITY") or "-"
 
     if app.name != "ChromiumWebViewHost.app":
@@ -52,6 +64,25 @@ def embed():
                 shutil.rmtree(host_dest)
             shutil.copytree(host_source, host_dest, symlinks=True)
             
+            sources = ROOT / "Host"
+            command = ["xcrun", "clang++", "-std=c++20", "-arch", config["arch"],
+                       "-fobjc-arc", "-mmacosx-version-min=13.0",
+                       "-I" + str(ROOT / "cef/root"),
+                       "-F" + str(ROOT / "cef/root/Release"),
+                       "-L" + str(ROOT / "cef/build/lib")]
+            if os.environ.get("CONFIGURATION", "Release").lower() == "debug":
+                command += ["-DDEBUG=1", "-g"]
+            else:
+                command += ["-O2"]
+            command += [str(sources / name) for name in (
+                "main.mm", "ChromiumHostApp.mm", "IpcServer.mm", "IpcConnection.mm",
+                "HostBrowserClient.mm", "JavaScriptRequests.mm")]
+            command += [str(ROOT / "Classes/Protocol.mm"),
+                        "-framework", "Chromium Embedded Framework", "-framework", "Cocoa",
+                        "-framework", "IOSurface", "-framework", "CoreVideo", "-framework", "Metal",
+                        "-lcef_dll_wrapper", "-o", str(host_dest / "Contents/MacOS/ChromiumWebViewHost")]
+            subprocess.run(command, check=True)
+
             # Re-sign the inner frameworks and helpers with the current identity
             host_frameworks = host_dest / "Contents" / "Frameworks"
             cef_framework = host_frameworks / "Chromium Embedded Framework.framework"
@@ -63,19 +94,13 @@ def embed():
             for suffix in SUFFIXES:
                 helper_app = host_frameworks / ("ChromiumWebView Helper" + suffix + ".app")
                 if helper_app.exists():
-                    entitlements = ROOT / "Helpers/Renderer.entitlements" if suffix == " (Renderer)" else None
+                    entitlements = renderer_entitlements() if suffix == " (Renderer)" else None
                     sign(helper_app, identity, entitlements)
             
             sign(host_dest, identity)
         print("Embedded ChromiumWebViewHost.app into Flutter App")
         return
 
-    project = Path(os.environ["PROJECT_DIR"])
-    entitlements = os.environ.get("CODE_SIGN_ENTITLEMENTS")
-    if entitlements:
-        values = plistlib.loads((project / entitlements).read_bytes())
-        if values.get("com.apple.security.app-sandbox"):
-            raise RuntimeError("This CEF backend targets direct distribution, not Apple's App Sandbox; see MACOS.md")
     framework_source = ROOT / "cef/root/Release/Chromium Embedded Framework.framework"
     frameworks = contents / "Frameworks"
     frameworks.mkdir(exist_ok=True)
@@ -106,7 +131,7 @@ def embed():
         sign(library, identity)
     sign(framework, identity)
     for suffix in SUFFIXES:
-        entitlements = ROOT / "Helpers/Renderer.entitlements" if suffix == " (Renderer)" else None
+        entitlements = renderer_entitlements() if suffix == " (Renderer)" else None
         sign(frameworks / ("ChromiumWebView Helper" + suffix + ".app"), identity, entitlements)
 
     print(f"Embedded CEF {config['version']} ({config['arch']}) and five signed helpers")

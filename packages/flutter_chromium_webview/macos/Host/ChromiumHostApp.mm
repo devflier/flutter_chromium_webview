@@ -78,6 +78,24 @@
         return;
     }
 
+#if DEBUG
+    if (message.type == "getRenderDiagnostics") {
+        IPC::Message response;
+        response.type = "renderDiagnostics";
+        response.requestId = message.requestId;
+        response.payload = self.browserClient->RenderDiagnostics([message.payload[@"browserId"] longLongValue]);
+        [connection sendMessage:response];
+        return;
+    }
+    if (message.type == "getResourceCounters") {
+        IPC::Message response;
+        response.type = "resourceCounters";
+        response.requestId = message.requestId;
+        response.payload = g_counters.snapshot();
+        [connection sendMessage:response];
+        return;
+    }
+#endif
     if (message.type == "shutdown") {
         IPC::Message ack;
         ack.type = "shutdownAck";
