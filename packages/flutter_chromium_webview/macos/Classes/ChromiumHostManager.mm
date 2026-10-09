@@ -28,16 +28,7 @@
     self = [super init];
     if (self) {
         _state = HostStateStopped;
-        _ipcClient = [[ChromiumIpcClient alloc] init];
-        __weak ChromiumHostManager* weakSelf = self;
-        _ipcClient.onDisconnect = ^{
-            [weakSelf handleDisconnect];
-        };
-        _ipcClient.onPushMessage = ^(const IPC::Message& msg) {
-            if (weakSelf.delegate) {
-                [weakSelf.delegate onHostMessage:msg];
-            }
-        };
+
     }
     return self;
 }
@@ -48,6 +39,7 @@
 }
 
 - (void)failLaunchWithError:(NSError*)error {
+    NSLog(@"[ChromiumHostManager] launch failed: %@", error);
     [self transitionToState:HostStateFailed];
     [self cleanup];
     if (_launchCompletion) {
@@ -84,6 +76,22 @@
         return;
     }
     
+    // A connection and its delayed callbacks belong to one host launch.
+    // Never let a dying host disconnect a replacement connection.
+    [_ipcClient disconnect];
+    _ipcClient = [[ChromiumIpcClient alloc] init];
+    __weak ChromiumHostManager* manager = self;
+    __weak ChromiumIpcClient* client = _ipcClient;
+    _ipcClient.onDisconnect = ^{
+        ChromiumHostManager* owner = manager;
+        if (owner && owner->_ipcClient == client) [owner handleDisconnect];
+    };
+    _ipcClient.onPushMessage = ^(const IPC::Message& msg) {
+        ChromiumHostManager* owner = manager;
+        if (owner && owner->_ipcClient == client && owner.delegate)
+            [owner.delegate onHostMessage:msg];
+    };
+
     _launchCompletion = [completion copy];
     [self transitionToState:HostStateLaunching];
     NSLog(@"[ChromiumHostManager] launching");
@@ -117,14 +125,16 @@
     
     _task = [[NSTask alloc] init];
     _task.launchPath = hostAppPath;
+    NSLog(@"[ChromiumHostManager] executable=%@", hostAppPath);
     
-    _task.standardOutput = [NSFileHandle fileHandleForWritingAtPath:@"/tmp/cef_host.log"];
-    _task.standardError = [NSFileHandle fileHandleForWritingAtPath:@"/tmp/cef_host.log"];
-    if (!_task.standardOutput) {
-        [[NSFileManager defaultManager] createFileAtPath:@"/tmp/cef_host.log" contents:nil attributes:nil];
-        _task.standardOutput = [NSFileHandle fileHandleForWritingAtPath:@"/tmp/cef_host.log"];
-        _task.standardError = [NSFileHandle fileHandleForWritingAtPath:@"/tmp/cef_host.log"];
-    }
+    NSString* logPath = NSProcessInfo.processInfo.environment[@"CEF_HOST_LOG_FILE"] ?: @"/tmp/cef_host.log";
+    BOOL preserveRunLog = NSProcessInfo.processInfo.environment[@"CEF_HOST_LOG_FILE"] != nil;
+    if (!preserveRunLog || ![[NSFileManager defaultManager] fileExistsAtPath:logPath])
+        [[NSFileManager defaultManager] createFileAtPath:logPath contents:nil attributes:nil];
+    NSFileHandle* output = [NSFileHandle fileHandleForWritingAtPath:logPath];
+    if (preserveRunLog) [output seekToEndOfFile];
+    _task.standardOutput = output;
+    _task.standardError = output;
     _task.arguments = @[
         [NSString stringWithFormat:@"--ipc-socket=%@", _socketPath],
         [NSString stringWithFormat:@"--ipc-token=%@", _token],
@@ -134,7 +144,8 @@
     __weak ChromiumHostManager* weakSelf = self;
     _task.terminationHandler = ^(NSTask* t) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [weakSelf handleHostTermination];
+            ChromiumHostManager* owner = weakSelf;
+            if (owner && owner->_task == t) [owner handleHostTermination];
         });
     };
     

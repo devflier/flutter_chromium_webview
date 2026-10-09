@@ -21,6 +21,26 @@ embed = load("embed_cef")
 
 
 class DistributionTests(unittest.TestCase):
+    def test_clean_runner_build_compiles_host_without_a_prebuilt_host_app(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "cef").mkdir()
+            (root / "cef/config.json").write_text('{"arch":"arm64"}')
+            (root / "Runner.app/Contents").mkdir(parents=True)
+            environment = {"ARCHS": "arm64", "TARGET_BUILD_DIR": str(root),
+                           "FULL_PRODUCT_NAME": "Runner.app", "PROJECT_DIR": str(root)}
+            with patch.object(embed, "ROOT", root), patch.object(embed.sys, "platform", "darwin"), \
+                    patch.dict(embed.os.environ, environment), \
+                    patch.object(embed.subprocess, "run", side_effect=RuntimeError("compiler reached")) as run:
+                with self.assertRaisesRegex(RuntimeError, "compiler reached"):
+                    embed.embed()
+            command = run.call_args.args[0]
+            for source in ("main.mm", "HostBrowserClient.mm", "NativeUi.mm"):
+                self.assertIn(str(root / "Host" / source), command)
+            output = root / "Runner.app/Contents/Frameworks/ChromiumWebViewHost.app/Contents/MacOS/ChromiumWebViewHost"
+            self.assertEqual(command[command.index("-o") + 1], str(output))
+            self.assertTrue(output.parent.is_dir())
+
     def test_debug_renderer_is_attachable_but_release_is_not(self):
         for configuration, expected in (("Debug", True), ("Release", False), ("Profile", False)):
             with self.subTest(configuration=configuration), patch.dict(embed.os.environ, {"CONFIGURATION": configuration}):

@@ -1,5 +1,7 @@
 #pragma once
 #include "include/cef_client.h"
+#include "include/cef_jsdialog_handler.h"
+#include "include/cef_context_menu_handler.h"
 #include "include/cef_render_handler.h"
 #include "include/cef_life_span_handler.h"
 #include "include/cef_display_handler.h"
@@ -10,6 +12,8 @@
 #include <functional>
 #include "../Classes/Protocol.h"
 #include "../../native/javascript_bridge.h"
+#include "../../native/html_document.h"
+#include "../../native/browser_settings.h"
 #include <IOSurface/IOSurface.h>
 
 class HostBrowserClient : public CefClient,
@@ -17,7 +21,9 @@ class HostBrowserClient : public CefClient,
                           public CefLifeSpanHandler,
                           public CefDisplayHandler,
                           public CefLoadHandler,
-                          public CefRequestHandler {
+                          public CefRequestHandler,
+                          public CefJSDialogHandler,
+                          public CefContextMenuHandler {
 public:
     struct BrowserSession {
         int64_t browser_id;
@@ -32,6 +38,7 @@ public:
         chromium_bridge::Policy javascript_policy;
         std::string context_token;
         bool renderer_gone = false;
+        CefRefPtr<chromium_settings::UserAgent> user_agent;
         CefRefPtr<CefDevToolsMessageObserver> media_observer;
         CefRefPtr<CefRegistration> media_observer_registration;
         
@@ -80,6 +87,8 @@ public:
     bool OnBeforeBrowse(CefRefPtr<CefBrowser>, CefRefPtr<CefFrame>, CefRefPtr<CefRequest>, bool, bool) override;
     void OnRenderProcessTerminated(CefRefPtr<CefBrowser>, TerminationStatus, int, const CefString&) override;
     
+    void ClearHtml(int64_t browserId);
+    void SetUserAgent(const IPC::Message& request);
     void LoadHtmlString(int64_t browser_id, const std::string& html, const std::string& base_url);
     void EvaluateJavaScript(const IPC::Message& request);
     void CancelJavaScript(int64_t browserId, const std::string& operationId);
@@ -87,6 +96,19 @@ public:
 #if DEBUG
     NSDictionary* RenderDiagnostics(int64_t browserId);
 #endif
+
+    CefRefPtr<CefJSDialogHandler> GetJSDialogHandler() override { return this; }
+    CefRefPtr<CefContextMenuHandler> GetContextMenuHandler() override { return this; }
+    bool OnJSDialog(CefRefPtr<CefBrowser>, const CefString&, JSDialogType,
+        const CefString&, const CefString&, CefRefPtr<CefJSDialogCallback>, bool&) override;
+    void OnResetDialogState(CefRefPtr<CefBrowser>) override;
+    bool RunContextMenu(CefRefPtr<CefBrowser>, CefRefPtr<CefFrame>,
+        CefRefPtr<CefContextMenuParams>, CefRefPtr<CefMenuModel>,
+        CefRefPtr<CefRunContextMenuCallback>) override;
+    void CloseJSDialog(int64_t browserId, int dialogId, bool success, const std::string& input);
+    void CloseContextMenu(int64_t browserId, int menuId, int commandId);
+    void OnPopupShow(CefRefPtr<CefBrowser>, bool) override;
+    void OnPopupSize(CefRefPtr<CefBrowser>, const CefRect&) override;
 
     // CefLifeSpanHandler methods:
     virtual void OnAfterCreated(CefRefPtr<CefBrowser> browser) override;
@@ -113,13 +135,17 @@ public:
     virtual void OnLoadingStateChange(CefRefPtr<CefBrowser> browser, bool isLoading, bool canGoBack, bool canGoForward) override;
     virtual void OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, ErrorCode errorCode, const CefString& errorText, const CefString& failedUrl) override;
 
-    void CreateBrowser(int64_t browser_id, const std::string& url, int width, int height, double scale_factor, uint64_t request_id, const std::string& javascriptChannels);
+    void CreateBrowser(int64_t browser_id, const std::string& url, int width, int height, double scale_factor, uint64_t request_id, const std::string& javascriptChannels, bool requiresGesture, const std::string& profile);
     void CloseBrowser(int64_t browser_id);
     void ResizeBrowser(int64_t browser_id, int width, int height, double scale_factor);
 
     BrowserSession* GetSession(int64_t browser_id);
 
 private:
+    int next_ui_id_ = 1;
+    std::map<int, std::pair<int64_t, CefRefPtr<CefJSDialogCallback>>> dialogs_;
+    std::map<int, std::pair<int64_t, CefRefPtr<CefRunContextMenuCallback>>> menus_;
+    void UiEvent(int64_t browserId, NSString* name, NSDictionary* args);
     struct JavaScriptRequest {
         int64_t browserId;
         std::string operationId, contextToken;
@@ -138,7 +164,7 @@ private:
 
     
     std::mutex html_mutex_;
-    std::unordered_map<std::string, std::string> pending_html_;
+    std::unordered_map<int, CefRefPtr<chromium_html::Documents>> html_documents_;
     
     IMPLEMENT_REFCOUNTING(HostBrowserClient);
 };

@@ -57,6 +57,20 @@ void HostBrowserClient::EvaluateJavaScript(const IPC::Message& message) {
     if (timeout < 1 || timeout > 60000) {
         FailJavaScript(message.requestId, "invalid_argument", "Timeout must be between 1 and 60000 milliseconds"); return;
     }
+    // executeJavaScript acknowledges dispatch, not completion. A dialog or an
+    // unresolved promise must not block callers from navigating or disposing.
+    if (message.type == "executeJavaScript") {
+        session->browser->GetMainFrame()->ExecuteJavaScript([source UTF8String], "", 0);
+        pending_js_.erase(message.requestId);
+        g_counters.pendingIpcRequests--;
+        IPC::Message response;
+        response.type = "javascriptResult";
+        response.requestId = message.requestId;
+        response.browserId = std::to_string(browserId);
+        response.payload = @{@"browserId": @(browserId), @"value": NSNull.null};
+        if (on_message_) on_message_(response);
+        return;
+    }
     auto execute = CefProcessMessage::Create(chromium_bridge::kEvaluate);
     auto args = execute->GetArgumentList();
     args->SetString(0, std::to_string(message.requestId));

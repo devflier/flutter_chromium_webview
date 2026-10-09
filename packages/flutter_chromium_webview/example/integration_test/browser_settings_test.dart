@@ -38,7 +38,12 @@ Uint8List wav() {
 }
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isMacOS) {
+    // Manual pumps must finish even when macOS throttles a background window.
+    binding.framePolicy =
+        LiveTestWidgetsFlutterBindingFramePolicy.benchmarkLive;
+  }
   testWidgets('browser user-agent and autoplay settings stay isolated', (
     tester,
   ) async {

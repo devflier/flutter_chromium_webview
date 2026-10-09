@@ -18,67 +18,6 @@
 
 namespace {
 
-class StringResourceHandler : public CefResourceHandler {
-public:
-    StringResourceHandler(const std::string& html) 
-        : html_(html), offset_(0) {}
-    
-    bool ProcessRequest(CefRefPtr<CefRequest> request,
-                        CefRefPtr<CefCallback> callback) override {
-        callback->Continue();
-        return true;
-    }
-    
-    void GetResponseHeaders(CefRefPtr<CefResponse> response,
-                            int64_t& response_length,
-                            CefString& redirectUrl) override {
-        response->SetStatus(200);
-        response->SetMimeType("text/html");
-        response_length = html_.length();
-        CefResponse::HeaderMap headerMap;
-        response->GetHeaderMap(headerMap);
-        headerMap.insert(std::make_pair("Access-Control-Allow-Origin", "*"));
-        response->SetHeaderMap(headerMap);
-    }
-    
-    bool ReadResponse(void* data_out,
-                      int bytes_to_read,
-                      int& bytes_read,
-                      CefRefPtr<CefCallback> callback) override {
-        if (offset_ >= html_.length()) {
-            bytes_read = 0;
-            return false;
-        }
-        int size = std::min((int)(html_.length() - offset_), bytes_to_read);
-        memcpy(data_out, html_.c_str() + offset_, size);
-        offset_ += size;
-        bytes_read = size;
-        return true;
-    }
-    
-    void Cancel() override {}
-    
-private:
-    std::string html_;
-    size_t offset_;
-    IMPLEMENT_REFCOUNTING(StringResourceHandler);
-};
-
-class HtmlResourceRequestHandler : public CefResourceRequestHandler {
-public:
-    HtmlResourceRequestHandler(const std::string& html) : html_(html) {}
-    
-    CefRefPtr<CefResourceHandler> GetResourceHandler(
-        CefRefPtr<CefBrowser> browser,
-        CefRefPtr<CefFrame> frame,
-        CefRefPtr<CefRequest> request) override {
-        return new StringResourceHandler(html_);
-    }
-private:
-    std::string html_;
-    IMPLEMENT_REFCOUNTING(HtmlResourceRequestHandler);
-};
-
 class MediaDevToolsObserver : public CefDevToolsMessageObserver {
 public:
     CefRefPtr<HostBrowserClient> client;
@@ -219,7 +158,7 @@ NSDictionary* HostBrowserClient::RenderDiagnostics(int64_t browserId) {
 }
 #endif
 
-void HostBrowserClient::CreateBrowser(int64_t browser_id, const std::string& url, int width, int height, double scale_factor, uint64_t request_id, const std::string& javascriptChannels) {
+void HostBrowserClient::CreateBrowser(int64_t browser_id, const std::string& url, int width, int height, double scale_factor, uint64_t request_id, const std::string& javascriptChannels, bool requiresGesture, const std::string& profile) {
     CEF_REQUIRE_UI_THREAD();
     if (width <= 0) width = 1;
     if (height <= 0) height = 1;
@@ -235,6 +174,7 @@ void HostBrowserClient::CreateBrowser(int64_t browser_id, const std::string& url
     session.frameSequence = 0;
     session.creation_request_id = request_id;
     session.javascript_policy.Configure(javascriptChannels);
+    session.user_agent = new chromium_settings::UserAgent;
     
 
     _sessions[browser_id] = session;
@@ -256,8 +196,9 @@ void HostBrowserClient::CreateBrowser(int64_t browser_id, const std::string& url
     // Picking an arbitrary unbound session in OnAfterCreated swaps concurrent
     // browsers (and consequently their textures, focus and input destinations).
     creating_browser_id_ = browser_id;
+    auto context = chromium_settings::CustomContext(requiresGesture, profile);
     auto browser = CefBrowserHost::CreateBrowserSync(window_info, this, url,
-                                                     browser_settings, extra_info, nullptr);
+                                                     browser_settings, extra_info, context);
     creating_browser_id_ = -1;
     auto& created = _sessions.at(browser_id);
     if (!browser) {
@@ -271,6 +212,17 @@ void HostBrowserClient::CreateBrowser(int64_t browser_id, const std::string& url
         return;
     }
     created.browser = browser;
+    std::string settingsError;
+    if (!requiresGesture && (!context || !chromium_settings::AllowAutoplay(browser, settingsError))) {
+        CloseBrowser(browser_id);
+        IPC::Message error;
+        error.type = "error";
+        error.requestId = request_id;
+        error.payload = @{@"message": [NSString stringWithUTF8String:settingsError.c_str()]};
+        if (on_message_) on_message_(error);
+        return;
+    }
+    NSLog(@"[CEFHost] browserCreated id=%lld", browser_id);
     IPC::Message ack;
     ack.type = "browserCreated";
     ack.requestId = request_id;
@@ -300,47 +252,75 @@ void HostBrowserClient::CreateBrowser(int64_t browser_id, const std::string& url
     created.current_surface_slot = 0;
 }
 
+void HostBrowserClient::SetUserAgent(const IPC::Message& request) {
+    auto* session = GetSession([request.payload[@"browserId"] longLongValue]);
+    if (!session || !session->browser) {
+        IPC::Message error;
+        error.type = "error";
+        error.requestId = request.requestId;
+        error.payload = @{@"message": @"Browser closed before the user-agent change"};
+        if (on_message_) on_message_(error);
+        return;
+    }
+    CefRefPtr<HostBrowserClient> self = this;
+    NSString* value = request.payload[@"userAgent"];
+    session->user_agent->Set(session->browser, [value UTF8String],
+        [self, request](bool success, const std::string& detail) {
+            IPC::Message response;
+            response.type = success ? "userAgentChanged" : "error";
+            response.requestId = request.requestId;
+            response.payload = @{@"message": [NSString stringWithUTF8String:detail.c_str()]};
+            if (self->on_message_) self->on_message_(response);
+        });
+}
+
 void HostBrowserClient::LoadHtmlString(int64_t browser_id, const std::string& html, const std::string& base_url) {
     CEF_REQUIRE_UI_THREAD();
-    
-    NSLog(@"[CEFHost] LoadHtmlString called with baseUrl: %s", base_url.c_str());
-    
-    auto session = GetSession(browser_id);
-    if (session && session->browser) {
-        {
-            std::lock_guard<std::mutex> lock(html_mutex_);
-            pending_html_[base_url] = html;
-            // Also store with a trailing slash just in case CEF requests it that way
-            pending_html_[base_url + "/"] = html;
-        }
-        session->browser->GetMainFrame()->LoadURL(base_url);
+    auto* session = GetSession(browser_id);
+    if (!session || !session->browser) return;
+    CefRefPtr<chromium_html::Documents> documents;
+    {
+        std::lock_guard<std::mutex> lock(html_mutex_);
+        auto& entry = html_documents_[session->browser->GetIdentifier()];
+        if (!entry) entry = new chromium_html::Documents;
+        documents = entry;
     }
+    std::string canonical;
+    if (documents->Set(html, base_url, canonical))
+        session->browser->GetMainFrame()->LoadURL(canonical);
+}
+
+void HostBrowserClient::ClearHtml(int64_t browserId) {
+    CEF_REQUIRE_UI_THREAD();
+    auto* session = GetSession(browserId);
+    if (!session || !session->browser) return;
+    std::lock_guard<std::mutex> lock(html_mutex_);
+    html_documents_.erase(session->browser->GetIdentifier());
 }
 
 CefRefPtr<CefResourceRequestHandler> HostBrowserClient::GetResourceRequestHandler(
-    CefRefPtr<CefBrowser> browser,
-    CefRefPtr<CefFrame> frame,
-    CefRefPtr<CefRequest> request,
-    bool is_navigation,
-    bool is_download,
-    const CefString& request_initiator,
-    bool& disable_default_handling) {
-    
-    std::string url = request->GetURL().ToString();
-    NSLog(@"[CEFHost] GetResourceRequestHandler for URL: %s", url.c_str());
-
-    std::lock_guard<std::mutex> lock(html_mutex_);
-    auto it = pending_html_.find(url);
-    if (it != pending_html_.end()) {
-        std::string html = it->second;
-        pending_html_.erase(it); // Remove after serving once to not leak memory, though if they reload it might break unless we re-send it.
-        return new HtmlResourceRequestHandler(html);
+    CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
+    CefRefPtr<CefRequest> request, bool navigation, bool download,
+    const CefString& initiator, bool& disable_default) {
+    if (!browser) return nullptr;
+    CefRefPtr<chromium_html::Documents> documents;
+    {
+        std::lock_guard<std::mutex> lock(html_mutex_);
+        auto found = html_documents_.find(browser->GetIdentifier());
+        if (found == html_documents_.end()) return nullptr;
+        documents = found->second;
     }
-    return nullptr;
+    return documents->GetResourceRequestHandler(browser, frame, request, navigation,
+        download, initiator, disable_default);
 }
 
 void HostBrowserClient::CloseBrowser(int64_t browser_id) {
     CEF_REQUIRE_UI_THREAD();
+    if (auto* session = GetSession(browser_id); session && session->browser)
+        OnResetDialogState(session->browser);
+    if (auto* session = GetSession(browser_id); session && session->user_agent)
+        session->user_agent->Cancel();
+    ClearHtml(browser_id);
     InvalidateJavaScript(browser_id, "browser_closed", "Browser closed");
     auto it = _sessions.find(browser_id);
     if (it != _sessions.end() && it->second.browser) {
@@ -440,6 +420,8 @@ void HostBrowserClient::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
     CEF_REQUIRE_UI_THREAD();
     int64_t id = GetBrowserId(browser);
     if (id != -1) {
+        if (auto* session = GetSession(id); session && session->user_agent) session->user_agent->Cancel();
+        ClearHtml(id);
         InvalidateJavaScript(id, "browser_closed", "Browser closed");
         IPC::Message msg;
         msg.type = "browserClosed";

@@ -82,7 +82,7 @@ def embed():
             command += ["-O2"]
         command += [str(sources / name) for name in (
             "main.mm", "ChromiumHostApp.mm", "IpcServer.mm", "IpcConnection.mm",
-            "HostBrowserClient.mm", "JavaScriptRequests.mm")]
+            "HostBrowserClient.mm", "JavaScriptRequests.mm", "NativeUi.mm")]
         command += [str(ROOT / "Classes/Protocol.mm"),
                     "-framework", "Chromium Embedded Framework", "-framework", "Cocoa",
                     "-framework", "IOSurface", "-framework", "CoreVideo", "-framework", "Metal",

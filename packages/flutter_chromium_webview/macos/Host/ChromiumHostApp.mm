@@ -114,9 +114,11 @@
         int height = [message.payload[@"height"] intValue];
         double scale = [message.payload[@"deviceScaleFactor"] doubleValue];
         NSString* jsChannels = message.payload[@"javascriptChannels"] ?: @"{}";
+        bool requiresGesture = message.payload[@"mediaPlaybackRequiresUserGesture"] ? [message.payload[@"mediaPlaybackRequiresUserGesture"] boolValue] : true;
+        NSString* profile = message.payload[@"profileName"] ?: @"";
         uint64_t reqId = message.requestId;
         dispatch_async(dispatch_get_main_queue(), ^{
-            self.browserClient->CreateBrowser(browserId, [url UTF8String], width, height, scale, reqId, [jsChannels UTF8String]);
+            self.browserClient->CreateBrowser(browserId, [url UTF8String], width, height, scale, reqId, [jsChannels UTF8String], requiresGesture, [profile UTF8String]);
         });
     } else if (message.type == "closeBrowser") {
         int64_t browserId = [message.payload[@"browserId"] longLongValue];
@@ -144,6 +146,7 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             auto session = self.browserClient->GetSession(browserId);
             if (session && session->browser) {
+                self.browserClient->ClearHtml(browserId);
                 session->browser->GetMainFrame()->LoadURL([url UTF8String]);
             }
         });
@@ -189,6 +192,22 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             self.browserClient->EvaluateJavaScript(request);
         });
+    } else if (message.type == "closeJSDialog" || message.type == "closeContextMenu") {
+        IPC::Message request = message;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            int64_t browserId = [request.payload[@"browserId"] longLongValue];
+            if (request.type == "closeJSDialog") {
+                NSString* input = request.payload[@"userInput"] ?: @"";
+                self.browserClient->CloseJSDialog(browserId, [request.payload[@"dialogId"] intValue],
+                    [request.payload[@"success"] boolValue], [input UTF8String]);
+            } else {
+                self.browserClient->CloseContextMenu(browserId, [request.payload[@"menuId"] intValue],
+                    [request.payload[@"commandId"] intValue]);
+            }
+        });
+    } else if (message.type == "setUserAgent") {
+        IPC::Message request = message;
+        dispatch_async(dispatch_get_main_queue(), ^{ self.browserClient->SetUserAgent(request); });
     } else if (message.type == "cancelJavaScript") {
         int64_t browserId = [message.payload[@"browserId"] longLongValue];
         NSString* operation = message.payload[@"operationId"];
@@ -389,7 +408,6 @@ void ChromiumHostApp::OnBeforeCommandLineProcessing(const CefString& process_typ
     command_line->AppendSwitch("enable-gpu");
     command_line->AppendSwitch("enable-gpu-compositing");
     command_line->AppendSwitch("force-gpu-rasterization");
-    command_line->AppendSwitchWithValue("autoplay-policy", "no-user-gesture-required");
 }
 
 void ChromiumHostApp::StartIpcServer() {
@@ -401,6 +419,7 @@ void ChromiumHostApp::StartIpcServer() {
     if ([delegate.server startAndReturnError:&error]) {
         NSLog(@"[CEFHost] socket listening on %@", _socketPath);
     } else {
+        _startupFailed = true;
         NSLog(@"[CEFHost] Failed to start IPC server: %@", error);
         CefQuitMessageLoop();
     }

@@ -7,7 +7,12 @@ import 'package:flutter_chromium_webview/chromium_youtube_player.dart';
 import 'package:flutter_chromium_webview/flutter_chromium_webview.dart';
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isMacOS) {
+    // Manual pumps must finish even when macOS throttles a background window.
+    binding.framePolicy =
+        LiveTestWidgetsFlutterBindingFramePolicy.benchmarkLive;
+  }
   testWidgets(
     'renderer executes YouTube adapter contract and isolates players',
     (tester) async {

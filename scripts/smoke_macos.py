@@ -1,5 +1,6 @@
 """Launch a copied example bundle and require a normal, complete CEF shutdown."""
 import argparse
+import os
 from pathlib import Path
 import plistlib
 import shutil
@@ -20,13 +21,20 @@ def smoke(source, logs):
         executable = app / "Contents/MacOS" / info["CFBundleExecutable"]
         stderr = logs / "macos-packaged-stderr.log"
         with stderr.open("wb") as output:
-            process = subprocess.Popen([str(executable)], stdout=output, stderr=subprocess.STDOUT)
+            host_log = logs / "macos-packaged-host.log"
+            cef_log = logs / "macos-packaged-cef.log"
+            host_log.unlink(missing_ok=True)
+            cef_log.unlink(missing_ok=True)
+            environment = dict(os.environ, CEF_HOST_LOG_FILE=str(host_log), CEF_LOG_FILE=str(cef_log),
+                               CEF_INPUT_TEST_USE_MOCK_KEYCHAIN="1")
+            process = subprocess.Popen([str(executable)], stdout=output, stderr=subprocess.STDOUT, env=environment)
             try:
                 deadline = time.monotonic() + 45
                 while time.monotonic() < deadline:
                     if process.poll() is not None:
                         raise RuntimeError(f"App exited during startup: {process.returncode}")
-                    if "[CEF] Initialization result: 1" in stderr.read_text(errors="replace"):
+                    if ("[ChromiumHostManager] ready" in stderr.read_text(errors="replace")
+                            and host_log.exists() and "[CEFHost] browserCreated" in host_log.read_text(errors="replace")):
                         break
                     time.sleep(0.25)
                 else:
@@ -40,11 +48,19 @@ def smoke(source, logs):
                 code = process.wait(timeout=20)
                 if code != 0:
                     raise RuntimeError(f"Normal quit exited with code {code}")
-                if "[CEF] Shutdown complete" not in stderr.read_text(errors="replace"):
+                # The host finishes CEF shutdown asynchronously after Runner quits.
+                # Wait for observed process exit, with a deadline, rather than a fixed sleep.
+                deadline = time.monotonic() + 20
+                while True:
+                    listing = subprocess.check_output(["ps", "-axo", "command="], text=True)
+                    bundle_processes = [line for line in listing.splitlines() if str(app / "Contents/") in line]
+                    if not bundle_processes:
+                        break
+                    if time.monotonic() >= deadline:
+                        raise RuntimeError(f"Bundle processes survived application quit: {bundle_processes}")
+                    time.sleep(0.1)
+                if "[CEFHost] CefShutdown complete" not in host_log.read_text(errors="replace"):
                     raise RuntimeError("CEF shutdown did not complete")
-                listing = subprocess.check_output(["ps", "-axo", "command="], text=True)
-                if str(app / "Contents/Frameworks/ChromiumWebView Helper") in listing:
-                    raise RuntimeError("CEF helpers survived application quit")
                 print("Copied macOS bundle startup and normal shutdown passed")
             finally:
                 if process.poll() is None:
