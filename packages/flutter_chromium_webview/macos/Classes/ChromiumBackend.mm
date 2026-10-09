@@ -94,19 +94,19 @@ class BrowserProxy {
 
 
   
-  void OnSurfaceCreated(IOSurfaceRef surface, uint32_t slot, int width, int height, bool isPopup) {
+  void OnSurfaceCreated(IOSurfaceRef surface, uint32_t slot, int width, int height, uint32_t generation, bool isPopup) {
     if (closing_) {
         CFRelease(surface);
         return;
     }
     ChromiumTexture* target = isPopup ? popup_ : main_;
-    [target updateWithIOSurface:surface slot:slot width:width height:height];
+    [target updateWithIOSurface:surface slot:slot width:width height:height generation:generation];
   }
   
-  void OnSurfaceFrameReady(uint32_t slot, bool isPopup) {
+  void OnSurfaceFrameReady(uint32_t slot, uint32_t generation, bool isPopup) {
     if (closing_) return;
     ChromiumTexture* target = isPopup ? popup_ : main_;
-    [target selectSlot:slot];
+    [target selectSlot:slot generation:generation];
     [textures_ textureFrameAvailable:isPopup ? popup_id : texture_id];
   }
   int64_t id_;
@@ -160,7 +160,7 @@ static void StartSurfacePortListener() {
                     for (auto* core : cores) {
                         auto found = core->browsers_.find(browserId);
                         if (found != core->browsers_.end()) {
-                            found->second->OnSurfaceCreated(surface, slot, width, height, isPopup);
+                            found->second->OnSurfaceCreated(surface, slot, width, height, msg.generation, isPopup);
                             return;
                         }
                     }
@@ -269,8 +269,9 @@ void Core::OnHostMessage(const std::string& type, int64_t browserId, NSDictionar
         // Now handled entirely by Mach side channel (StartSurfacePortListener).
     } else if (type == "frameReady") {
         if (payload[@"surfaceGeneration"]) {
+            uint32_t generation = [payload[@"surfaceGeneration"] unsignedIntValue];
             uint32_t slot = [payload[@"surfaceSlot"] unsignedIntValue];
-            proxy->OnSurfaceFrameReady(slot, false);
+            proxy->OnSurfaceFrameReady(slot, generation, false);
         } else if (payload[@"buffer"]) {
             NSData* buffer = payload[@"buffer"];
             int width = [payload[@"width"] intValue];

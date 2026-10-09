@@ -6,6 +6,7 @@
   std::mutex _mutex;
   CVPixelBufferRef _frames[3];
   CVPixelBufferRef _activeFrame;
+  uint32_t _generation;
 }
 
 - (instancetype)init {
@@ -13,6 +14,7 @@
   if (self) {
     for (int i = 0; i < 3; i++) _frames[i] = nullptr;
     _activeFrame = nullptr;
+    _generation = 0;
   }
   return self;
 }
@@ -43,7 +45,7 @@
   return YES;
 }
 
-- (BOOL)updateWithIOSurface:(IOSurfaceRef)ioSurface slot:(uint32_t)slot width:(int)width height:(int)height {
+- (BOOL)updateWithIOSurface:(IOSurfaceRef)ioSurface slot:(uint32_t)slot width:(int)width height:(int)height generation:(uint32_t)generation {
   if (width <= 0 || height <= 0 || width > 16384 || height > 16384 || slot >= 3) return NO;
   
   if (!ioSurface) {
@@ -69,11 +71,15 @@
   std::lock_guard<std::mutex> lock(_mutex);
   if (_frames[slot]) CVPixelBufferRelease(_frames[slot]);
   _frames[slot] = next;
+  _generation = generation;
   return YES;
 }
 
-- (void)selectSlot:(uint32_t)slot {
+- (void)selectSlot:(uint32_t)slot generation:(uint32_t)generation {
   std::lock_guard<std::mutex> lock(_mutex);
+  if (generation < _generation) {
+    return;
+  }
   if (slot < 3) {
     if (_activeFrame) CVPixelBufferRelease(_activeFrame);
     _activeFrame = _frames[slot] ? CVPixelBufferRetain(_frames[slot]) : nullptr;
