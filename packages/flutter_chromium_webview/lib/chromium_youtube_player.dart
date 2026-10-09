@@ -439,8 +439,9 @@ class ChromiumYoutubePlayerController {
   /// Returns the video playback quality statistics.
   Future<Map<String, Object?>> get videoPlaybackQuality => _enqueue(() async {
     final value = await _request('getVideoPlaybackQuality', []);
-    if (value is! Map<String, dynamic>)
+    if (value is! Map<String, dynamic>) {
       throw StateError('Invalid video playback quality');
+    }
     return Map<String, Object?>.unmodifiable(value);
   });
 
