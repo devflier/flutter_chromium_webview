@@ -132,3 +132,24 @@ symbolized Chromium/media allocation attribution. Static `example.com` and
 animated local-page comparisons use the same profiling harness and retain
 separate reports. No architecture change, assertion suppression, version bump,
 or tag replacement is part of this fix.
+
+## Main CI evidence and remaining blockers
+
+[Unified run 37996689217](https://github.com/devflier/flutter_chromium_webview/actions/runs/37996689217)
+tested main commit `1be7977`. All nine macOS native integration suites passed.
+Live YouTube then failed with player error 150 and network diagnostics containing
+`Sign_in_to_confirm_you_re_not_a_bot`. This is an external authentication challenge;
+the macOS job did not pass. Its later resource, allocation, release, texture and
+packaged smoke stages were not executed in that run. Diagnostic artifacts were
+uploaded successfully, and the executed stages reported no surviving helpers.
+
+Windows failed the settings fixture because audio `currentTime` was still zero
+after its 300 ms observation. The same revision passed Windows in the branch run;
+the cause of this intermittent result is not yet established. Quality, Linux and
+Android passed on main. No release was published.
+
+macOS validation now continues independent stages after a recorded stage failure
+and returns failure at the end if any stage failed. This lets release, ownership
+and packaged startup diagnostics run even when live YouTube is unavailable;
+YouTube remains a required, failing gate. Two additional regression tests verify
+continuation and the final nonzero status, and the all-success path.

@@ -5,6 +5,7 @@ import io
 import json
 from pathlib import Path
 import sys
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -15,6 +16,34 @@ spec.loader.exec_module(stage)
 
 
 class DiagnosticTests(unittest.TestCase):
+    def test_validation_continues_but_fails_after_an_independent_stage_fails(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'scripts').mkdir()
+            (root / 'scripts/macos_diagnostic_stage.py').write_text(
+                'import sys\nprint(sys.argv[3], flush=True)\n'
+                'sys.exit(7 if sys.argv[3] == "failed-test" else 0)\n')
+            helper = Path(__file__).with_name('macos_validation_stages.sh')
+            result = subprocess.run(['bash', '-c',
+                'set -euo pipefail; root="$1"; diagnostics="$1"; source "$2"; '
+                'run_stage failed-test; run_stage following-test; finish_stage_validation',
+                'validation-test', str(root), str(helper)], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 1)
+            self.assertIn('following-test', result.stdout)
+            self.assertIn('failed-test (exit 7)', result.stderr)
+
+    def test_validation_succeeds_when_all_stages_succeed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'scripts').mkdir()
+            (root / 'scripts/macos_diagnostic_stage.py').write_text('import sys\nsys.exit(0)\n')
+            helper = Path(__file__).with_name('macos_validation_stages.sh')
+            result = subprocess.run(['bash', '-c',
+                'set -euo pipefail; root="$1"; diagnostics="$1"; source "$2"; '
+                'run_stage passing-test; finish_stage_validation',
+                'validation-test', str(root), str(helper)], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+
     def test_nonzero_status_and_complete_output_survive_collection(self):
         with tempfile.TemporaryDirectory() as directory, patch.object(stage, 'capture'), \
                 contextlib.redirect_stdout(io.StringIO()):

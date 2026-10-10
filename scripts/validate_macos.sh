@@ -13,9 +13,7 @@ export CEF_INPUT_TEST_USE_MOCK_KEYCHAIN=1
   xcodebuild -version
   xcrun --show-sdk-version
 } > "$diagnostics/versions.txt" 2>&1
-run_stage() {
-  python3 "$root/scripts/macos_diagnostic_stage.py" --directory "$diagnostics" "$@"
-}
+source "$root/scripts/macos_validation_stages.sh"
 export CHROMIUM_WEBVIEW_MACOS_ARCH="$(uname -m)"
 command -v cmake >/dev/null
 command -v pod >/dev/null
@@ -49,3 +47,4 @@ run_stage texture-build xcrun clang++ -DDEBUG=1 -std=c++20 -fobjc-arc -mmacosx-v
   -o build/macos/native-tests/texture_test
 run_stage texture-ownership build/macos/native-tests/texture_test
 run_stage packaged-smoke python3 "$root/scripts/smoke_macos.py" "$PWD/build/macos/Build/Products/Release/flutter_chromium_webview_example.app"
+finish_stage_validation
