@@ -153,3 +153,57 @@ and returns failure at the end if any stage failed. This lets release, ownership
 and packaged startup diagnostics run even when live YouTube is unavailable;
 YouTube remains a required, failing gate. Two additional regression tests verify
 continuation and the final nonzero status, and the all-success path.
+
+## Follow-up recovery and long playback measurements
+
+Main commit `648155b` was tested in
+[run 38057950291](https://github.com/devflier/flutter_chromium_webview/actions/runs/38057950291).
+All nine native suites, resource stability, texture ownership, release build and
+packaged startup/shutdown passed, with no surviving helpers in any stage.
+Quality, Windows, Linux and Android passed. Live YouTube and the allocation
+profile failed on the runner's YouTube authentication challenge; the profile
+collected no soak samples. Full macOS CI remains failed.
+
+An isolated local 30-minute YouTube workload completed 1,801.717 seconds and
+passed its original assertions. It recorded 53,820 Metal frames, zero Metal
+failures, zero software frames, nine processes, and a descriptor plateau of 105.
+All nine interaction sequences completed, including two track switches. Video
+dropped-frame counts reached 18 in the first session and eight in the second;
+the final playback session recorded zero. These counters reset on track changes.
+Owned resources returned to baseline and all renderers exited on disposal.
+
+Combined RSS ended 18.7 MiB below the 30-second sample, after peaking 96.2 MiB
+above it. The largest renderer ended 42.1 MiB above its early sample and peaked
+at +53.0 MiB. A renderer VM map and leak scan could not fully inspect PartitionAlloc;
+the leak scan reported six allocations totaling 144 bytes. Passing the combined
+RSS assertion does not attribute renderer allocations or prove a lasting plateau.
+Evidence is in `docs/validation/macos-investigation/youtube-30min/`.
+
+A GPU-helper kill exposed a separate recovery failure: CEF launched a replacement
+GPU, but accelerated paint stopped. Resizing, including a new surface generation,
+and CEF hide/show notifications did not recover it. Explicit document reload did.
+The crash notification also lacked the top-level browser ID used by the native
+backend, so existing renderer-crash events were dropped before reaching Dart.
+
+The recovery change routes renderer crashes correctly and treats replacement GPU
+launches as requiring the existing browser-crash/recreation contract. Pending
+JavaScript is invalidated and callers receive the existing crash callback. This
+recreates the document rather than preserving arbitrary page state. Two-cycle
+GPU and renderer regressions check new browser IDs, resumed Metal frames, no
+software fallback, stable host PID and ownership cleanup.
+
+Three rapid GPU kills in one CEF host triggered Chromium's software fallback.
+That experiment failed its Metal requirement and is retained as a remaining
+limitation; the change does not override Chromium's crash policy. The related
+[upstream macOS OSR synchronization report](https://github.com/chromiumembedded/cef/issues/4258)
+is a plausible explanation for stalled views, not confirmed attribution of this
+GPU-crash failure. Recovery evidence is in
+`docs/validation/macos-investigation/gpu-recovery/`.
+
+The complete local validation sequence with this recovery change passed all 24
+stages, including eleven native suites, live playback, 100-cycle resource churn,
+300-second allocation profile, texture ownership, release build and packaged
+startup/shutdown. Every stage's surviving-helper audit was empty. The profile
+completed 301.298 seconds with 9,171 Metal frames and +59.5 MiB combined RSS
+growth against the existing 75,000 KiB limit; ownership returned to baseline.
+This short profile remains distinct from the earlier 30-minute measurement.

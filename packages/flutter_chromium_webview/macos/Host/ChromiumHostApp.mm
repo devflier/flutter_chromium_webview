@@ -424,3 +424,14 @@ void ChromiumHostApp::StartIpcServer() {
         CefQuitMessageLoop();
     }
 }
+
+void ChromiumHostApp::OnBeforeChildProcessLaunch(CefRefPtr<CefCommandLine> command_line) {
+    if (command_line->GetSwitchValue("type") != "gpu-process") return;
+    // CEF calls this on its IO thread for GPU launches. The first launch is
+    // normal startup; later launches invalidate the OSR compositor instances.
+    if (_gpuLaunches.fetch_add(1) == 0) return;
+    ChromiumHostAppDelegate* delegate = (__bridge ChromiumHostAppDelegate*)_delegateWrapper;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        delegate.browserClient->RecoverGpuProcess();
+    });
+}

@@ -27,7 +27,7 @@ cd example
 flutter pub get
 run_stage example-analysis flutter analyze
 run_stage example-tests flutter test test
-for suite in plugin_integration_test input_scaling_test native_ui_test javascript_bridge_test html_loading_test browser_settings_test youtube_adapter_test evaluate_javascript_test host_crash_test; do
+for suite in plugin_integration_test input_scaling_test native_ui_test javascript_bridge_test html_loading_test browser_settings_test youtube_adapter_test evaluate_javascript_test host_crash_test gpu_recovery_test renderer_recovery_test; do
   run_stage "$suite" flutter test "integration_test/$suite.dart" -d macos --no-pub -v
 done
 run_stage youtube-live flutter test integration_test/youtube_live_test.dart -d macos --no-pub -v --dart-define=YOUTUBE_LIVE=true --dart-define="YOUTUBE_REPORT=$diagnostics/youtube-live.json"

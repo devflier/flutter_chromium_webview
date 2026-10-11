@@ -2,6 +2,7 @@
 #include "../Helpers/javascript_ipc.h"
 #include <vector>
 #include <cstdlib>
+#include "include/wrapper/cef_helpers.h"
 
 void HostBrowserClient::FailJavaScript(uint64_t requestId, const char* code, const char* message) {
     auto found = pending_js_.find(requestId);
@@ -108,6 +109,7 @@ void HostBrowserClient::OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
     IPC::Message event;
     event.type = "event";
     event.payload = @{
+        @"browserId": @(id),
         @"name": @"browserCrash",
         @"args": @{@"browserId": @(id)}
     };
@@ -164,4 +166,24 @@ bool HostBrowserClient::HandleJavaScriptMessage(CefRefPtr<CefBrowser> browser, C
     response.payload = payload;
     if (on_message_) on_message_(response);
     return true;
+}
+
+void HostBrowserClient::RecoverGpuProcess() {
+    CEF_REQUIRE_UI_THREAD();
+    // In the pinned CEF build a replacement GPU does not resume accelerated
+    // paint on existing views. Use the existing crash/recreation contract;
+    // never silently reload an otherwise live document.
+    std::vector<int64_t> ids;
+    for (const auto& [id, session] : _sessions) ids.push_back(id);
+    for (auto id : ids) {
+        auto* session = GetSession(id);
+        if (!session || session->renderer_gone) continue;
+        session->renderer_gone = true;
+        InvalidateJavaScript(id, "gpu_restarted", "GPU process restarted; browser recreation required");
+        IPC::Message event;
+        event.type = "event";
+        event.payload = @{@"browserId": @(id), @"name": @"browserCrash", @"args": @{@"browserId": @(id), @"reason": @"gpu_restarted"}};
+        NSLog(@"[CEFHost] GPU restart requires recreation of browser %lld", id);
+        if (on_message_) on_message_(event);
+    }
 }

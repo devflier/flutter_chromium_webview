@@ -2,6 +2,7 @@
 #import <Foundation/Foundation.h>
 #include "include/cef_app.h"
 #include "IpcServer.h"
+#include <atomic>
 
 class ChromiumHostApp : public CefApp, public CefBrowserProcessHandler {
 public:
@@ -14,6 +15,7 @@ public:
     virtual void OnContextInitialized() override;
     virtual void OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line) override;
 
+    void OnBeforeChildProcessLaunch(CefRefPtr<CefCommandLine> command_line) override;
     void StartIpcServer();
     bool StartupFailed() const { return _startupFailed; }
 
@@ -22,6 +24,7 @@ private:
     NSString* _expectedToken;
     pid_t _parentPid;
     bool _startupFailed = false;
+    std::atomic<unsigned> _gpuLaunches{0};
     
     // We will use an Objective-C wrapper object to act as the delegate for IPC Server.
     void* _delegateWrapper;
