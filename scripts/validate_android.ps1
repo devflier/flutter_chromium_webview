@@ -2,6 +2,13 @@ param([string]$Device = 'emulator-5554', [switch]$LiveYoutube, [switch]$Headless
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $packagePath = Join-Path $projectRoot 'packages/flutter_chromium_webview'
+$diagnostics = Join-Path $projectRoot 'docs/validation/android'
+New-Item -ItemType Directory -Force -Path $diagnostics | Out-Null
+& flutter --version 2>&1 | Set-Content (Join-Path $diagnostics 'flutter-version.txt')
+& dart --version 2>&1 | Set-Content (Join-Path $diagnostics 'dart-version.txt')
+& java -version 2>&1 | Set-Content (Join-Path $diagnostics 'java-version.txt')
+& python3 -m unittest discover -s $PSScriptRoot -p test_android_diagnostics.py -v
+if ($LASTEXITCODE) { throw 'Android diagnostic wrapper regressions failed' }
 Push-Location $packagePath
 try {
   & flutter pub get
@@ -18,7 +25,7 @@ try {
   & flutter test test
   if ($LASTEXITCODE) { throw 'Example regressions failed' }
   foreach ($suite in @('android_backend_test', 'javascript_bridge_test', 'html_loading_test', 'browser_settings_test', 'youtube_adapter_test')) {
-    & flutter test "integration_test/$suite.dart" -d $Device --no-pub
+    & python3 (Join-Path $PSScriptRoot 'android_diagnostic_stage.py') --directory (Join-Path $diagnostics $suite) --device $Device flutter test "integration_test/$suite.dart" -d $Device --no-pub -v
     if ($LASTEXITCODE) { throw "Android integration failed: $suite" }
   }
   if ($LiveYoutube) {
