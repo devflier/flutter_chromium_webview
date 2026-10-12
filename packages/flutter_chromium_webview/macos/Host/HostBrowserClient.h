@@ -137,6 +137,7 @@ public:
 
     void CreateBrowser(int64_t browser_id, const std::string& url, int width, int height, double scale_factor, uint64_t request_id, const std::string& javascriptChannels, bool requiresGesture, const std::string& profile);
     void CloseBrowser(int64_t browser_id);
+    void RecoverGpuProcess();
     void ResizeBrowser(int64_t browser_id, int width, int height, double scale_factor);
 
     BrowserSession* GetSession(int64_t browser_id);
