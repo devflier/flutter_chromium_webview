@@ -65,8 +65,13 @@ void main() {
           document.cookie = 'browser=$key; path=/';
           (async () => {
             let status;
-            try { await audio.play(); await new Promise(r => setTimeout(r, 300)); status = audio.currentTime > 0 ? 'playing' : 'stalled'; }
-            catch (error) { status = error.name; }
+            try {
+              await audio.play();
+              for (let i = 0; i < 20 && audio.currentTime === 0 && !audio.paused; i++) {
+                await new Promise(r => setTimeout(r, 100));
+              }
+              status = (!audio.paused || audio.currentTime > 0) ? 'playing' : 'stalled';
+            } catch (error) { status = error.name; }
             chromiumPostMessage('player', JSON.stringify({key:'$key', ua:navigator.userAgent,
               status, cookie:document.cookie, activated:navigator.userActivation.hasBeenActive}));
           })();

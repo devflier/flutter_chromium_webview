@@ -32,6 +32,7 @@ cef-artifacts/
 .pub-cache/
 .pub/
 pubspec.lock
+pubspec_overrides.yaml
 /coverage/
 
 # Logs generated during validation sessions
@@ -46,5 +47,6 @@ scratch/
 
 docs/validation/macos/
 docs/validation/macos-investigation/
+docs/validation/public-dependencies/
 
 __pycache__/
