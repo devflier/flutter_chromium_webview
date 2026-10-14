@@ -49,7 +49,7 @@ incompatible intervals fail analysis. Raw historical captures are unchanged.
   video-frame identity and does not prove physical presentation.
 
 Sources: https://w3c.github.io/media-playback-quality/ and
-https://html.spec.whatwg.org/multipage/media.html#video-frame-callbacks
+https://wicg.github.io/video-rvfc/
 
 Opt-in `PERFORMANCE_DIAGNOSTICS=true` adds bounded per-callback timestamps,
 media times, compositor frame IDs and decode processing durations, plus Flutter
@@ -80,3 +80,24 @@ instrumentation; current compositor/Flutter counters cannot certify them.
 Interface API checks remain independent of native runtime diagnostics. Existing
 unpublished interface tagf202e72 targets the old workflow; explicit owner approval
 of source/tag strategy is required. Hosted0.1.6 remains a mandatory plugin gate.
+
+## New evidence (2026-10-14)
+
+Independent HTML loading PASS on release SDK in
+https://github.com/devflier/flutter_chromium_webview/actions/runs/38603598173 .
+Persistent capture starts17:07:31.595UTC, command finishes17:11:01.502UTC and
+capture finishes17:11:03.090UTC;203 process observations, app observed during
+launch/test before normal teardown. All eight post-command diagnostic commands
+exit0, no identified fatal signal/exception in persistent log. The original
+VM-service disconnect is not reproduced and its mechanism remains INCONCLUSIVE.
+A separate failed diagnostic dispatch38603102853 never reached Flutter because
+the emulator action executed multiline shell fragments separately. Fixed with
+one standalone script; the failed invocation remains preserved.
+
+Local instrumented macOS diagnostic PASS for evidence completeness and unchanged
+RSS gate:302.175s,12 samples,RSS growth−133424KiB,zero matched drops over9021
+frames,compositor rate≈29.94FPS. Callback interval average33.53ms,p95/p99 50.1ms;
+Flutter raster average0.48ms,p99 0.91ms. Those are different measurements with no
+shared frame ID; neither proves final physical presentation. Native shutdown
+survivors empty. Older SDK/16GiB diagnostic only; no hardware qualification or
+approved performance acceptance. Instrumentation may change workload overhead.

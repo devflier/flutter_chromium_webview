@@ -45,6 +45,9 @@ def analyze(data):
     callback_frames = [f for s in samples for f in (s.get('localMedia') or {}).get('timingFrames', [])]
     flutter = [f for s in samples for f in s.get('flutterTimings', [])]
     callback_intervals = [b['callbackTime'] - a['callbackTime'] for a, b in zip(callback_frames, callback_frames[1:]) if b['callbackTime'] >= a['callbackTime']]
+    callback_ids = [b['presentedFrames'] - a['presentedFrames'] for a, b in zip(callback_frames, callback_frames[1:])]
+    if any(delta < 0 for delta in callback_ids):
+        errors.append('Callback compositor counter reset; timing identity not continuous')
     flutter_intervals = [(b['vsyncMicros'] - a['vsyncMicros']) / 1000 for a, b in zip(flutter, flutter[1:]) if b['vsyncMicros'] >= a['vsyncMicros']]
     missing = []
     if not windows:
@@ -62,6 +65,9 @@ def analyze(data):
         'performanceAcceptance': 'INCONCLUSIVE: product requirements and numeric gates pending approval',
         'counterErrors': errors, 'missingEvidence': missing, 'windows': windows,
         'matchedDropFraction': drops / total if total else None, 'matchedTotalDelta': total, 'matchedDroppedDelta': drops,
+        'callbackRepeatedCompositorIds': sum(delta == 0 for delta in callback_ids),
+        'compositorFramesWithoutObservedCallback': sum(max(0, delta - 1) for delta in callback_ids),
+        'callbackGapMeaning': 'Missing callbacks are not necessarily dropped media frames; compositor IDs and video drop counts are separate',
         'chromiumCallbackIntervalMs': stats(callback_intervals),
         'chromiumCallbackDelayAfterSubmissionMs': stats([f['callbackTime'] - f['presentationTime'] for f in callback_frames]),
         'chromiumExpectedDisplayMinusCallbackMs': stats([f['expectedDisplayTime'] - f['callbackTime'] for f in callback_frames]),
