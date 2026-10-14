@@ -6,7 +6,7 @@
 * Recover macOS browsers after renderer or GPU-process crashes through the existing browser recreation contract; arbitrary page state is not preserved.
 * Improve macOS playback telemetry and independent validation-stage reporting.
 * Preserve Android integration startup and crash diagnostics.
-* Refresh installation, runnable examples, macOS setup and release documentation.
+* Refresh installation, runnable examples, macOS setup and release documentation; correct the iOS support claim because the release pubspec does not register that backend.
 * Exclude monorepo dependency overrides from publication and keep the bundled example's published dependency resolution independent of sibling checkouts.
 * Document remaining macOS memory limits: proposed 8 GB support is unverified, historical strict RSS acceptance remains failed, and long-term memory boundedness is not established. No allocator fix or relaxed memory threshold is included.
 

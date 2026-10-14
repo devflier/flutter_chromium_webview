@@ -1,7 +1,8 @@
 # Flutter Chromium WebView
 
 Chromium webview for Flutter using CEF on Windows, macOS and Linux, the system
-WebView on Android, and headless WKWebView on iOS. Web is not implemented.
+WebView on Android. Headless WKWebView source exists for iOS but is not registered
+in this release. Web is not implemented.
 
 ## Version 0.5.3
 
