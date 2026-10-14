@@ -15,6 +15,13 @@ def profile():
 
 
 class Reports(unittest.TestCase):
+    def test_isolation_cannot_be_release_memory_acceptance(self):
+        from macos_profile_report import assess
+        for data in [{'experimentOnly': True}, {'pipelineMode': 'cef-only'}]:
+            result = assess(data)
+            self.assertEqual(result['verdict'], 'FAIL')
+            self.assertIn('Isolation/short experiment is not release memory acceptance', result['completenessErrors'])
+
     def test_complete_profile(self):
         self.assertEqual(assess(profile())['verdict'], 'PASS')
 

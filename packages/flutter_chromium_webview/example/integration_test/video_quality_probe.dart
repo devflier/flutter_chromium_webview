@@ -179,6 +179,14 @@ class VideoQualityProbe {
     }
   }
 
+  Future<Map<String, dynamic>> systemInfo() async {
+    try {
+      return await _send('SystemInfo.getInfo', {});
+    } catch (error) {
+      return {'unavailableReason': error.toString()};
+    }
+  }
+
   static const _expression =
       r'''Array.from(document.querySelectorAll('video')).filter(v =>
     v.getVideoPlaybackQuality && v.videoWidth > 0 && v.videoHeight > 0).map(v => {

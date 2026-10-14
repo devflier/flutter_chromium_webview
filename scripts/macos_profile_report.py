@@ -6,6 +6,8 @@ from pathlib import Path
 
 def assess(data, required_seconds=300):
     errors = []
+    if data.get('experimentOnly') or data.get('pipelineMode', 'full') != 'full':
+        errors.append('Isolation/short experiment is not release memory acceptance')
     samples = data.get('samples', [])
     if not data.get('observerStarted'):
         errors.append('Video observer never started')

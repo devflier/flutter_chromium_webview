@@ -33,6 +33,18 @@ class PerformanceTests(unittest.TestCase):
         self.assertIn('End-to-end latency', result['unmeasured'])
         self.assertIsNone(stats([]))
 
+    def test_native_timing_is_separate_from_media_and_cross_clock_latency(self):
+        data = self.report()
+        data['pipelineMode'] = 'native-only'
+        for i, sample in enumerate(data['samples']):
+            sample['rendering']['pipelineFrames'] = [{'sequence': i + 1,
+                'callbackMs': i * 100, 'copyCompletedMs': i * 100 + 2, 'blitMs': 2}]
+        result = analyze(data)
+        self.assertEqual(result['nativeCallbackIntervalMs']['average'], 100)
+        self.assertEqual(result['nativeBlitMs']['average'], 2)
+        self.assertIsNone(result['flutterRasterMs'])
+        self.assertIn('End-to-end latency', result['unmeasured'])
+
 
 if __name__ == '__main__':
     unittest.main()

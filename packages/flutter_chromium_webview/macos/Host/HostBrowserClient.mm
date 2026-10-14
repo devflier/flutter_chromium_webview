@@ -17,6 +17,27 @@
 #include "include/cef_parser.h"
 
 namespace {
+#if DEBUG
+bool PipelineDiagnostics() {
+    static bool enabled = [NSProcessInfo.processInfo.environment[@"PERFORMANCE_DIAGNOSTICS"] isEqualToString:@"true"];
+    return enabled;
+}
+NSString* PipelineMode() {
+    static NSString* mode = PipelineDiagnostics() ? (NSProcessInfo.processInfo.environment[@"CEF_DIAGNOSTIC_PIPELINE"] ?: @"full") : @"full";
+    return mode;
+}
+double MonotonicMs() {
+    mach_timebase_info_data_t base;
+    mach_timebase_info(&base);
+    return (double)mach_absolute_time() * base.numer / base.denom / 1e6;
+}
+void RecordPipeline(HostBrowserClient::BrowserSession* session, double callback, double blit) {
+    if (!PipelineDiagnostics()) return;
+    if (session->pipelineFrames.size() < 4096)
+        session->pipelineFrames.push_back({(double)session->frameSequence, callback, MonotonicMs(), blit});
+    else session->pipelineOverflow++;
+}
+#endif
 
 class MediaDevToolsObserver : public CefDevToolsMessageObserver {
 public:
@@ -147,6 +168,10 @@ HostBrowserClient::~HostBrowserClient() {
 NSDictionary* HostBrowserClient::RenderDiagnostics(int64_t browserId) {
     auto* session = GetSession(browserId);
     if (!session) return @{@"hostPid": @(getpid()), @"browserPresent": @NO};
+    NSMutableArray* frames = [NSMutableArray array];
+    for (const auto& frame : session->pipelineFrames)
+        [frames addObject:@{@"sequence": @(frame[0]), @"callbackMs": @(frame[1]), @"copyCompletedMs": @(frame[2]), @"blitMs": @(frame[3])}];
+    session->pipelineFrames.clear();
     return @{@"hostPid": @(getpid()), @"browserPresent": @YES,
         @"surfaceGeneration": @(session->generation),
         @"frameSequence": @(session->frameSequence),
@@ -154,7 +179,10 @@ NSDictionary* HostBrowserClient::RenderDiagnostics(int64_t browserId) {
         @"acceleratedCallbacks": @(session->acceleratedFrames),
         @"completedMetalFrames": @(session->completedMetalFrames),
         @"failedMetalFrames": @(session->failedMetalFrames),
-        @"totalGpuBlitTimeMs": @(session->totalGpuBlitTimeMs),
+        @"telemetryWindowGpuBlitTimeMs": @(session->totalGpuBlitTimeMs),
+        @"diagnosticGpuBlitTimeMs": @(session->diagnosticGpuBlitTimeMs),
+        @"pipelineMode": PipelineMode(), @"pipelineFrames": frames,
+        @"pipelineOverflow": @(session->pipelineOverflow),
         @"droppedFrames": session->droppedFrames >= 0 ? @(session->droppedFrames) : NSNull.null};
 }
 #endif
@@ -547,6 +575,13 @@ void HostBrowserClient::OnAcceleratedPaint(CefRefPtr<CefBrowser> browser,
     
     session->frameSequence++;
     session->acceleratedFrames++;
+#if DEBUG
+    double callbackMs = PipelineDiagnostics() ? MonotonicMs() : 0;
+    if ([PipelineMode() isEqualToString:@"cef-only"]) {
+        RecordPipeline(session, callbackMs, 0);
+        return; // CEF still composes into its own accelerated surface.
+    }
+#endif
     
     id<MTLDevice> device = (__bridge id<MTLDevice>)metal_device_;
     id<MTLCommandQueue> queue = (__bridge id<MTLCommandQueue>)command_queue_;
@@ -619,6 +654,14 @@ void HostBrowserClient::OnAcceleratedPaint(CefRefPtr<CefBrowser> browser,
     mach_timebase_info(&timebase);
     double blitTimeMs = (double)(end_time - start_time) * timebase.numer / timebase.denom / 1e6;
     session->totalGpuBlitTimeMs += blitTimeMs;
+#if DEBUG
+    if (PipelineDiagnostics()) session->diagnosticGpuBlitTimeMs += blitTimeMs;
+    RecordPipeline(session, callbackMs, blitTimeMs);
+    if ([PipelineMode() isEqualToString:@"native-only"]) {
+        session->current_surface_slot = (slot + 1) % 3;
+        return; // Exercise native copies, omit downstream frameReady notification.
+    }
+#endif
     
     IPC::Message msg;
     msg.type = "frameReady";

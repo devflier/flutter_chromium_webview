@@ -44,6 +44,8 @@ def analyze(data):
                 'decodedDelta': q.get('decodedFrames', 0) - old.get('decodedFrames', 0) if isinstance(q.get('decodedFrames'), int) and isinstance(old.get('decodedFrames'), int) else None})
     callback_frames = [f for s in samples for f in (s.get('localMedia') or {}).get('timingFrames', [])]
     flutter = [f for s in samples for f in s.get('flutterTimings', [])]
+    native = [f for s in samples for f in s.get('rendering', {}).get('pipelineFrames', [])]
+    native_intervals = [b['callbackMs'] - a['callbackMs'] for a, b in zip(native, native[1:]) if b['callbackMs'] >= a['callbackMs']]
     callback_intervals = [b['callbackTime'] - a['callbackTime'] for a, b in zip(callback_frames, callback_frames[1:]) if b['callbackTime'] >= a['callbackTime']]
     callback_ids = [b['presentedFrames'] - a['presentedFrames'] for a, b in zip(callback_frames, callback_frames[1:])]
     if any(delta < 0 for delta in callback_ids):
@@ -54,8 +56,12 @@ def analyze(data):
         missing.append('No compatible counter intervals')
     if not callback_frames:
         missing.append('No per-frame Chromium callback timing')
-    if not flutter:
+    if not flutter and data.get('pipelineMode', 'full') == 'full':
         missing.append('No Flutter frame timing')
+    if data.get('performanceDiagnostics') and not native:
+        missing.append('No native callback timing')
+    if any(s.get('rendering', {}).get('pipelineOverflow', 0) for s in samples):
+        missing.append('Native callback buffer overflow')
     overflow = max([(s.get('localMedia') or {}).get('timingOverflow', 0) for s in samples] or [0])
     if overflow:
         missing.append('Bounded callback log overflow: ' + str(overflow))
@@ -76,6 +82,10 @@ def analyze(data):
         'flutterBuildMs': stats([f['buildMicros'] / 1000 for f in flutter]),
         'flutterRasterMs': stats([f['rasterMicros'] / 1000 for f in flutter]),
         'flutterTotalSpanMs': stats([f['totalSpanMicros'] / 1000 for f in flutter]),
+        'nativeCallbackIntervalMs': stats(native_intervals),
+        'nativeBlitMs': stats([f['blitMs'] for f in native]) if data.get('pipelineMode') != 'cef-only' else None,
+        'pipelineMode': data.get('pipelineMode', 'full'),
+        'experimentOnly': data.get('experimentOnly', False),
         'cpuAndRss': [{'elapsedSeconds': s['elapsedSeconds'], 'processes': s.get('processes', [])} for s in samples],
         'unmeasured': ['Actual display presentation and scanout', 'Correlated per-video-frame IOSurface/Metal/Flutter identity',
                       'End-to-end latency', 'Separately classified predecode vs compositor drops', 'Audio/video synchronization (silent fixture)'],

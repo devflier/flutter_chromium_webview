@@ -23,7 +23,14 @@ def processes(output):
     lines = listing.splitlines()
     output.write(lines[0] + '\n')
     relevant = re.compile(r'ChromiumWebView|flutter_chromium_webview|flutter_tools.snapshot (test|build)|xcodebuild')
-    output.write('\n'.join(line for line in lines[1:] if relevant.search(line)) + '\n')
+    def selected(line):
+        if relevant.search(line):
+            return True
+        if os.environ.get('PERFORMANCE_DIAGNOSTICS') == 'true':
+            fields = line.split(None, 5)
+            return len(fields) >= 4 and float(fields[3]) >= 5
+        return False
+    output.write('\n'.join(line for line in lines[1:] if selected(line)) + '\n')
 
 
 def cef_processes():

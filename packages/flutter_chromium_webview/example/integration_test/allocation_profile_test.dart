@@ -31,6 +31,10 @@ void main() {
   const performanceDiagnostics = bool.fromEnvironment(
     'PERFORMANCE_DIAGNOSTICS',
   );
+  const pipelineMode = String.fromEnvironment(
+    'PIPELINE_MODE',
+    defaultValue: 'full',
+  );
   const workload = String.fromEnvironment(
     'PROFILE_WORKLOAD',
     defaultValue: 'youtube',
@@ -47,9 +51,16 @@ void main() {
       expect(seconds, greaterThan(0));
       expect(interactionSeconds, greaterThan(0));
       expect(sampleSeconds, greaterThan(0));
+      expect({'full', 'cef-only', 'native-only'}, contains(pipelineMode));
+      if (pipelineMode != 'full') {
+        expect(performanceDiagnostics, isTrue);
+        expect(workload, 'local-video');
+      }
       expect(Platform.environment['CEF_INPUT_TEST_USE_MOCK_KEYCHAIN'], '1');
       final report = <String, dynamic>{
         'performanceDiagnostics': performanceDiagnostics,
+        'pipelineMode': pipelineMode,
+        'experimentOnly': pipelineMode != 'full' || seconds < 300,
         'startedUtc': DateTime.now().toUtc().toIso8601String(),
         'requestedSeconds': seconds,
         'disposalSeconds': disposalSeconds,
@@ -388,11 +399,20 @@ function frame(now,info){window.mediaFrames++;${performanceDiagnostics ? 'if(win
         expect(player.playerError, isNull);
         if (workload == 'youtube') expect(player.playerState, 1);
         expect(rendering['browserPresent'], isTrue);
-        expect(rendering['completedMetalFrames'], greaterThan(0));
+        if (pipelineMode == 'cef-only') {
+          expect(rendering['pipelineMode'], 'cef-only');
+          expect(rendering['completedMetalFrames'], 0);
+          expect(rendering['acceleratedCallbacks'], greaterThan(0));
+        } else {
+          expect(rendering['completedMetalFrames'], greaterThan(0));
+        }
+        if (performanceDiagnostics) {
+          expect(rendering['pipelineMode'], pipelineMode);
+        }
         expect(rendering['failedMetalFrames'], 0);
         expect(rendering['softwareFrames'], 0);
         if (previousRendering != null) {
-          if (workload != 'static') {
+          if (workload != 'static' && pipelineMode != 'cef-only') {
             expect(
               rendering['completedMetalFrames'],
               greaterThan(previousRendering!['completedMetalFrames'] as int),
@@ -573,6 +593,9 @@ function frame(now,info){window.mediaFrames++;${performanceDiagnostics ? 'if(win
           );
         }
         report['observerStarted'] = videoProbe != null;
+        if (performanceDiagnostics && videoProbe != null) {
+          report['chromiumSystemInfo'] = await finish(videoProbe.systemInfo());
+        }
         clock.start();
         await sample('0 min');
         var nextSample = sampleSeconds;

@@ -326,6 +326,8 @@ void Core::Handle(FlutterMethodCall* call, FlutterResult result) {
     return;
   }
   if ([method isEqualToString:@"getRenderDiagnostics"]) {
+    auto found = browsers_.find([Num(args, @"browserId") longLongValue]);
+    NSDictionary* consumption = found != browsers_.end() ? [found->second->main_ diagnosticConsumption] : @{};
     IPC::Message request;
     request.type = "getRenderDiagnostics";
     request.payload = args;
@@ -333,7 +335,9 @@ void Core::Handle(FlutterMethodCall* call, FlutterResult result) {
       if (response.type != "renderDiagnostics") {
         result(Error(@"DIAGNOSTICS_UNAVAILABLE", @"A Debug host with render diagnostics is required")); return;
       }
-      result(response.payload);
+      NSMutableDictionary* diagnostics = [response.payload mutableCopy];
+      diagnostics[@"clientTexture"] = consumption;
+      result(diagnostics);
     }];
     return;
   }

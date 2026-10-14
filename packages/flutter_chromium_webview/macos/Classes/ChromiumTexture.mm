@@ -9,6 +9,10 @@
   CVPixelBufferRef _activeFrame;
   uint32_t _generation;
   int32_t _activeSlot;
+#if DEBUG
+  uint64_t _diagnosticReads;
+  uint64_t _diagnosticSelections;
+#endif
 }
 
 - (instancetype)init {
@@ -103,6 +107,10 @@
 
 - (void)selectSlot:(uint32_t)slot generation:(uint32_t)generation {
   std::lock_guard<std::mutex> lock(_mutex);
+#if DEBUG
+  static bool diagnosticEnabled = [NSProcessInfo.processInfo.environment[@"PERFORMANCE_DIAGNOSTICS"] isEqualToString:@"true"];
+  if (diagnosticEnabled) _diagnosticSelections++;
+#endif
   if (generation < _generation) {
     return;
   }
@@ -122,10 +130,20 @@
 
 - (CVPixelBufferRef)copyPixelBuffer {
   std::lock_guard<std::mutex> lock(_mutex);
+#if DEBUG
+  static bool diagnosticEnabled = [NSProcessInfo.processInfo.environment[@"PERFORMANCE_DIAGNOSTICS"] isEqualToString:@"true"];
+  if (diagnosticEnabled) _diagnosticReads++;
+#endif
   // A raster sample retains its immutable buffer independently of resize,
   // subsequent paints, texture unregistration and this object's destruction.
   return _activeFrame ? CVPixelBufferRetain(_activeFrame) : nullptr;
 }
+#if DEBUG
+- (NSDictionary*)diagnosticConsumption {
+  std::lock_guard<std::mutex> lock(_mutex);
+  return @{@"textureReadCalls": @(_diagnosticReads), @"surfaceSelections": @(_diagnosticSelections)};
+}
+#endif
 - (void)dealloc {
   for (int i = 0; i < 3; i++) {
     if (_frames[i]) { CVPixelBufferRelease(_frames[i]); g_counters.activeIOSurfaces--; }
