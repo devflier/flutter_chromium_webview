@@ -22,6 +22,18 @@ Profiling remains accurately described as **sampled CEF RSS/video telemetry**, n
 
 The old settled-disposal loop could skip its final observation after an interval overshoot. It now always captures a final point at/after the requested settle duration. Test assertions save evidence before a failing RSS comparison. No production cleanup sleep, forced GC or host restart was introduced.
 
+The first complete final-point run passed native/strict RSS assertions but the
+reporter correctly failed settled renderer absence: shared/global-context
+renderer PID97106 remained after63.9s, while owned counters were at baseline and
+all processes exited normally at app shutdown. This failure is preserved.
+Inspection confirmed the fixture had default requires-gesture=true/global CEF
+context, unlike the YouTube adapter's requires-gesture=false/private playback
+context (`CustomContext` returns null for the former). The local media fixture
+now uses the same private playback setting as the workload being replaced.
+No renderer assertion was removed, no production context behavior changed, and
+shared-context renderer retention is not claimed as a proven leak. A separate
+300s private-context run validates the corrected fixture.
+
 ## Dependency and package audit
 
 Both published package exports are explicit. Plugin0.5.3 calls evaluate/cancel JavaScript and uses PointerInput.clickCount and native browserCrash forwarding; published interface0.1.5 lacks these. Interface0.1.6 contains them and new contract tests verify correlation, defaults and native mapping without replacing real Chromium tests. Adding overridable methods with default unimplemented behavior broadens the pre-1.0 API without breaking extending implementations. PPPlayer's existing adapter contract and production native source are unchanged.
@@ -38,7 +50,7 @@ Monorepo overrides are development-only and excluded from the archive. The ordin
 | Interface example get / analysis / test / web build | PASS | Dependency resolution, clean analysis, one test and web build on installed supported SDK |
 | Profile/live report regressions | PASS, 9 tests | Missing samples/observer/duration/RSS and renderer survival fail; exact75000 fails; error150 alone is not classified externally blocked |
 | Shell syntax / workflow YAML and dependency invariants | PASS | Interface has no native needs; plugin retains memory gate; live is not a publisher dependency |
-| New local video native profile | Final run in progress; pilot completeness FAIL | Pilot: 302.242s, 12 samples, RSS delta −190912 KiB; native fixture passed but reporter rejected last disposal at58.661s. Final run uses corrected loop. Older local SDK; supplementary only |
+| New local video native profile | Private-context run in progress; pilot and shared-context completeness FAIL | Pilot: 302.242s, 12 samples, RSS delta −190912 KiB; native fixture passed but reporter rejected last disposal at58.661s. Second run: strict RSS PASS (−108432 KiB) but renderer-exit FAIL. Private-context run uses the matched adapter settings. Older local SDK; supplementary only |
 | Plugin release SDK get/analyze/test/dry run | BLOCKED locally | Dart3.12.2 cannot satisfy >=3.13.0; remote candidate CI must run |
 | Actual public dependency resolution | BLOCKED | Hosted interface0.1.6 is unpublished |
 | Windows/Linux/Android native checks for revised candidate | NOT RUN locally | Unavailable host platforms; CI will report separately |

@@ -16,3 +16,8 @@ ffmpeg -f lavfi -i 'testsrc2=size=640x360:rate=30' -t 4 -an \
 Frozen SHA-256: `324569821439b043ecc89ad32fd7fbd572936b80db95be05838f060411301884`.
 Tests serve the bytes over loopback HTTP; no remote URL, forced GC or host
 restart is used. Ownership and RSS assertions remain independent.
+
+The local media profile uses `mediaPlaybackRequiresUserGesture: false`, matching
+the YouTube adapter's private CEF playback context. Default/global contexts can
+retain a renderer after browser closure; that distinct observation is preserved
+in the validation report and is not silently accepted as private-session cleanup.

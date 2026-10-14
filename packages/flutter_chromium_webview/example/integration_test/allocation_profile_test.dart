@@ -47,6 +47,8 @@ void main() {
         'startedUtc': DateTime.now().toUtc().toIso8601String(),
         'requestedSeconds': seconds,
         'disposalSeconds': disposalSeconds,
+        'privatePlaybackContext':
+            workload == 'youtube' || workload == 'local-video',
         'profileKind':
             'sampled CEF process RSS and CDP video telemetry; no allocator trace',
         'mockKeychain': true,
@@ -106,6 +108,8 @@ function frame(){window.mediaFrames++;v.requestVideoFrameCallback(frame);}v.requ
       final controller = workload == 'youtube'
           ? player.webViewController
           : ChromiumWebViewController(
+              // Match the adapter's private autoplay context for media lifecycle.
+              mediaPlaybackRequiresUserGesture: workload != 'local-video',
               initialUrl: workload == 'static'
                   ? 'https://example.com'
                   : 'http://127.0.0.1:${server.port}/animated.html',
