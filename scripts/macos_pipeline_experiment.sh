@@ -4,6 +4,19 @@ set -euo pipefail
 root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 out="${PIPELINE_EVIDENCE_DIR:-$root/docs/validation/macos-pipeline-experiment}"
 mkdir -p "$out"
+env_tool="$root/scripts/macos_environment_capture.py"
+rm -f "$out/sampler.stop"
+finalize() {
+  touch "$out/sampler.stop"
+  [[ -n "${sampler_pid:-}" ]] && wait "$sampler_pid" 2>/dev/null || true
+  python3 "$env_tool" snapshot "$out/environment-after" || true
+  python3 "$env_tool" decoder "$out" || true
+  python3 "$env_tool" manifest "$out" || true
+}
+trap finalize EXIT
+python3 "$env_tool" snapshot "$out/environment-before"
+python3 "$env_tool" sample "$out" &
+sampler_pid=$!
 flutter --version > "$out/versions.txt"
 xcodebuild -version >> "$out/versions.txt"
 sw_vers >> "$out/versions.txt"

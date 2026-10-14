@@ -258,7 +258,7 @@ jobs:
     needs: quality
     if: ${{ always() && !cancelled() && ((github.event_name == 'workflow_dispatch' && startsWith(inputs.validation_scope, 'macos-')) || (needs.quality.result == 'success' && !startsWith(github.ref, 'refs/tags/platform_interface-v') && !startsWith(inputs.validation_scope, 'android'))) }}
     runs-on: macos-latest
-    timeout-minutes: 45
+    timeout-minutes: ${{ inputs.validation_scope == 'macos-isolation' && 100 || 45 }}
     steps:
       - uses: actions/checkout@v7
       - uses: subosito/flutter-action@v2
