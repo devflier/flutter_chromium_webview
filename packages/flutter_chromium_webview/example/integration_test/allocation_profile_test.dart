@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
+import 'dart:ui' show FramePhase;
 
 import 'package:flutter/services.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -26,6 +28,13 @@ void main() {
     defaultValue: 30,
   );
   const reportPath = String.fromEnvironment('SOAK_REPORT');
+  const performanceDiagnostics = bool.fromEnvironment(
+    'PERFORMANCE_DIAGNOSTICS',
+  );
+  const pipelineMode = String.fromEnvironment(
+    'PIPELINE_MODE',
+    defaultValue: 'full',
+  );
   const workload = String.fromEnvironment(
     'PROFILE_WORKLOAD',
     defaultValue: 'youtube',
@@ -42,10 +51,23 @@ void main() {
       expect(seconds, greaterThan(0));
       expect(interactionSeconds, greaterThan(0));
       expect(sampleSeconds, greaterThan(0));
+      expect({'full', 'cef-only', 'native-only'}, contains(pipelineMode));
+      if (pipelineMode != 'full') {
+        expect(performanceDiagnostics, isTrue);
+        expect(workload, 'local-video');
+      }
       expect(Platform.environment['CEF_INPUT_TEST_USE_MOCK_KEYCHAIN'], '1');
       final report = <String, dynamic>{
+        'performanceDiagnostics': performanceDiagnostics,
+        'pipelineMode': pipelineMode,
+        'experimentOnly': pipelineMode != 'full' || seconds < 300,
         'startedUtc': DateTime.now().toUtc().toIso8601String(),
         'requestedSeconds': seconds,
+        'disposalSeconds': disposalSeconds,
+        'privatePlaybackContext':
+            workload == 'youtube' || workload == 'local-video',
+        'profileKind':
+            'sampled CEF process RSS and CDP video telemetry; no allocator trace',
         'mockKeychain': true,
         'workload': workload,
         'disposalSamples': <Map<String, dynamic>>[],
@@ -55,6 +77,29 @@ void main() {
         'droppedFramesMeasured': false,
         'passed': false,
       };
+      final flutterTimings = <Map<String, dynamic>>[];
+      void collectTimings(List<FrameTiming> frames) {
+        for (final frame in frames) {
+          if (flutterTimings.length < 4096) {
+            flutterTimings.add({
+              'frameNumber': frame.frameNumber,
+              'vsyncMicros': frame.timestampInMicroseconds(
+                FramePhase.vsyncStart,
+              ),
+              'buildMicros': frame.buildDuration.inMicroseconds,
+              'rasterMicros': frame.rasterDuration.inMicroseconds,
+              'totalSpanMicros': frame.totalSpan.inMicroseconds,
+            });
+          }
+        }
+      }
+
+      if (performanceDiagnostics) {
+        SchedulerBinding.instance.addTimingsCallback(collectTimings);
+        addTearDown(
+          () => SchedulerBinding.instance.removeTimingsCallback(collectTimings),
+        );
+      }
       void save() {
         if (reportPath.isNotEmpty) {
           File(reportPath).writeAsStringSync(
@@ -63,9 +108,36 @@ void main() {
         }
       }
 
+      expect({
+        'youtube',
+        'static',
+        'animated',
+        'local-video',
+      }, contains(workload));
+      final localVideo = workload == 'local-video'
+          ? File('integration_test/fixtures/local-video.webm').readAsBytesSync()
+          : null;
       final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
       server.listen((request) async {
+        if (request.uri.path == '/local-video.webm' && localVideo != null) {
+          request.response.headers.contentType = ContentType('video', 'webm');
+          request.response.contentLength = localVideo.length;
+          request.response.add(localVideo);
+          await request.response.close();
+          return;
+        }
         request.response.headers.contentType = ContentType.html;
+        if (workload == 'local-video') {
+          request.response.write(
+            '''<!doctype html><video id="video" width="640" height="360" autoplay muted loop src="/local-video.webm"></video>
+<script>window.mediaTotalTime=0;window.mediaFrames=0;const v=document.getElementById('video');let last=0;
+v.addEventListener('timeupdate',()=>{const t=v.currentTime;window.mediaTotalTime+=t>=last?t-last:v.duration-last+t;last=t;});
+window.pipelineFrames=[];window.pipelineOverflow=0;
+function frame(now,info){window.mediaFrames++;${performanceDiagnostics ? 'if(window.pipelineFrames.length<4096){window.pipelineFrames.push({callbackTime:now,presentationTime:info.presentationTime,expectedDisplayTime:info.expectedDisplayTime,mediaTime:info.mediaTime,presentedFrames:info.presentedFrames,processingDuration:info.processingDuration});}else{window.pipelineOverflow++;}' : ''}v.requestVideoFrameCallback(frame);}v.requestVideoFrameCallback(frame);</script>''',
+          );
+          await request.response.close();
+          return;
+        }
         request.response.write(
           '''<!doctype html><canvas id="c" width="640" height="360"></canvas><script>const c=document.getElementById('c'),x=c.getContext('2d');window.renderedFrames=0;function paint(t){window.renderedFrames++;x.fillStyle='hsl('+t/20+' 80% 50%)';x.fillRect(0,0,640,360);requestAnimationFrame(paint)}requestAnimationFrame(paint);</script>''',
         );
@@ -77,6 +149,8 @@ void main() {
       final controller = workload == 'youtube'
           ? player.webViewController
           : ChromiumWebViewController(
+              // Match the adapter's private autoplay context for media lifecycle.
+              mediaPlaybackRequiresUserGesture: workload != 'local-video',
               initialUrl: workload == 'static'
                   ? 'https://example.com'
                   : 'http://127.0.0.1:${server.port}/animated.html',
@@ -215,6 +289,16 @@ void main() {
       Map<String, dynamic>? initialActive;
       Map<String, dynamic>? previousRendering;
       Future<void> sample(String label) async {
+        final localMedia = workload == 'local-video'
+            ? Map<String, dynamic>.from(
+                (await finish(
+                      controller.evaluateJavaScript(
+                        '({time:window.mediaTotalTime,frames:window.mediaFrames,width:video.videoWidth,height:video.videoHeight,paused:video.paused,error:video.error?.code??null,quality:video.getVideoPlaybackQuality()})',
+                      ),
+                    ))
+                    as Map,
+              )
+            : null;
         final position = workload == 'youtube'
             ? await finish(player.currentTime)
             : null;
@@ -222,6 +306,14 @@ void main() {
           'browserId': controller.browserId,
         });
         final counters = await query('getResourceCounters');
+        if (performanceDiagnostics && localMedia != null) {
+          localMedia['timingFrames'] = await finish(
+            controller.evaluateJavaScript('window.pipelineFrames.splice(0)'),
+          );
+          localMedia['timingOverflow'] = await finish(
+            controller.evaluateJavaScript('window.pipelineOverflow'),
+          );
+        }
         final hostPid = rendering['hostPid'] as int;
         final rows = await processes(hostPid);
         final fds = await Process.run('/usr/sbin/lsof', [
@@ -244,6 +336,7 @@ void main() {
           'timestampUtc': DateTime.now().toUtc().toIso8601String(),
           'videoId': videos[videoIndex],
           'position': position,
+          'localMedia': localMedia,
           'playerState': workload == 'youtube' ? player.playerState : null,
           'playerError': player.playerError,
           'heartbeatCount': heartbeatCount,
@@ -256,6 +349,12 @@ void main() {
           'numericDescriptors': descriptors.length,
           'window': await query('debugSoakWindow'),
         };
+        if (performanceDiagnostics) {
+          record['flutterTimings'] = List<Map<String, dynamic>>.from(
+            flutterTimings,
+          );
+          flutterTimings.clear();
+        }
         if (videoProbe != null) {
           final quality = await finish(videoProbe.sample());
           rendering['videoQuality'] = quality;
@@ -281,13 +380,39 @@ void main() {
         debugPrint(
           'SOAK_SAMPLE $label elapsed=${record['elapsedSeconds']} position=$position hostPid=$hostPid metal=${rendering['completedMetalFrames']} software=${rendering['softwareFrames']} fd=${descriptors.length} processes=${rows.length}',
         );
+        if (localMedia != null) {
+          expect(localMedia['width'], 640);
+          expect(localMedia['height'], 360);
+          expect(localMedia['paused'], isFalse);
+          expect(localMedia['error'], isNull);
+          expect(localMedia['frames'], greaterThan(0));
+          final old = (report['samples'] as List);
+          if (old.length > 1) {
+            final previous = old[old.length - 2]['localMedia'] as Map;
+            expect(localMedia['time'], greaterThan(previous['time'] as num));
+            expect(
+              localMedia['frames'],
+              greaterThan(previous['frames'] as num),
+            );
+          }
+        }
         expect(player.playerError, isNull);
         if (workload == 'youtube') expect(player.playerState, 1);
         expect(rendering['browserPresent'], isTrue);
-        expect(rendering['completedMetalFrames'], greaterThan(0));
+        if (pipelineMode == 'cef-only') {
+          expect(rendering['pipelineMode'], 'cef-only');
+          expect(rendering['completedMetalFrames'], 0);
+          expect(rendering['acceleratedCallbacks'], greaterThan(0));
+        } else {
+          expect(rendering['completedMetalFrames'], greaterThan(0));
+        }
+        if (performanceDiagnostics) {
+          expect(rendering['pipelineMode'], pipelineMode);
+        }
         expect(rendering['failedMetalFrames'], 0);
+        expect(rendering['softwareFrames'], 0);
         if (previousRendering != null) {
-          if (workload != 'static') {
+          if (workload != 'static' && pipelineMode != 'cef-only') {
             expect(
               rendering['completedMetalFrames'],
               greaterThan(previousRendering!['completedMetalFrames'] as int),
@@ -435,6 +560,8 @@ void main() {
                 controller.evaluateJavaScript(
                   workload == 'static'
                       ? 'document.title'
+                      : workload == 'local-video'
+                      ? 'window.mediaFrames'
                       : 'window.renderedFrames',
                 ),
               );
@@ -456,6 +583,18 @@ void main() {
             await wait(const Duration(milliseconds: 250));
           }
           expect(ready, isTrue, reason: 'Workload must load and execute');
+        }
+        if (workload == 'local-video') {
+          final port = int.parse(
+            Platform.environment['CEF_PROFILE_DEBUG_PORT']!,
+          );
+          videoProbe = await finish(
+            VideoQualityProbe.connect(port, controller.initialUrl),
+          );
+        }
+        report['observerStarted'] = videoProbe != null;
+        if (performanceDiagnostics && videoProbe != null) {
+          report['chromiumSystemInfo'] = await finish(videoProbe.systemInfo());
         }
         clock.start();
         await sample('0 min');
@@ -494,7 +633,7 @@ void main() {
           await finish(controller.dispose());
         }
         final disposalClock = Stopwatch()..start();
-        while (disposalClock.elapsed.inSeconds <= disposalSeconds) {
+        while (true) {
           final diagnostics = await query('getRenderDiagnostics', {
             'browserId': -1,
           });
@@ -531,7 +670,24 @@ void main() {
         await subscription.cancel();
         await server.close(force: true);
 
+        report['finishedUtc'] = DateTime.now().toUtc().toIso8601String();
+        save();
         final samplesList = report['samples'] as List;
+        expect(
+          report['completedMeasurement'],
+          isTrue,
+          reason: 'Workload must complete',
+        );
+        expect(
+          samplesList.length,
+          greaterThan(2),
+          reason: 'No usable memory samples',
+        );
+        expect(
+          report['actualSeconds'],
+          greaterThanOrEqualTo(seconds),
+          reason: 'Insufficient sampling duration',
+        );
         if (samplesList.length > 2) {
           int getRss(dynamic sample) => (sample['processes'] as List).fold<int>(
             0,
@@ -540,13 +696,22 @@ void main() {
           final startRss = getRss(samplesList[1]);
           final finalRss = getRss(samplesList.last);
           report['rssGrowthKiB'] = finalRss - startRss;
+          report['strictRssAcceptance'] = finalRss - startRss < 75000
+              ? 'PASS'
+              : 'FAIL';
+          save();
           expect(
             report['rssGrowthKiB'],
             lessThan(75000),
             reason: 'RSS growth must stabilize and not leak',
           );
         }
-        if (workload == 'youtube') {
+        if (workload == 'youtube' || workload == 'local-video') {
+          expect(
+            report['observerStarted'],
+            isTrue,
+            reason: 'Video observer never started',
+          );
           expect(
             report['droppedFramesMeasured'],
             isTrue,

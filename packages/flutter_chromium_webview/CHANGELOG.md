@@ -1,3 +1,18 @@
+## 0.5.3
+
+* Separate deterministic macOS core/local media RSS validation from explicitly invoked live YouTube reporting; preserve strict memory assertions and external blocked verdicts.
+* Gate platform-interface publication on its API/example checks and consumer compatibility, independently of native/live services.
+
+* Require platform interface 0.1.6, which publishes the JavaScript evaluation/cancellation, click-count and browser-crash APIs used by this plugin.
+
+* Fix macOS Chromium host embedding and preserve native startup/failure diagnostics.
+* Recover macOS browsers after renderer or GPU-process crashes through the existing browser recreation contract; arbitrary page state is not preserved.
+* Improve macOS playback telemetry and independent validation-stage reporting.
+* Preserve Android integration startup and crash diagnostics.
+* Refresh installation, runnable examples, macOS setup and release documentation; correct the iOS support claim because the release pubspec does not register that backend.
+* Exclude monorepo dependency overrides from publication and keep the bundled example's published dependency resolution independent of sibling checkouts.
+* Document remaining macOS memory limits: proposed 8 GB support is unverified, historical strict RSS acceptance remains failed, and long-term memory boundedness is not established. No allocator fix or relaxed memory threshold is included.
+
 ## 0.5.2
 
 * Fix JavaScript mocked player properties in integration test.

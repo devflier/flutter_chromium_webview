@@ -1,3 +1,80 @@
+# CI redesign readiness — 2026-10-14
+
+The current request authorizes preparation only: no publication, merge, or tags.
+See [pre-change audit](release/ci-audit-0.5.3.md) and the new redesign report for
+actual current checks. The earlier release notes below remain historical.
+
+Interface0.1.6 readiness is evaluated independently from native/live services.
+Plugin0.5.3 readiness still requires deterministic native and local media RSS
+checks and actual public interface resolution. Physical8GB support remains
+BLOCKED; strict historical RSS acceptance remains FAIL. No long-term leak
+freedom or approved numeric whole-app budget is claimed. The existing unpublished
+interface tag points to an old workflow and needs an owner-approved tag/version
+strategy before publication.
+
+## Prior release preparation record
+
+# Release 0.5.3 readiness — 2026-10-14
+
+The repository owner approved **stable 0.5.3 publication with the documented
+memory limitations** in this session on 2026-10-14. This is a release decision,
+not a memory acceptance pass: the historical RSS FAIL, physical 8 GB BLOCKED,
+allocator INCONCLUSIVE and unapproved numeric budgets remain unchanged.
+The automated publication job must still pass every configured validation job;
+no failed CI gate may be suppressed under this decision.
+
+Local preparation passed seven macOS packaging tests and the v0.5.3 tag/version
+check. Local publication dry run was BLOCKED by installed Dart 3.12.2 versus the
+unchanged >=3.13.0 package requirement; it is not reported as passed. The pinned
+CI SDK must run analysis/tests and publication dry runs before publication.
+
+Release candidate: patch from main `ded7f150d55a976549d645a6392b740ff7d9bdee`,
+excluding uncommitted profiling experiments. Package version/documentation must
+match the new tag; preserve all existing tags.
+
+The latest ordinary main workflow [38190100862](https://github.com/devflier/flutter_chromium_webview/actions/runs/38190100862)
+passed quality, Linux, Windows and Android, **but skipped macOS**. It is not a
+full release validation pass. A fresh manual/tag workflow must establish the
+actual candidate's configured job results before publication.
+
+Current memory verdicts remain independent: functional playback and tracked
+cleanup passed tested workloads; physical 8 GB verification is BLOCKED; exact
+PartitionAlloc ownership and long-term boundedness remain INCONCLUSIVE;
+historical strict less-than-75,000-KiB RSS acceptance remains FAIL. All numeric
+whole-application budgets are UNSET. No production memory fix or threshold
+relaxation is included. Publication must not imply memory certification.
+
+Release-mode whole-application evidence and target-hardware testing remain
+outstanding. A green short CI profile would not retroactively reclassify the
+failed repeated-session investigations. If releasing with these unresolved
+memory acceptance results, record the product-owner release decision explicitly.
+
+## Published dependency correction
+
+The completed candidate quality job passed 69 main-package tests, 18 interface
+tests and the interface example test. The main publication dry run had zero
+warnings and one hint about the local interface override. Comparing the actual
+pub.dev 0.1.5 archive exposed missing evaluate/cancel JavaScript APIs, pointer
+click-count metadata and native crash-event forwarding. The override had hidden
+this consumer dependency mismatch.
+
+Publish interface **0.1.6 first**, then plugin **0.5.3** with `^0.1.6`. Existing
+interface runtime source is unchanged by this release preparation; its version,
+changelog and documentation now expose the already-tested additions. Do not
+publish the plugin until the public 0.1.6 version is confirmed. Verify its source
+matches the tested interface, and validate a clean consumer without overrides.
+The main publication job removes its local override and reruns pub get,
+analysis, tests and dry-run publication against the real published interface.
+Both root/example override files are excluded from the package archive, and the
+example's ordinary pubspec no longer embeds a sibling-interface override.
+Superseded candidate CI remains separate; fresh checks must cover the corrected
+metadata. No existing tag is moved.
+
+## Historical readiness record (2026-10-05)
+
+The following original record is preserved as historical evidence. Its versions,
+platform registration and CI observations describe that date, not release 0.5.3.
+
 # Windows, Linux and Android readiness
 
 Updated: 2026-10-05. Desktop 0.2.1 has been published by the repository owner.

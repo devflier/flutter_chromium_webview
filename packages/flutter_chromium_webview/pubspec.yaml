@@ -1,6 +1,6 @@
 name: flutter_chromium_webview
-description: Chromium webview for Windows and Linux using CEF textures, and Android using the system WebView, with browser events and origin-restricted channels.
-version: 0.5.2
+description: Chromium webview for Windows, macOS and Linux using CEF textures, and Android using the system WebView, with browser events and origin-restricted channels.
+version: 0.5.3
 repository: https://github.com/devflier/flutter_chromium_webview/tree/main/packages/flutter_chromium_webview
 issue_tracker: https://github.com/devflier/flutter_chromium_webview/issues
 homepage: https://github.com/devflier/flutter_chromium_webview
@@ -12,13 +12,13 @@ topics:
   - chromium
 
 environment:
-  sdk: ">=3.13.0 <4.0.0"
+  sdk: ">=3.12.0 <4.0.0"
   flutter: ">=3.44.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_chromium_webview_platform_interface: ^0.1.5
+  flutter_chromium_webview_platform_interface: ^0.1.6
 
 dev_dependencies:
   flutter_test:

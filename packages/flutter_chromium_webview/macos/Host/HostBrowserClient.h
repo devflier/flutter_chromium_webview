@@ -10,6 +10,7 @@
 #include "include/cef_devtools_message_observer.h"
 #include <unordered_map>
 #include <functional>
+#include <array>
 #include "../Classes/Protocol.h"
 #include "../../native/javascript_bridge.h"
 #include "../../native/html_document.h"
@@ -48,6 +49,9 @@ public:
 #if DEBUG
         uint64_t completedMetalFrames = 0;
         uint64_t failedMetalFrames = 0;
+        std::vector<std::array<double, 4>> pipelineFrames;
+        uint64_t pipelineOverflow = 0;
+        double diagnosticGpuBlitTimeMs = 0;
 #endif
         // Telemetry
         uint64_t softwareFrames = 0;

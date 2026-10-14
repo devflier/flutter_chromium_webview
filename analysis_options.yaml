@@ -1,0 +1,6 @@
+analyzer:
+  exclude:
+    - "docs/**"
+    - "scratch/**"
+    - "verification/**"
+    - "**/dummy_plugin/**"

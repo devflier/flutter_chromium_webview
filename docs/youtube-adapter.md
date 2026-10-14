@@ -1,4 +1,10 @@
-# YouTube adapter for ppplayer
+# YouTube adapter — 0.5.3
+
+The public adapter includes playlist operations and desktop browser recovery.
+Functional macOS playback has passed tested workloads; physical 8 GB support,
+long-term memory boundedness and approved whole-app budgets remain outstanding.
+See [release readiness](release-readiness.md). Historical application-adoption
+results below are retained with their original workload limits.
 
 The optional `chromium_youtube_player.dart` library implements the first playback
 adapter against ppplayer's patched YouTube controller contract, inspected at
@@ -47,13 +53,15 @@ can supply one through the constructor when necessary.
 
 - Initialization, load/cue by video ID, play/pause, seek, volume, current time,
   duration and video metadata.
+- `loadPlaylist` / `cuePlaylist` with playlist ID, index and start time;
+  `nextVideo`, `previousVideo`, `playVideoAt`, `getPlaylist` and `getPlaylistIndex`.
 - `Ready`, `StateChange`, `PlayerError`, `VideoState` (JSON string), playback
   quality/rate, autoplay-blocked and API-change events with `playerId`.
 - Ordered commands, bounded readiness/command waits and a 128-command queue
   limit. Command completion acknowledges SDK dispatch; observe state/progress
   events to establish actual playback.
 - Reload rebuilds the player and restores the last reported position, selected
-  video, end time, volume and host play/pause intent. Position is not a precisely
+  video or playlist/index, end time, volume and host play/pause intent. Position is not a precisely
   synchronized bookmark. Prior-document events and responses are discarded.
 - Idempotent close/disposal rejects pending operations. After failed initialization,
   dispose and construct a fresh controller.
@@ -65,7 +73,7 @@ origin-restricted main-frame channel. There is no incoming message-to-eval path.
 SDK script loading failure. Codec advertisements are not proof of decoding a
 particular stream. `iframeApiUrl` is a fixture hook marked visibleForTesting.
 
-Playlists, fullscreen/UI parity, mute/rate controls, ppplayer's native media
+Fullscreen/UI parity, mute/rate controls, ppplayer's native media
 commands and app background lifecycle have not been ported. Host intent records
 commands submitted through this adapter; iframe controls can independently change
 observed player state. Use the event stream for observed playback.

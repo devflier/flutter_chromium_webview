@@ -4,9 +4,10 @@ We welcome contributions from the community! This document outlines how to set u
 
 ## Getting Started: Where to Begin
 
-If you are a new contributor, the best place to start is the `packages/flutter_chromium_webview` directory. 
-- The Dart API lives in `lib/flutter_chromium_webview.dart`.
-- The native C++ implementation lives in `linux/`.
+If you are a new contributor, the best place to start is the `packages/flutter_chromium_webview` directory:
+- The Dart API lives in `lib/flutter_chromium_webview.dart` and `lib/chromium_youtube_player.dart`.
+- The native implementations live in `macos/` (macOS CEF/Metal), `windows/` (Windows CEF), `linux/` (Linux CEF), and `android/` (Android WebView).
+- The platform interface contract lives in `packages/flutter_chromium_webview_platform_interface/`.
 - The example application in `example/` is the primary testbed for new features.
 
 Before contributing, please read the [Architecture Documentation](docs/architecture.md) to understand how the plugin interacts with CEF and Flutter.
@@ -14,8 +15,8 @@ Before contributing, please read the [Architecture Documentation](docs/architect
 ## Prerequisites
 
 ### Supported Versions
-* **Flutter**: 3.47.0 or newer.
-* **Dart**: 3.13.3 or newer.
+* **Flutter**: 3.44.0 or newer (CI validates against Flutter 3.47.4).
+* **Dart**: 3.12.0 or newer (CI validates against Dart 3.13.3).
 
 ### Linux Native Dependencies
 Building the native Linux implementation requires the following tools and libraries:

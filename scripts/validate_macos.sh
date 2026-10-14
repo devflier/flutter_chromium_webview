@@ -3,7 +3,9 @@ set -euo pipefail
 [[ "$(uname -s)" = Darwin ]] || { echo 'macOS validation requires a Mac with Xcode.' >&2; exit 1; }
 root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 package="$root/packages/flutter_chromium_webview"
-diagnostics="$root/docs/validation/macos"
+category="${1:-core}"
+case "$category" in core|memory|live) ;; *) echo 'Expected core, memory or live' >&2; exit 2 ;; esac
+diagnostics="$root/docs/validation/macos-$category"
 mkdir -p "$diagnostics"
 export CEF_INPUT_TEST_USE_MOCK_KEYCHAIN=1
 {
@@ -18,21 +20,23 @@ export CHROMIUM_WEBVIEW_MACOS_ARCH="$(uname -m)"
 command -v cmake >/dev/null
 command -v pod >/dev/null
 cd "$package"
-run_stage diagnostic-wrapper-tests python3 -m unittest discover -s "$root/scripts" -p test_macos_diagnostics.py -v
-run_stage packaging-tests python3 -m unittest discover -s macos/test -p 'test_*.py' -v
 flutter pub get
-run_stage package-analysis flutter analyze
-run_stage package-tests flutter test
+if [[ "$category" == core ]]; then
+  run_stage diagnostic-wrapper-tests python3 -m unittest discover -s "$root/scripts" -p test_macos_diagnostics.py -v
+  run_stage release-report-tests python3 -m unittest discover -s "$root/scripts" -p test_release_validation.py -v
+  run_stage packaging-tests python3 -m unittest discover -s macos/test -p 'test_*.py' -v
+  run_stage package-analysis flutter analyze
+  run_stage package-tests flutter test
+fi
 cd example
 flutter pub get
+if [[ "$category" == core ]]; then
 run_stage example-analysis flutter analyze
 run_stage example-tests flutter test test
 for suite in plugin_integration_test input_scaling_test native_ui_test javascript_bridge_test html_loading_test browser_settings_test youtube_adapter_test evaluate_javascript_test host_crash_test gpu_recovery_test renderer_recovery_test; do
   run_stage "$suite" flutter test "integration_test/$suite.dart" -d macos --no-pub -v
 done
-run_stage youtube-live flutter test integration_test/youtube_live_test.dart -d macos --no-pub -v --dart-define=YOUTUBE_LIVE=true --dart-define="YOUTUBE_REPORT=$diagnostics/youtube-live.json"
 run_stage resource-stability flutter test integration_test/resource_stability_test.dart -d macos --no-pub -v --dart-define=RESOURCE_DWELL_SECONDS=0
-run_stage allocation-profile env CEF_PROFILE_DEBUG_PORT=9229 flutter test "integration_test/allocation_profile_test.dart" -d macos --no-pub -v --dart-define=ALLOCATION_PROFILE=true --dart-define=SOAK_SECONDS=300 --dart-define="SOAK_REPORT=$diagnostics/allocation-profile.json"
 run_stage release-build flutter build macos --release --no-pub
 
 # Compile the texture ownership regression against genuine Apple/Flutter SDKs.
@@ -47,4 +51,19 @@ run_stage texture-build xcrun clang++ -DDEBUG=1 -std=c++20 -fobjc-arc -mmacosx-v
   -o build/macos/native-tests/texture_test
 run_stage texture-ownership build/macos/native-tests/texture_test
 run_stage packaged-smoke python3 "$root/scripts/smoke_macos.py" "$PWD/build/macos/Build/Products/Release/flutter_chromium_webview_example.app"
+fi
+if [[ "$category" == memory ]]; then
+  run_stage allocation-profile env CEF_PROFILE_DEBUG_PORT=9229 flutter test integration_test/allocation_profile_test.dart -d macos --no-pub -v --dart-define=ALLOCATION_PROFILE=true --dart-define=PERFORMANCE_DIAGNOSTICS=${PERFORMANCE_DIAGNOSTICS:-false} --dart-define=PROFILE_WORKLOAD=local-video --dart-define=SOAK_SECONDS=300 --dart-define="SOAK_REPORT=$diagnostics/allocation-profile.json"
+  run_stage profile-artifact-validation python3 "$root/scripts/macos_profile_report.py" --report "$diagnostics/allocation-profile.json" --directory "$diagnostics/profile-summary" --seconds 300
+  cat "$diagnostics/profile-summary/summary.md" >> "${GITHUB_STEP_SUMMARY:-/dev/null}"
+fi
+if [[ "$category" == live ]]; then
+  run_stage youtube-live flutter test integration_test/youtube_live_test.dart -d macos --no-pub -v --dart-define=YOUTUBE_LIVE=true --dart-define="YOUTUBE_REPORT=$diagnostics/youtube-live.json"
+  run_stage allocation-profile env CEF_PROFILE_DEBUG_PORT=9229 flutter test integration_test/allocation_profile_test.dart -d macos --no-pub -v --dart-define=ALLOCATION_PROFILE=true --dart-define=PROFILE_WORKLOAD=youtube --dart-define=SOAK_SECONDS=300 --dart-define="SOAK_REPORT=$diagnostics/allocation-profile.json"
+  # Nonzero (78) is BLOCKED, never a success. Live job is independent of publication.
+  live_status=0
+  python3 "$root/scripts/macos_live_report.py" --directory "$diagnostics" || live_status=$?
+  cat "$diagnostics/live-summary.md" >> "${GITHUB_STEP_SUMMARY:-/dev/null}"
+  if (( live_status != 0 )); then exit "$live_status"; fi
+fi
 finish_stage_validation

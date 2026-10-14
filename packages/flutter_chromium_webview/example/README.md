@@ -1,23 +1,36 @@
-# flutter_chromium_webview_example
+# flutter_chromium_webview example — 0.5.3
 
-Demonstrates how to use the flutter_chromium_webview plugin.
+The example consumes the parent package through `path: ../`; keep that local
+reference when running this checkout. Repository-only platform-interface paths
+live in `pubspec_overrides.yaml`, excluded from the published package. The
+published example resolves the released interface instead. A consumer application uses
+`flutter_chromium_webview: ^0.5.3` instead. Use an SDK satisfying the parent
+package's Dart >=3.12.0 and Flutter >=3.44.0 constraints.
 
-Run `flutter run -d windows`, `-d linux` or (after native validation) `-d macos`.
-Open **YouTube test** to check video, speaker output, pause, seek, volume, reload
-and hide/show behavior. The page cues the demo video; press Play to start it.
-Try minimize/restore while listening. Leaving the page closes its player.
-See [adapter setup and automated reports](../../../docs/youtube-adapter.md).
+```sh
+cd packages/flutter_chromium_webview/example
+flutter pub get
+flutter run -d macos
+```
 
-## Getting Started
+Use `-d windows`, `-d linux`, or an Android device ID as appropriate. For a new
+macOS application, follow the package's [Runner setup](../MACOS.md). The bundled
+example already supplies that setup; CEF must still download/build on first use.
 
-This project is a starting point for a Flutter application.
+Open **YouTube test** and press Play after the video is cued. Exercise pause,
+resume, seek, volume, reload, resize and hide/show. Check media-time progression
+and sound separately; a visible frame does not prove audible output. Leaving
+the page disposes its player. Live YouTube can reject playback on CI networks;
+retain those failures rather than treating a successful build as playback proof.
+See the [adapter guide](../../../docs/youtube-adapter.md) for host integration.
 
-A few resources to get you started if this is your first Flutter project:
+For the local browser example, try navigation, JavaScript, keyboard focus and
+resizing. macOS renderer/GPU recovery recreates the document, so arbitrary page
+state is not preserved. Ownership cleanup does not certify memory boundedness.
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+From the repository root, `bash scripts/validate_macos.sh core` runs native suites,
+release build, texture ownership and packaged shutdown checks. The `memory`
+category runs a loopback VP9 video for 300-second RSS/video telemetry, retaining
+the strict RSS assertion; `live` separately exercises real YouTube. Logs and exit statuses are preserved even after independent
+stage failures. This validation does not establish physical 8 GB support or an
+approved whole-application memory budget.
