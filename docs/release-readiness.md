@@ -47,6 +47,10 @@ interface runtime source is unchanged by this release preparation; its version,
 changelog and documentation now expose the already-tested additions. Do not
 publish the plugin until the public 0.1.6 version is confirmed. Verify its source
 matches the tested interface, and validate a clean consumer without overrides.
+The main publication job removes its local override and reruns pub get,
+analysis, tests and dry-run publication against the real published interface.
+Both root/example override files are excluded from the package archive, and the
+example's ordinary pubspec no longer embeds a sibling-interface override.
 Superseded candidate CI remains separate; fresh checks must cover the corrected
 metadata. No existing tag is moved.
 

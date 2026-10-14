@@ -234,9 +234,14 @@ jobs:
         with:
           sdk: '3.13.3'
           
-      - name: Install dependencies
+      - name: Verify published dependencies and package
         working-directory: packages/flutter_chromium_webview
-        run: flutter pub get
+        run: |
+          rm pubspec_overrides.yaml
+          flutter pub get
+          flutter analyze
+          flutter test
+          dart pub publish --dry-run
         
       - name: Publish flutter_chromium_webview
         working-directory: packages/flutter_chromium_webview

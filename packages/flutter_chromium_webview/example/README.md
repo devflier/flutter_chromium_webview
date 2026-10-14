@@ -1,7 +1,9 @@
 # flutter_chromium_webview example — 0.5.3
 
 The example consumes the parent package through `path: ../`; keep that local
-reference when running this checkout. A consumer application uses
+reference when running this checkout. Repository-only platform-interface paths
+live in `pubspec_overrides.yaml`, excluded from the published package. The
+published example resolves the released interface instead. A consumer application uses
 `flutter_chromium_webview: ^0.5.3` instead. Use an SDK satisfying the parent
 package's Dart >=3.13.0 and Flutter >=3.44.0 constraints.
 

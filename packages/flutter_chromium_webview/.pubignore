@@ -1,2 +1,5 @@
 macos/Host/ChromiumWebViewHost.app/
 macos/Host/Chromium Embedded Framework.framework/
+# Monorepo development paths are unavailable to pub.dev consumers.
+pubspec_overrides.yaml
+example/pubspec_overrides.yaml

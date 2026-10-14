@@ -7,6 +7,7 @@
 * Improve macOS playback telemetry and independent validation-stage reporting.
 * Preserve Android integration startup and crash diagnostics.
 * Refresh installation, runnable examples, macOS setup and release documentation.
+* Exclude monorepo dependency overrides from publication and keep the bundled example's published dependency resolution independent of sibling checkouts.
 * Document remaining macOS memory limits: proposed 8 GB support is unverified, historical strict RSS acceptance remains failed, and long-term memory boundedness is not established. No allocator fix or relaxed memory threshold is included.
 
 ## 0.5.2

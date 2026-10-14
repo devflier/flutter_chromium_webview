@@ -87,7 +87,3 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
-
-dependency_overrides:
-  flutter_chromium_webview_platform_interface:
-    path: ../../flutter_chromium_webview_platform_interface
