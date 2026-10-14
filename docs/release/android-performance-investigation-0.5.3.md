@@ -13,7 +13,7 @@ runs cannot publish. Use pinned Flutter3.47.4/Dart3.13.3 for final validation.
 ```
 gh workflow run ci.yml --ref release/0.5.3 -f validation_scope=android-html
 gh workflow run ci.yml --ref release/0.5.3 -f validation_scope=android
-# Run sequentially: existing branch concurrency cancels overlapping runs.
+# Different explicit scopes have separate concurrency groups.
 gh workflow run ci.yml --ref release/0.5.3 -f validation_scope=macos-performance
 ```
 
