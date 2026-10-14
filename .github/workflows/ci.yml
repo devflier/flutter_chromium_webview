@@ -243,6 +243,14 @@ jobs:
           flutter test
           dart pub publish --dry-run
         
+      - name: Verify bundled example without monorepo overrides
+        working-directory: packages/flutter_chromium_webview/example
+        run: |
+          rm pubspec_overrides.yaml
+          flutter pub get
+          flutter analyze
+          flutter test test
+
       - name: Publish flutter_chromium_webview
         working-directory: packages/flutter_chromium_webview
         run: dart pub publish --force

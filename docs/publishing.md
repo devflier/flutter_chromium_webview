@@ -28,7 +28,8 @@ The owner approved stable 0.5.3 with these documented memory limitations on
    quality, Linux, Windows, Android and macOS validation jobs all succeed.
 The main publishing job removes the repository-only dependency override and
    reruns dependency resolution, analysis, tests and dry-run validation against
-   the actual published interface before uploading. The archive excludes both
+   the actual published interface before uploading. It also resolves, analyzes
+   and tests the bundled example without its monorepo override. The archive excludes both
    main/example override files; the example's ordinary pubspec keeps its parent
    package path without referencing an unavailable sibling repository.
 
