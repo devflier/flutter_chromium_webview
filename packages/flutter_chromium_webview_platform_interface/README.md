@@ -5,6 +5,16 @@
 If you want to embed a Chromium (CEF) web view in your Flutter app, depend on
 [`flutter_chromium_webview`](https://pub.dev/packages/flutter_chromium_webview) instead.
 
+## Version 0.1.6
+
+This release publishes the evaluated-JavaScript/cancellation methods,
+`PointerInput.clickCount` and native browser-crash event forwarding used by
+`flutter_chromium_webview` 0.5.3. Platform implementations can override
+`evaluateJavaScript` and `cancelJavaScript`; the base implementations throw
+`UnimplementedError` when unsupported. Execute-only JavaScript remains available.
+The main package requires `^0.1.6`; application developers should depend on the
+main package rather than copying this repository's development overrides.
+
 ## What it contains
 
 - `ChromiumWebViewPlatform` – the abstract contract implemented by platform packages (initialize, create/dispose browser, load URL/HTML, reload, back/forward, JavaScript execution, resize, focus, pointer input, dialog/menu responses and a browser event stream).

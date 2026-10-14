@@ -33,6 +33,23 @@ outstanding. A green short CI profile would not retroactively reclassify the
 failed repeated-session investigations. If releasing with these unresolved
 memory acceptance results, record the product-owner release decision explicitly.
 
+## Published dependency correction
+
+The completed candidate quality job passed 69 main-package tests, 18 interface
+tests and the interface example test. The main publication dry run had zero
+warnings and one hint about the local interface override. Comparing the actual
+pub.dev 0.1.5 archive exposed missing evaluate/cancel JavaScript APIs, pointer
+click-count metadata and native crash-event forwarding. The override had hidden
+this consumer dependency mismatch.
+
+Publish interface **0.1.6 first**, then plugin **0.5.3** with `^0.1.6`. Existing
+interface runtime source is unchanged by this release preparation; its version,
+changelog and documentation now expose the already-tested additions. Do not
+publish the plugin until the public 0.1.6 version is confirmed. Verify its source
+matches the tested interface, and validate a clean consumer without overrides.
+Superseded candidate CI remains separate; fresh checks must cover the corrected
+metadata. No existing tag is moved.
+
 ## Historical readiness record (2026-10-05)
 
 The following original record is preserved as historical evidence. Its versions,

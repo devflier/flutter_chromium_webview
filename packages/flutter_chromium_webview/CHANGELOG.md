@@ -1,5 +1,7 @@
 ## 0.5.3
 
+* Require platform interface 0.1.6, which publishes the JavaScript evaluation/cancellation, click-count and browser-crash APIs used by this plugin.
+
 * Fix macOS Chromium host embedding and preserve native startup/failure diagnostics.
 * Recover macOS browsers after renderer or GPU-process crashes through the existing browser recreation contract; arbitrary page state is not preserved.
 * Improve macOS playback telemetry and independent validation-stage reporting.
