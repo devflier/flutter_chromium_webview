@@ -1,3 +1,26 @@
+# Current memory/release caveats — 2026-10-14
+
+The following native history includes successful functional and recovery tests,
+plus failed experiments. Do not generalize an individual short profile pass to
+whole-application memory acceptance. Repeated-session investigations retained
+strict RSS failures; no native ownership defect justifying a production allocator
+fix was established. Exact allocator ownership is inconclusive.
+
+The whole-application Debug preflight was supplementary on a 16 GiB Apple M1 Pro.
+Both final runs verified sampled decoded 1920×1080 playback, advancing media time
+and Metal frames, disposal ownership restoration and zero owned shutdown
+survivors. One ordered measurement/control pair left overhead inconclusive.
+Two cycles do not prove boundedness, and charged footprint is not RSS.
+
+Physical 8 GB minimum-tier validation is BLOCKED until target hardware is
+available; no VM, larger-memory machine or synthetic pressure substitutes for it.
+No numeric whole-application budget is approved. Legacy RSS acceptance remains
+FAIL. Debug observations are not Release certification. Local investigation
+artifacts are intentionally excluded from publication; these conclusions do not
+claim an independently reviewed long-term or minimum-tier pass.
+
+## Earlier native validation history
+
 # macOS native integration investigation — 2026-10-09
 
 The original lifecycle failure was a missing embedded host executable. It was

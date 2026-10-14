@@ -1,11 +1,16 @@
-# macOS CEF backend — implementation awaiting native validation
+# macOS CEF backend — setup and validation limits
 
-This backend is the first macOS implementation, targeting macOS 13+ with separate
-Apple Silicon (`arm64`) and Intel (`x86_64`) builds. It uses the same Dart controller
-and texture widget as Windows/Linux. Native compilation, input, playback and
-shutdown have **not** been verified: development was performed on Windows.
-The example runner is configured; `scripts/validate_macos.sh` at repository root
-performs the required build and runtime checks on a Mac.
+The backend targets macOS 13+ with separate Apple Silicon (`arm64`) and Intel
+(`x86_64`) builds. It uses the shared Dart controller and texture widget.
+Functional playback, tracked cleanup and GPU/Metal checks have passed tested
+Apple Silicon workloads. Intel support is an implementation target, not a claim
+that the memory investigation validated that architecture.
+
+Proposed physical 8 GB support is **unverified**. Historical strict RSS acceptance
+remains **FAIL**, exact allocator ownership is inconclusive, and long-term leak
+freedom is not established. No approved whole-application memory ceilings exist.
+Debug diagnostic results do not certify Release-mode memory usage. See
+[validation history](../../docs/macos-native-validation.md).
 
 ## Native design
 
@@ -16,8 +21,12 @@ performs the required build and runtime checks on a Mac.
 - A versioned CEF framework and five helper app variants are embedded and signed
   inside the app. Helper sandbox initialization precedes CEF loading. No runtime
   sandbox-disabling fallback is provided.
-- BGRA frames are copied into immutable, IOSurface-backed CVPixelBuffers. Raster
-  consumers retain buffers across paints, resizing and texture unregistration.
+- Accelerated CEF frames arrive through `OnAcceleratedPaint` and IOSurfaces;
+  Metal delivers textures to Flutter. Native ownership retains surfaces/textures
+  for in-flight frames and releases browser-owned resources on disposal.
+- Renderer/GPU crashes use the existing browser-crash/recreation contract.
+  Recovery creates a new document; restore application state explicitly.
+  Repeated GPU crashes may trigger Chromium's software fallback policy.
 - An AppKit text-input responder forwards keys, Cmd editing shortcuts and IME
   composition while its browser owns focus. Precise IME candidate placement and
   widget-to-screen offsets still need work and native validation.
@@ -87,10 +96,15 @@ bash scripts/validate_macos.sh
 This runs package/example analysis and tests, lifecycle/scaling/native-UI
 integration suites, a release build, a native pixel-buffer ownership regression,
 and copied-bundle startup/normal Quit validation. Logs are written to
-`docs/validation`. The manual macOS GitHub Actions workflow runs the same script
-after the package has an actual Git repository/remote; it has not been executed.
+`docs/validation`. The unified GitHub Actions workflow runs the same script on manual dispatch and
+version tags. Ordinary main pushes skip the macOS job. Check the actual job and
+all stage results before claiming validation; build success alone is insufficient.
 
-## ppplayer integration
+## Historical ppplayer integration planning
+
+The following records earlier compatibility planning, not current release
+verification of ppplayer. See the validation history above for later plugin tests.
+
 
 ppplayer was inspected at commit
 [`93c4af5`](https://github.com/ppplayer-labs/app/tree/93c4af527b238d237c2da3b9fab4d639f84177a9).

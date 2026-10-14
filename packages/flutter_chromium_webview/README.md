@@ -7,14 +7,14 @@ Windows, macOS, and Linux bundle a pinned Chromium engine through
 system Chromium WebView; its engine version follows the device's WebView updates.
 iOS uses a headless WKWebView implementation to comply with App Store rules.
 
-Desktop pages use CEF **off-screen rendering (OSR)**. Each frame is
-delivered to native code, copied into a pixel buffer and shown in Flutter
-through a **Flutter `Texture`**. This lets the web view behave like any other
+Desktop pages use CEF **off-screen rendering (OSR)** and a Flutter `Texture`.
+macOS imports accelerated IOSurface frames through Metal; Windows and Linux
+use the software pixel-buffer path. This lets the web view behave like any other
 widget: it can be clipped, transformed, stacked and overlaid. Android renders
 through a native Flutter platform view with native touch and keyboard input.
 iOS evaluates JavaScript headlessly in the background.
 
-> Published version: **`0.5.1`**.
+> Package version: **`0.5.3`**.
 
 ## Platform support
 
@@ -22,7 +22,7 @@ iOS evaluates JavaScript headlessly in the background.
 | --- | --- |
 | Linux x64 | Supported, validated on Ubuntu / WSLg |
 | Windows x64 | Supported, sandboxed CEF implementation |
-| macOS | Supported, native CEF implementation |
+| macOS 13+ | Native CEF/Metal backend; see [setup and validation limits](MACOS.md) |
 | Android API 24+ | System Chromium WebView; see [Android requirements](ANDROID.md) |
 | iOS | Supported, headless WKWebView implementation |
 | Web | Not implemented |
@@ -31,8 +31,22 @@ iOS evaluates JavaScript headlessly in the background.
 
 ```yaml
 dependencies:
-  flutter_chromium_webview: ^0.5.1
+  flutter_chromium_webview: ^0.5.3
 ```
+
+### SDK requirements
+
+The package requires Dart >=3.13.0 and Flutter >=3.44.0; both constraints must
+be satisfied by the installed Flutter SDK. CI uses Flutter 3.47.4 / Dart 3.13.3.
+Do not lower the SDK requirement to use the release on an older SDK.
+
+### Requirements (macOS)
+
+Use Xcode, CMake, Python 3 and CocoaPods. Configure the Runner application class,
+CEF embedding/signing, native architecture and entitlements as described in
+[MACOS.md](MACOS.md); adding the dependency alone is insufficient. The current
+backend targets direct distribution outside Apple's App Sandbox. Swift Package
+Manager and universal builds are not supported by the current setup.
 
 ### Requirements (Linux)
 
@@ -48,7 +62,9 @@ dependencies:
 
 ## Usage
 
-Initialize the CEF runtime once, before creating any browser:
+Initialize the CEF runtime once, before creating any browser. For this complete
+`lib/main.dart` example, add `path_provider` to your application with
+`flutter pub add path_provider`:
 
 ```dart
 import 'package:flutter/material.dart';
@@ -58,15 +74,21 @@ import 'package:path_provider/path_provider.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final cache = await getApplicationSupportDirectory();
-  await ChromiumWebViewController.initialize(cachePath: cache.path);
-  runApp(const MyApp());
+  final initialized = await ChromiumWebViewController.initialize(
+    cachePath: cache.path,
+  );
+  if (!initialized) throw StateError('Chromium initialization failed');
+  runApp(const BrowserApp());
 }
-```
 
-Then place a `ChromiumWebView` in your widget tree:
+class BrowserApp extends StatefulWidget {
+  const BrowserApp({super.key});
 
-```dart
-class _MyAppState extends State<MyApp> {
+  @override
+  State<BrowserApp> createState() => _BrowserAppState();
+}
+
+class _BrowserAppState extends State<BrowserApp> {
   final controller = ChromiumWebViewController();
 
   @override
@@ -106,7 +128,14 @@ flutter run -d linux
 
 ## Limitations
 
-- Rendering uses the CPU (software compositing). GPU acceleration is disabled.
+- Windows/Linux use software compositing; macOS uses accelerated Metal rendering.
+- macOS GPU/renderer recovery recreates the browser document. Applications must
+  restore their own page state. Repeated GPU crashes can trigger Chromium's
+  software fallback policy.
+- macOS 8 GB support has not been verified on physical target hardware. Historical
+  strict RSS memory acceptance remains failed; tracked resource cleanup and
+  successful playback do not establish long-term memory boundedness. No numeric
+  whole-application memory budget has been approved.
 - Standard CEF builds have no proprietary codecs (for example H.264).
 - Native drag and drop and IME candidate-window positioning are unfinished.
 - Once CEF is shut down the process must be restarted to use it again.

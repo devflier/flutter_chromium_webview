@@ -1,44 +1,41 @@
 # Publishing to pub.dev
 
-Ordinary branch pushes run validation. Publishing runs only when a version tag is pushed. Pub.dev's GitHub authentication requires a tag-triggered workflow; see [Dart's automated publishing documentation](https://dart.dev/tools/pub/automated-publishing).
+## Release 0.5.3 procedure — 2026-10-14
 
-On 2026-10-06, pub.dev still lists webview 0.2.1 and interface 0.1.1. The publishing runs for `v0.4.0` and `platform_interface-v0.1.2` were cancelled. The existing `v0.4.0` tag contains webview version 0.3.0, so it also mismatches the release version. Existing tags are preserved.
+The public main package is currently 0.5.2. Prepare 0.5.3 with matching pubspec,
+changelog, README and examples. Keep platform interface version 0.1.5 unchanged;
+the main package's `^0.1.5` dependency already accepts it. Preserve every old tag.
 
-The updated publishing workflow installs the temporary pub.dev authentication through `dart-lang/setup-dart`, pins the Flutter/Dart versions used for validation, and rejects tags that differ from the package version.
+1. Use clean main source, excluding local profiling fixtures and native experiments.
+2. Run formatting, analyzers, unit/example tests and publication dry runs with
+   the declared SDK constraints satisfied. Do not lower constraints to bypass
+   an older local SDK. CI pins Flutter 3.47.4 and Dart 3.13.3.
+3. Run the unified workflow manually on the candidate to include macOS. Ordinary
+   branch/main pushes skip macOS. Preserve all failed stages and artifacts.
+4. Review [release readiness](release-readiness.md), including the unresolved
+   historical memory acceptance and blocked physical 8 GB verification. A short
+   CI pass does not erase those verdicts. Record any owner-approved release
+   exception explicitly; do not describe it as memory acceptance.
+The owner approved stable 0.5.3 with these documented memory limitations on
+2026-10-14; see release readiness. This does not waive configured CI failures.
 
-## One-time account configuration
+5. Commit and push the approved candidate, verify `v0.5.3` matches pubspec using
+   `GITHUB_REF_NAME=v0.5.3 bash scripts/check_release_tag.sh packages/flutter_chromium_webview v`,
+   then push only that new tag. Tag pushes start automated publication after
+   quality, Linux, Windows, Android and macOS validation jobs all succeed.
+6. Inspect the publishing job and confirm the public version endpoint for 0.5.3.
+   A pushed tag or successful dry run alone is not proof of publication.
 
-In each package's **Admin → Automated publishing** settings, enable GitHub Actions with repository `devflier/flutter_chromium_webview` and the corresponding tag pattern:
+## Automated publishing account setup
 
-| Package | Tag pattern |
-| --- | --- |
-| flutter_chromium_webview | `v{{version}}` |
-| flutter_chromium_webview_platform_interface | `platform_interface-v{{version}}` |
+Configure each package's Admin → Automated publishing settings for repository
+`devflier/flutter_chromium_webview`: main tag pattern `v{{version}}`, interface
+pattern `platform_interface-v{{version}}`. If pub.dev requires an environment,
+the workflow must declare the same environment. Public package metadata cannot
+verify these private settings. GitHub OIDC authentication is supplied by
+`dart-lang/setup-dart`; no credentials belong in release files.
 
-These account settings cannot be verified through the public package API. If an environment is required in those settings, the publishing job must also declare the same GitHub environment.
-
-## Interface 0.1.4 release recovery
-
-The existing `platform_interface-v0.1.3` tag points to commit `bc327be`, where the interface version is still 0.1.2 and the publishing workflow lacks authentication setup. Preserve that tag. Prepare interface **0.1.4** from the corrected workflow instead.
-
-The main **0.3.1** publishing run succeeded on 2026-10-06, and its version endpoint confirms publication. Its `^0.1.3` dependency accepts interface 0.1.4; no main-package version bump or repeat publication is required.
-
-Release the prepared interface version in this order:
-
-1. Commit the interface version/changelog and these release notes, then push that commit.
-2. Create `platform_interface-v0.1.4` on that commit and push the individual tag. Check the tag's pubspec version before pushing.
-3. Confirm the interface publishing run succeeds and `https://pub.dev/api/packages/flutter_chromium_webview_platform_interface/versions/0.1.4` exists.
-4. Verify a clean consumer can resolve main package 0.3.1 without local overrides.
-
-Pushing a tag before committing the release files uses the previous package version and workflow. Rerunning an old tag checks out its old workflow and package source; it does not include subsequent fixes. Each later release needs a new package version and a matching new tag.
-
-## Example release 0.1.5
-
-Interface 0.1.5 adds a runnable in-memory backend example and documents the
-method-channel constructor. The example has its own Flutter package, web entry
-point and lifecycle smoke test. CI analyzes, tests and builds it. The main
-package's `^0.1.3` constraint accepts 0.1.5 without a main-package release.
-
-Publish this change using a fresh `platform_interface-v0.1.5` tag on the commit
-containing the example and version update. Pub.dev's documentation/example score
-will be recalculated after publication; a particular score is not guaranteed.
+See [Dart automated publishing documentation](https://dart.dev/tools/pub/automated-publishing).
+Never retag a historical release to fix source/version mismatches; use a new
+version and tag. Publication changes the public package and must retain the
+exact validated source and documented limitations.

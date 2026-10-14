@@ -1,3 +1,43 @@
+# Release 0.5.3 readiness — 2026-10-14
+
+The repository owner approved **stable 0.5.3 publication with the documented
+memory limitations** in this session on 2026-10-14. This is a release decision,
+not a memory acceptance pass: the historical RSS FAIL, physical 8 GB BLOCKED,
+allocator INCONCLUSIVE and unapproved numeric budgets remain unchanged.
+The automated publication job must still pass every configured validation job;
+no failed CI gate may be suppressed under this decision.
+
+Local preparation passed seven macOS packaging tests and the v0.5.3 tag/version
+check. Local publication dry run was BLOCKED by installed Dart 3.12.2 versus the
+unchanged >=3.13.0 package requirement; it is not reported as passed. The pinned
+CI SDK must run analysis/tests and publication dry runs before publication.
+
+Release candidate: patch from main `ded7f150d55a976549d645a6392b740ff7d9bdee`,
+excluding uncommitted profiling experiments. Package version/documentation must
+match the new tag; preserve all existing tags.
+
+The latest ordinary main workflow [38190100862](https://github.com/devflier/flutter_chromium_webview/actions/runs/38190100862)
+passed quality, Linux, Windows and Android, **but skipped macOS**. It is not a
+full release validation pass. A fresh manual/tag workflow must establish the
+actual candidate's configured job results before publication.
+
+Current memory verdicts remain independent: functional playback and tracked
+cleanup passed tested workloads; physical 8 GB verification is BLOCKED; exact
+PartitionAlloc ownership and long-term boundedness remain INCONCLUSIVE;
+historical strict less-than-75,000-KiB RSS acceptance remains FAIL. All numeric
+whole-application budgets are UNSET. No production memory fix or threshold
+relaxation is included. Publication must not imply memory certification.
+
+Release-mode whole-application evidence and target-hardware testing remain
+outstanding. A green short CI profile would not retroactively reclassify the
+failed repeated-session investigations. If releasing with these unresolved
+memory acceptance results, record the product-owner release decision explicitly.
+
+## Historical readiness record (2026-10-05)
+
+The following original record is preserved as historical evidence. Its versions,
+platform registration and CI observations describe that date, not release 0.5.3.
+
 # Windows, Linux and Android readiness
 
 Updated: 2026-10-05. Desktop 0.2.1 has been published by the repository owner.

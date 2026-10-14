@@ -1,3 +1,12 @@
+## 0.5.3
+
+* Fix macOS Chromium host embedding and preserve native startup/failure diagnostics.
+* Recover macOS browsers after renderer or GPU-process crashes through the existing browser recreation contract; arbitrary page state is not preserved.
+* Improve macOS playback telemetry and independent validation-stage reporting.
+* Preserve Android integration startup and crash diagnostics.
+* Refresh installation, runnable examples, macOS setup and release documentation.
+* Document remaining macOS memory limits: proposed 8 GB support is unverified, historical strict RSS acceptance remains failed, and long-term memory boundedness is not established. No allocator fix or relaxed memory threshold is included.
+
 ## 0.5.2
 
 * Fix JavaScript mocked player properties in integration test.
