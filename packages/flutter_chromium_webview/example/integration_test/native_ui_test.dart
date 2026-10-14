@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -19,11 +20,12 @@ void main() {
     await tester.pumpWidget(const SizedBox());
     final cache = Directory.systemTemp.createTempSync('cef-native-ui-');
     await ChromiumWebViewController.initialize(cachePath: cache.path);
-    final page = Uri.dataFromString('''<!doctype html><title>ready</title>
+    final page = Uri.dataFromString('''<!doctype html><title>loading</title>
       <style>select,input {position:absolute;left:20px;width:200px;height:40px}
       select{top:20px}input{top:90px}</style>
       <select><option>One</option><option>Two</option><option>Three</option></select>
       <input id="text" value="clipboard test">
+      <script>window.onload = () => { document.title = 'ready'; };</script>
       ''', mimeType: 'text/html').toString();
     final first = ChromiumWebViewController(initialUrl: page);
     final second = ChromiumWebViewController(initialUrl: page);
@@ -34,6 +36,27 @@ void main() {
           fail('Timed out; titles: ${first.pageTitle}, ${second.pageTitle}');
         }
         await Future<void>.delayed(const Duration(milliseconds: 50));
+      }
+    }
+
+    Future<void> runJs(
+      ChromiumWebViewController controller,
+      String script,
+    ) async {
+      final deadline = DateTime.now().add(const Duration(seconds: 15));
+      while (true) {
+        try {
+          await controller.executeJavaScript(script);
+          return;
+        } catch (e) {
+          if (e is PlatformException &&
+              e.code == 'context_unavailable' &&
+              DateTime.now().isBefore(deadline)) {
+            await Future<void>.delayed(const Duration(milliseconds: 50));
+            continue;
+          }
+          rethrow;
+        }
       }
     }
 
@@ -63,7 +86,11 @@ void main() {
       await first.updateBrowserSize(400, 300, 1);
       await second.updateBrowserSize(400, 300, 1.5);
       await until(
-        () => first.pageTitle == 'ready' && second.pageTitle == 'ready',
+        () =>
+            first.pageTitle == 'ready' &&
+            !first.isLoading &&
+            second.pageTitle == 'ready' &&
+            !second.isLoading,
       );
       final types = <JSDialogType>[];
       first.onJSDialog = (request) async {
@@ -73,17 +100,11 @@ void main() {
           userInput: 'ação',
         );
       };
-      await first.executeJavaScript(
-        "alert('hello');document.title='alert-done';",
-      );
+      await runJs(first, "alert('hello');document.title='alert-done';");
       await until(() => first.pageTitle == 'alert-done');
-      await first.executeJavaScript(
-        "document.title='confirm:'+confirm('continue?');",
-      );
+      await runJs(first, "document.title='confirm:'+confirm('continue?');");
       await until(() => first.pageTitle == 'confirm:false');
-      await first.executeJavaScript(
-        "document.title='prompt:'+prompt('name','seed');",
-      );
+      await runJs(first, "document.title='prompt:'+prompt('name','seed');");
       await until(() => first.pageTitle == 'prompt:ação');
       expect(types, [
         JSDialogType.alert,
@@ -106,7 +127,7 @@ void main() {
       await click(first, 60, 110, button: 2);
       await until(() => menuSeen);
       // Seeing the request does not mean CEF has applied the async menu result.
-      await first.executeJavaScript("""
+      await runJs(first, """
         (function probeSelection() {
           const end = document.getElementById('text').selectionEnd;
           document.title = 'selection:' + end;
@@ -121,14 +142,14 @@ void main() {
         pending = true;
         return response.future;
       };
-      await first.executeJavaScript("confirm('pending navigation');");
+      await runJs(first, "confirm('pending navigation');");
       await until(() => pending);
       await first.loadRequest(page);
       await until(() => first.pageTitle == 'ready' && !first.isLoading);
       response.complete(const JSDialogResponse(success: true));
 
       await first.setFocus(true);
-      await first.executeJavaScript("""
+      await runJs(first, """
         document.querySelector('select').addEventListener('mousedown', () => document.title = 'select-mousedown:' + document.hasFocus());
         document.title = 'select-ready';
       """);
@@ -137,7 +158,7 @@ void main() {
       await click(first, 60, 40);
       await until(() => first.isPopupShowing);
       await first.dispose().timeout(const Duration(seconds: 30));
-      await second.executeJavaScript("document.title='other-browser-alive';");
+      await runJs(second, "document.title='other-browser-alive';");
       await until(() => second.pageTitle == 'other-browser-alive');
 
       final late = Completer<JSDialogResponse>();
@@ -146,7 +167,7 @@ void main() {
         pending = true;
         return late.future;
       };
-      await second.executeJavaScript("alert('dispose while pending');");
+      await runJs(second, "alert('dispose while pending');");
       await until(() => pending);
       await second.dispose().timeout(const Duration(seconds: 30));
       late.complete(const JSDialogResponse(success: false));
