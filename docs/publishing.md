@@ -67,6 +67,11 @@ GITHUB_REF_NAME=v0.5.3 bash scripts/check_release_tag.sh packages/flutter_chromi
 curl --fail https://pub.dev/api/packages/flutter_chromium_webview/versions/0.5.3
 ```
 
+The dedicated readiness job performs main/example analysis and tests once.
+The upload job resolves the same hosted dependency again in its fresh checkout,
+checks its origin/version and repeats only final archive validation before
+uploading. Native suites are not duplicated inside publishing jobs.
+
 ## Account configuration
 
 GitHub OIDC via dart-lang/setup-dart requires the correct repository and tag

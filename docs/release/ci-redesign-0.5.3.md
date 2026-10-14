@@ -34,17 +34,24 @@ Monorepo overrides are development-only and excluded from the archive. The ordin
 
 | Check | Current result | Evidence / limits |
 |---|---|---|
-| Interface pub get / analysis / API unit tests | PASS (21 expected in final run) | release-checks/redesign; final logs determine exact count |
-| Interface example get / analysis / test / web build | Pending final result | Runs on installed supported SDK |
+| Interface pub get / analysis / API unit tests | PASS, 21 tests | release-checks/redesign; analysis clean; API, cancellation, click-count and crash-event coverage |
+| Interface example get / analysis / test / web build | PASS | Dependency resolution, clean analysis, one test and web build on installed supported SDK |
 | Profile/live report regressions | PASS, 9 tests | Missing samples/observer/duration/RSS and renderer survival fail; exact75000 fails; error150 alone is not classified externally blocked |
 | Shell syntax / workflow YAML and dependency invariants | PASS | Interface has no native needs; plugin retains memory gate; live is not a publisher dependency |
-| New local video native profile | In progress | 300s real decoding/Metal on 16 GiB arm64, older local SDK; supplementary only |
+| New local video native profile | Final run in progress; pilot completeness FAIL | Pilot: 302.242s, 12 samples, RSS delta −190912 KiB; native fixture passed but reporter rejected last disposal at58.661s. Final run uses corrected loop. Older local SDK; supplementary only |
 | Plugin release SDK get/analyze/test/dry run | BLOCKED locally | Dart3.12.2 cannot satisfy >=3.13.0; remote candidate CI must run |
 | Actual public dependency resolution | BLOCKED | Hosted interface0.1.6 is unpublished |
 | Windows/Linux/Android native checks for revised candidate | NOT RUN locally | Unavailable host platforms; CI will report separately |
 | Real YouTube | BLOCKED in two preserved attempts | Explicit service authentication challenge; no bypass or repeated retry campaign |
 | Historical strict memory acceptance / long-term boundedness / physical8GB | FAIL / not established / BLOCKED | Separate from local media results; no retroactive reclassification |
 | Publication / merge / tag actions | NOT RUN | New approval boundary; existing tags unchanged |
+
+Local interface publication dry run from committed source passes with zero
+warnings. The earlier dirty-tree dry run failed with an uncommitted-test warning;
+it is preserved separately, not labeled passed. Two dependency-origin tests
+reject a local path, old0.1.5 and a different host, and accept actual hosted0.1.6
+configuration. This is resolution validation, not a fabricated public version.
+The registry endpoint itself remains404 until actual publication.
 
 ## Decisions and next actions
 

@@ -39,6 +39,10 @@ jobs:
           flutter-version: '3.47.4'
           channel: stable
           cache: true
+      - name: Release-report and dependency-origin regressions
+        run: |
+          python3 -m unittest discover -s scripts -p test_release_validation.py -v
+          python3 -m unittest discover -s scripts -p test_public_dependency.py -v
       - name: Interface API, tests, example and dry run
         run: |
           set -euo pipefail
@@ -346,22 +350,13 @@ jobs:
         with:
           sdk: '3.13.3'
 
-      - name: Verify published dependencies and package
+      - name: Resolve verified public dependency for upload
         working-directory: packages/flutter_chromium_webview
         run: |
           rm pubspec_overrides.yaml
           flutter pub get
-          flutter analyze
-          flutter test
+          python3 ../../scripts/verify_hosted_interface.py .dart_tool/package_config.json
           dart pub publish --dry-run
-
-      - name: Verify bundled example without monorepo overrides
-        working-directory: packages/flutter_chromium_webview/example
-        run: |
-          rm pubspec_overrides.yaml
-          flutter pub get
-          flutter analyze
-          flutter test test
 
       - name: Publish flutter_chromium_webview
         working-directory: packages/flutter_chromium_webview
