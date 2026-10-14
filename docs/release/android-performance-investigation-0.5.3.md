@@ -101,3 +101,18 @@ Flutter raster average0.48ms,p99 0.91ms. Those are different measurements with n
 shared frame ID; neither proves final physical presentation. Native shutdown
 survivors empty. Older SDK/16GiB diagnostic only; no hardware qualification or
 approved performance acceptance. Instrumentation may change workload overhead.
+
+Affected Android sequence PASS on pinned SDK:
+https://github.com/devflier/flutter_chromium_webview/actions/runs/38604533507 .
+All five native integrations and their persistent-capture completeness PASS;
+release APK build and packaged smoke PASS. Smoke checks startup,native touch,
+keyboard and JavaScript alert. It is not evidence of graceful app shutdown
+(the emulator action later terminates its test device). The historical run
+remains FAIL, root-cause INCONCLUSIVE. No Android production fix was made.
+
+Focused macOS CI timing run:
+https://github.com/devflier/flutter_chromium_webview/actions/runs/38605252039 .
+At17:23UTC it remains queued on macos-latest with no assigned runner; CI timing
+comparison is BLOCKED until it actually executes. No missing measurements are
+fabricated. A full required CI run must follow successful targeted diagnostics;
+prior candidate results remain separately attributed to129e585.
