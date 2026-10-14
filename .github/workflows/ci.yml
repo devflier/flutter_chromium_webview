@@ -208,14 +208,7 @@ jobs:
           target: google_apis
           arch: x86_64
           disable-animations: true
-          script: |
-            if [ "${{ inputs.validation_scope }}" = android-html ]; then
-              cd packages/flutter_chromium_webview/example
-              flutter pub get
-              python3 ../../../scripts/android_diagnostic_stage.py --directory ../../../docs/validation/android-html --device emulator-5554 flutter test integration_test/html_loading_test.dart -d emulator-5554 --no-pub -v
-            else
-              pwsh -File scripts/validate_android.ps1 -Device emulator-5554
-            fi
+          script: bash scripts/investigate_android.sh "${{ inputs.validation_scope }}"
 
       - uses: actions/upload-artifact@v7
         if: ${{ success() && inputs.validation_scope != 'android-html' }}
