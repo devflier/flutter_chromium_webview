@@ -12,6 +12,11 @@ on:
       - main
   workflow_dispatch:
     inputs:
+      validation_scope:
+        description: Focused diagnostics; all retains every required release check
+        type: choice
+        options: [all, android-html, android, macos-performance]
+        default: all
       live_youtube:
         description: 'Run independent external YouTube validation (never a publication dependency)'
         type: boolean
@@ -31,6 +36,7 @@ permissions:
 jobs:
   interface_checks:
     name: Platform interface API and publication readiness
+    if: ${{ !startsWith(inputs.validation_scope, 'android') && inputs.validation_scope != 'macos-performance' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -67,6 +73,7 @@ jobs:
 
   quality:
     name: Dart/Flutter Quality
+    if: ${{ !startsWith(inputs.validation_scope, 'android') && inputs.validation_scope != 'macos-performance' }}
     needs: interface_checks
     runs-on: ubuntu-latest
     steps:
@@ -108,7 +115,7 @@ jobs:
 
 
   linux:
-    if: ${{ !startsWith(github.ref, 'refs/tags/platform_interface-v') }}
+    if: ${{ !startsWith(github.ref, 'refs/tags/platform_interface-v') && !startsWith(inputs.validation_scope, 'android') && inputs.validation_scope != 'macos-performance' }}
     name: Linux
     needs: quality
     runs-on: ubuntu-latest
@@ -140,7 +147,7 @@ jobs:
           path: docs/validation/linux-native.log
 
   windows:
-    if: ${{ !startsWith(github.ref, 'refs/tags/platform_interface-v') }}
+    if: ${{ !startsWith(github.ref, 'refs/tags/platform_interface-v') && !startsWith(inputs.validation_scope, 'android') && inputs.validation_scope != 'macos-performance' }}
     name: Windows
     needs: quality
     runs-on: windows-latest
@@ -171,7 +178,7 @@ jobs:
           path: docs/validation/windows-packaged-*.log
 
   android:
-    if: ${{ !startsWith(github.ref, 'refs/tags/platform_interface-v') }}
+    if: ${{ always() && !cancelled() && ((github.event_name == 'workflow_dispatch' && startsWith(inputs.validation_scope, 'android')) || (needs.quality.result == 'success' && !startsWith(github.ref, 'refs/tags/platform_interface-v') && inputs.validation_scope != 'macos-performance')) }}
     name: Android
     needs: quality
     runs-on: ubuntu-latest
@@ -201,10 +208,17 @@ jobs:
           target: google_apis
           arch: x86_64
           disable-animations: true
-          script: pwsh -File scripts/validate_android.ps1 -Device emulator-5554
+          script: |
+            if [ "${{ inputs.validation_scope }}" = android-html ]; then
+              cd packages/flutter_chromium_webview/example
+              flutter pub get
+              python3 ../../../scripts/android_diagnostic_stage.py --directory ../../../docs/validation/android-html --device emulator-5554 flutter test integration_test/html_loading_test.dart -d emulator-5554 --no-pub -v
+            else
+              pwsh -File scripts/validate_android.ps1 -Device emulator-5554
+            fi
 
       - uses: actions/upload-artifact@v7
-        if: success()
+        if: ${{ success() && inputs.validation_scope != 'android-html' }}
         with:
           name: android-example-apk
           path: packages/flutter_chromium_webview/example/build/app/outputs/flutter-apk/app-release.apk
@@ -218,7 +232,7 @@ jobs:
   macos:
     name: macOS deterministic native lifecycle and rendering
     needs: quality
-    if: ${{ !startsWith(github.ref, 'refs/tags/platform_interface-v') }}
+    if: ${{ !startsWith(github.ref, 'refs/tags/platform_interface-v') && !startsWith(inputs.validation_scope, 'android') && inputs.validation_scope != 'macos-performance' }}
     runs-on: macos-latest
     timeout-minutes: 45
     steps:
@@ -249,7 +263,7 @@ jobs:
   macos_memory:
     name: macOS decoded-media RSS and ownership acceptance
     needs: quality
-    if: ${{ !startsWith(github.ref, 'refs/tags/platform_interface-v') }}
+    if: ${{ always() && !cancelled() && ((github.event_name == 'workflow_dispatch' && inputs.validation_scope == 'macos-performance') || (needs.quality.result == 'success' && !startsWith(github.ref, 'refs/tags/platform_interface-v') && !startsWith(inputs.validation_scope, 'android'))) }}
     runs-on: macos-latest
     timeout-minutes: 45
     steps:
@@ -267,7 +281,13 @@ jobs:
           xcodebuild -version
 
       - name: Local decoded media, RSS acceptance and completeness checks
-        run: bash scripts/validate_macos.sh memory
+        env:
+          PERFORMANCE_DIAGNOSTICS: ${{ inputs.validation_scope == 'macos-performance' && 'true' || 'false' }}
+        run: |
+          bash scripts/validate_macos.sh memory
+          if [ "$PERFORMANCE_DIAGNOSTICS" = true ]; then
+            python3 scripts/macos_performance_report.py --report docs/validation/macos-memory/allocation-profile.json --directory docs/validation/macos-memory/performance-summary
+          fi
 
       - uses: actions/upload-artifact@v7
         if: always()

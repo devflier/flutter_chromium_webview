@@ -154,6 +154,7 @@ NSDictionary* HostBrowserClient::RenderDiagnostics(int64_t browserId) {
         @"acceleratedCallbacks": @(session->acceleratedFrames),
         @"completedMetalFrames": @(session->completedMetalFrames),
         @"failedMetalFrames": @(session->failedMetalFrames),
+        @"totalGpuBlitTimeMs": @(session->totalGpuBlitTimeMs),
         @"droppedFrames": session->droppedFrames >= 0 ? @(session->droppedFrames) : NSNull.null};
 }
 #endif

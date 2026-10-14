@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
+import 'dart:ui' show FramePhase;
 
 import 'package:flutter/services.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -26,6 +28,9 @@ void main() {
     defaultValue: 30,
   );
   const reportPath = String.fromEnvironment('SOAK_REPORT');
+  const performanceDiagnostics = bool.fromEnvironment(
+    'PERFORMANCE_DIAGNOSTICS',
+  );
   const workload = String.fromEnvironment(
     'PROFILE_WORKLOAD',
     defaultValue: 'youtube',
@@ -44,6 +49,7 @@ void main() {
       expect(sampleSeconds, greaterThan(0));
       expect(Platform.environment['CEF_INPUT_TEST_USE_MOCK_KEYCHAIN'], '1');
       final report = <String, dynamic>{
+        'performanceDiagnostics': performanceDiagnostics,
         'startedUtc': DateTime.now().toUtc().toIso8601String(),
         'requestedSeconds': seconds,
         'disposalSeconds': disposalSeconds,
@@ -60,6 +66,29 @@ void main() {
         'droppedFramesMeasured': false,
         'passed': false,
       };
+      final flutterTimings = <Map<String, dynamic>>[];
+      void collectTimings(List<FrameTiming> frames) {
+        for (final frame in frames) {
+          if (flutterTimings.length < 4096) {
+            flutterTimings.add({
+              'frameNumber': frame.frameNumber,
+              'vsyncMicros': frame.timestampInMicroseconds(
+                FramePhase.vsyncStart,
+              ),
+              'buildMicros': frame.buildDuration.inMicroseconds,
+              'rasterMicros': frame.rasterDuration.inMicroseconds,
+              'totalSpanMicros': frame.totalSpan.inMicroseconds,
+            });
+          }
+        }
+      }
+
+      if (performanceDiagnostics) {
+        SchedulerBinding.instance.addTimingsCallback(collectTimings);
+        addTearDown(
+          () => SchedulerBinding.instance.removeTimingsCallback(collectTimings),
+        );
+      }
       void save() {
         if (reportPath.isNotEmpty) {
           File(reportPath).writeAsStringSync(
@@ -92,7 +121,8 @@ void main() {
             '''<!doctype html><video id="video" width="640" height="360" autoplay muted loop src="/local-video.webm"></video>
 <script>window.mediaTotalTime=0;window.mediaFrames=0;const v=document.getElementById('video');let last=0;
 v.addEventListener('timeupdate',()=>{const t=v.currentTime;window.mediaTotalTime+=t>=last?t-last:v.duration-last+t;last=t;});
-function frame(){window.mediaFrames++;v.requestVideoFrameCallback(frame);}v.requestVideoFrameCallback(frame);</script>''',
+window.pipelineFrames=[];window.pipelineOverflow=0;
+function frame(now,info){window.mediaFrames++;${performanceDiagnostics ? 'if(window.pipelineFrames.length<4096){window.pipelineFrames.push({callbackTime:now,presentationTime:info.presentationTime,expectedDisplayTime:info.expectedDisplayTime,mediaTime:info.mediaTime,presentedFrames:info.presentedFrames,processingDuration:info.processingDuration});}else{window.pipelineOverflow++;}' : ''}v.requestVideoFrameCallback(frame);}v.requestVideoFrameCallback(frame);</script>''',
           );
           await request.response.close();
           return;
@@ -265,6 +295,14 @@ function frame(){window.mediaFrames++;v.requestVideoFrameCallback(frame);}v.requ
           'browserId': controller.browserId,
         });
         final counters = await query('getResourceCounters');
+        if (performanceDiagnostics && localMedia != null) {
+          localMedia['timingFrames'] = await finish(
+            controller.evaluateJavaScript('window.pipelineFrames.splice(0)'),
+          );
+          localMedia['timingOverflow'] = await finish(
+            controller.evaluateJavaScript('window.pipelineOverflow'),
+          );
+        }
         final hostPid = rendering['hostPid'] as int;
         final rows = await processes(hostPid);
         final fds = await Process.run('/usr/sbin/lsof', [
@@ -300,6 +338,12 @@ function frame(){window.mediaFrames++;v.requestVideoFrameCallback(frame);}v.requ
           'numericDescriptors': descriptors.length,
           'window': await query('debugSoakWindow'),
         };
+        if (performanceDiagnostics) {
+          record['flutterTimings'] = List<Map<String, dynamic>>.from(
+            flutterTimings,
+          );
+          flutterTimings.clear();
+        }
         if (videoProbe != null) {
           final quality = await finish(videoProbe.sample());
           rendering['videoQuality'] = quality;

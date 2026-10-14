@@ -48,6 +48,12 @@ def run(name, command, directory):
         (stage / filename).unlink(missing_ok=True)
     before_cef = cef_processes()
     started = time.time()
+    performance = os.environ.get('PERFORMANCE_DIAGNOSTICS') == 'true'
+    if performance:
+        capture(['/usr/sbin/sysctl', 'hw.memsize', 'hw.model', 'hw.ncpu', 'machdep.cpu.brand_string', 'kern.hv_vmm_present'], stage / 'hardware.txt')
+        capture(['/usr/bin/top', '-l', '1', '-n', '0'], stage / 'system-load-before.txt')
+        capture(['/usr/bin/vm_stat'], stage / 'vm-before.txt')
+        capture(['/usr/bin/pmset', '-g', 'therm'], stage / 'thermal-before.txt')
     stamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     with (stage / 'processes-before.txt').open('w') as output:
         processes(output)
@@ -65,6 +71,9 @@ def run(name, command, directory):
                 tree.flush()
                 processes(tree)
     command_code = code
+    if performance:
+        capture(['/usr/bin/top', '-l', '1', '-n', '0'], stage / 'system-load-after.txt')
+        capture(['/usr/bin/vm_stat'], stage / 'vm-after.txt')
     # Runner can exit before its host completes CEF shutdown. Observe completion
     # with a deadline; a surviving new host/helper makes validation fail.
     deadline = time.monotonic() + 20

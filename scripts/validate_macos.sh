@@ -53,7 +53,7 @@ run_stage texture-ownership build/macos/native-tests/texture_test
 run_stage packaged-smoke python3 "$root/scripts/smoke_macos.py" "$PWD/build/macos/Build/Products/Release/flutter_chromium_webview_example.app"
 fi
 if [[ "$category" == memory ]]; then
-  run_stage allocation-profile env CEF_PROFILE_DEBUG_PORT=9229 flutter test integration_test/allocation_profile_test.dart -d macos --no-pub -v --dart-define=ALLOCATION_PROFILE=true --dart-define=PROFILE_WORKLOAD=local-video --dart-define=SOAK_SECONDS=300 --dart-define="SOAK_REPORT=$diagnostics/allocation-profile.json"
+  run_stage allocation-profile env CEF_PROFILE_DEBUG_PORT=9229 flutter test integration_test/allocation_profile_test.dart -d macos --no-pub -v --dart-define=ALLOCATION_PROFILE=true --dart-define=PERFORMANCE_DIAGNOSTICS=${PERFORMANCE_DIAGNOSTICS:-false} --dart-define=PROFILE_WORKLOAD=local-video --dart-define=SOAK_SECONDS=300 --dart-define="SOAK_REPORT=$diagnostics/allocation-profile.json"
   run_stage profile-artifact-validation python3 "$root/scripts/macos_profile_report.py" --report "$diagnostics/allocation-profile.json" --directory "$diagnostics/profile-summary" --seconds 300
   cat "$diagnostics/profile-summary/summary.md" >> "${GITHUB_STEP_SUMMARY:-/dev/null}"
 fi
