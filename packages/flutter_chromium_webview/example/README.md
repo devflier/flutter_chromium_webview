@@ -28,8 +28,9 @@ For the local browser example, try navigation, JavaScript, keyboard focus and
 resizing. macOS renderer/GPU recovery recreates the document, so arbitrary page
 state is not preserved. Ownership cleanup does not certify memory boundedness.
 
-From the repository root, `bash scripts/validate_macos.sh` runs native suites,
-300-second allocation profiling, release build, texture ownership and packaged
-shutdown checks. Logs and exit statuses are preserved even after independent
+From the repository root, `bash scripts/validate_macos.sh core` runs native suites,
+release build, texture ownership and packaged shutdown checks. The `memory`
+category runs a loopback VP9 video for 300-second RSS/video telemetry, retaining
+the strict RSS assertion; `live` separately exercises real YouTube. Logs and exit statuses are preserved even after independent
 stage failures. This validation does not establish physical 8 GB support or an
 approved whole-application memory budget.

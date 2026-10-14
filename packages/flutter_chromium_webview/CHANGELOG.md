@@ -1,5 +1,8 @@
 ## 0.5.3
 
+* Separate deterministic macOS core/local media RSS validation from explicitly invoked live YouTube reporting; preserve strict memory assertions and external blocked verdicts.
+* Gate platform-interface publication on its API/example checks and consumer compatibility, independently of native/live services.
+
 * Require platform interface 0.1.6, which publishes the JavaScript evaluation/cancellation, click-count and browser-crash APIs used by this plugin.
 
 * Fix macOS Chromium host embedding and preserve native startup/failure diagnostics.

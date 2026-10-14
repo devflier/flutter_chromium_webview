@@ -90,14 +90,17 @@ CEF cache reuse are deliberately rejected; use separate checkouts for ARM/Intel.
 Run on a Mac from the repository root:
 
 ```sh
-bash scripts/validate_macos.sh
+bash scripts/validate_macos.sh core    # deterministic native, ownership, release/shutdown
+bash scripts/validate_macos.sh memory  # local VP9 video, 300s RSS and completeness
+bash scripts/validate_macos.sh live    # independently reported real YouTube
 ```
 
 This runs package/example analysis and tests, lifecycle/scaling/native-UI
 integration suites, a release build, a native pixel-buffer ownership regression,
 and copied-bundle startup/normal Quit validation. Logs are written to
 `docs/validation`. The unified GitHub Actions workflow runs the same script on manual dispatch and
-version tags. Ordinary main pushes skip the macOS job. Check the actual job and
+version tags. The redesigned workflow validates deterministic macOS core and memory jobs on
+plugin PR/main/tag runs. Real YouTube is explicitly invoked independently. Check the actual job and
 all stage results before claiming validation; build success alone is insufficient.
 
 ## Historical ppplayer integration planning

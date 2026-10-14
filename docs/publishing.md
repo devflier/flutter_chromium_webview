@@ -1,51 +1,77 @@
-# Publishing to pub.dev
+# Release preparation and publishing
 
-## Release 0.5.3 procedure — 2026-10-14
+## Approval boundary
 
-The public main package is currently 0.5.2. Prepare 0.5.3 with matching pubspec,
-changelog, README and examples. Publish platform interface 0.1.6 before the main package, which requires
-`^0.1.6`. The published 0.1.5 interface lacks APIs present in the local override.
-Preserve every old tag.
+No package publication, merge or tag action is authorized by the CI-redesign
+request. The earlier stable-release decision does not authorize these actions
+under the new instruction. PR #6 contains preparation only. Existing tags stay
+unchanged. In particular, the unpublished `platform_interface-v0.1.6` tag points
+to the old workflow at f202e72; rerunning it will still use that old dependency
+graph. Before release, the owner must approve either retargeting that
+**unpublished** tag to reviewed source, or a new version/tag. Do not move it as
+an automatic CI fix.
 
-1. Use clean main source, excluding local profiling fixtures and native experiments.
-2. Run formatting, analyzers, unit/example tests and publication dry runs with
-   the declared SDK constraints satisfied. Do not lower constraints to bypass
-   an older local SDK. CI pins Flutter 3.47.4 and Dart 3.13.3.
-3. Run the unified workflow manually on the candidate to include macOS. Ordinary
-   branch/main pushes skip macOS. Preserve all failed stages and artifacts.
-4. Review [release readiness](release-readiness.md), including the unresolved
-   historical memory acceptance and blocked physical 8 GB verification. A short
-   CI pass does not erase those verdicts. Record any owner-approved release
-   exception explicitly; do not describe it as memory acceptance.
-The owner approved stable 0.5.3 with these documented memory limitations on
-2026-10-14; see release readiness. This does not waive configured CI failures.
+## Relevant release gates
 
-5. Commit and push the approved candidate, verify `v0.5.3` matches pubspec using
-   `GITHUB_REF_NAME=v0.5.3 bash scripts/check_release_tag.sh packages/flutter_chromium_webview v`,
-   first create/push the new `platform_interface-v0.1.6` tag on the approved
-   source and confirm its publishing workflow and public version endpoint.
-   Then create/push only the new `v0.5.3` tag. Tag pushes start automated publication after
-   quality, Linux, Windows, Android and macOS validation jobs all succeed.
-The main publishing job removes the repository-only dependency override and
-   reruns dependency resolution, analysis, tests and dry-run validation against
-   the actual published interface before uploading. It also resolves, analyzes
-   and tests the bundled example without its monorepo override. The archive excludes both
-   main/example override files; the example's ordinary pubspec keeps its parent
-   package path without referencing an unavailable sibling repository.
+- Interface: `interface_checks` analyzes/tests exported API and method-channel
+  contracts, validates/builds the in-memory example and dry-runs publication.
+  `quality` compiles/analyzes/tests the plugin consumer against the local
+  candidate interface. Both must pass; no native/live/soak dependency exists.
+- Plugin: quality and Linux/Windows/Android native jobs, deterministic macOS
+  core, local decoded-media RSS/ownership acceptance, and actual published
+  dependency readiness must pass. Failed or missing jobs cannot publish.
+- `macos_youtube_live` is explicitly invoked through the workflow input. It
+  remains independently reported and nonzero on FAIL/BLOCKED. External
+  challenges cannot certify success or block unrelated interface publication.
+- Historical strict RSS failures remain failed. A new local-media profile pass
+  is a different workload, not a replacement YouTube or long-term acceptance
+  result. Any unresolved memory release decision must be reviewed explicitly.
 
-6. Inspect the publishing job and confirm the public version endpoint for 0.5.3.
-   A pushed tag or successful dry run alone is not proof of publication.
+## Prepared release sequence (execute only after approval)
 
-## Automated publishing account setup
+1. Review PR #6 and complete relevant readiness checks; authorize a specific
+   source commit and interface tag/version strategy. Because GitHub/OIDC
+   publication runs on tags, an approved interface tag must precede the actual
+   upload. The current old tag cannot inherit the new workflow.
+2. Publish interface 0.1.6 through its independently gated tag workflow. Confirm
+   its public version endpoint and archive/source checksum.
+3. Validate plugin 0.5.3 without local development overrides:
 
-Configure each package's Admin → Automated publishing settings for repository
-`devflier/flutter_chromium_webview`: main tag pattern `v{{version}}`, interface
-pattern `platform_interface-v{{version}}`. If pub.dev requires an environment,
-the workflow must declare the same environment. Public package metadata cannot
-verify these private settings. GitHub OIDC authentication is supplied by
-`dart-lang/setup-dart`; no credentials belong in release files.
+   ```sh
+   bash scripts/verify_public_dependencies.sh
+   # Or invoke workflow_dispatch with public_dependencies=true.
+   ```
 
-See [Dart automated publishing documentation](https://dart.dev/tools/pub/automated-publishing).
-Never retag a historical release to fix source/version mismatches; use a new
-version and tag. Publication changes the public package and must retain the
-exact validated source and documented limitations.
+   This requires hosted interface0.1.6, runs package and example analysis/tests,
+   dry-runs packaging and restores development overrides afterward. If the
+   version is not yet published, readiness is BLOCKED; never silently use a path.
+4. Complete deterministic native and memory gates. Inspect explicit live-service
+   results independently and document product risks. Merge only reviewed and
+   explicitly approved changes. Verify the resulting tree matches validation.
+5. With explicit plugin-release approval, create/push the new plugin tag; the
+   tag workflow reruns required checks before uploading. Do not describe a
+   successful tag push as successful publication.
+
+Example commands for the approved source (not executed during preparation):
+
+```sh
+GITHUB_REF_NAME=platform_interface-v0.1.6 bash scripts/check_release_tag.sh packages/flutter_chromium_webview_platform_interface platform_interface-v
+# Only after the owner resolves/approves the already-existing unpublished tag:
+# git tag platform_interface-v0.1.6 APPROVED_COMMIT
+# git push origin refs/tags/platform_interface-v0.1.6
+curl --fail https://pub.dev/api/packages/flutter_chromium_webview_platform_interface/versions/0.1.6
+bash scripts/verify_public_dependencies.sh
+GITHUB_REF_NAME=v0.5.3 bash scripts/check_release_tag.sh packages/flutter_chromium_webview v
+# git tag v0.5.3 APPROVED_MERGED_COMMIT
+# git push origin refs/tags/v0.5.3
+curl --fail https://pub.dev/api/packages/flutter_chromium_webview/versions/0.5.3
+```
+
+## Account configuration
+
+GitHub OIDC via dart-lang/setup-dart requires the correct repository and tag
+pattern in each package's pub.dev Admin → Automated publishing settings:
+`v{{version}}` for plugin, `platform_interface-v{{version}}` for interface.
+Private account settings cannot be inferred from public metadata. If an
+approval environment is configured, the workflow must match it. No credentials
+belong in source. Do not bypass account protection or package integrity.

@@ -1,3 +1,19 @@
+# CI redesign readiness — 2026-10-14
+
+The current request authorizes preparation only: no publication, merge, or tags.
+See [pre-change audit](release/ci-audit-0.5.3.md) and the new redesign report for
+actual current checks. The earlier release notes below remain historical.
+
+Interface0.1.6 readiness is evaluated independently from native/live services.
+Plugin0.5.3 readiness still requires deterministic native and local media RSS
+checks and actual public interface resolution. Physical8GB support remains
+BLOCKED; strict historical RSS acceptance remains FAIL. No long-term leak
+freedom or approved numeric whole-app budget is claimed. The existing unpublished
+interface tag points to an old workflow and needs an owner-approved tag/version
+strategy before publication.
+
+## Prior release preparation record
+
 # Release 0.5.3 readiness — 2026-10-14
 
 The repository owner approved **stable 0.5.3 publication with the documented
