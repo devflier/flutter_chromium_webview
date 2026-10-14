@@ -13,7 +13,7 @@
 /// );
 /// ```
 ///
-/// Linux (x64), Windows (x64) and Android (API 24+) are supported.
+/// Linux (x64), Windows (x64), macOS (13+ arm64/x86_64) and Android (API 24+) are supported.
 // ignore: unnecessary_library_name
 library flutter_chromium_webview;
 
@@ -914,8 +914,9 @@ class ChromiumWebViewController extends ChangeNotifier {
 
   void _closeMenu(int menuId, int commandId) {
     unawaited(
-      _invoke((id) => _platform.closeContextMenu(id, menuId, commandId))
-          .catchError((Object _) {}),
+      _invoke(
+        (id) => _platform.closeContextMenu(id, menuId, commandId),
+      ).catchError((Object _) {}),
     );
   }
 

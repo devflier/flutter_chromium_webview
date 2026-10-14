@@ -20,8 +20,9 @@ WebView keyboard and accessibility behavior;
   Local HTTP test fixtures require a debug-only cleartext policy; the example
   supplies one without enabling cleartext in the release manifest.
 
-For unpublished Android support, use this checkout as a path dependency. The
-published 0.2.1 release is the desktop package.
+In release 0.5.3, Android is officially published and supported as a first-class
+platform via `pub.dev`. Consumer applications can depend directly on
+`flutter_chromium_webview: ^0.5.3`.
 
 ```powershell
 ./scripts/validate_android.ps1 -Device emulator-5554
