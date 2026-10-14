@@ -1,5 +1,13 @@
 # Flutter Chromium WebView Architecture
 
+The C++/GTK software-frame walkthrough below describes the Linux backend.
+Windows also uses software frames. macOS instead uses a separate CEF host,
+accelerated IOSurfaces and Metal texture delivery; see
+[macOS setup and design](../packages/flutter_chromium_webview/MACOS.md).
+Renderer/GPU recovery recreates the browser document and does not preserve
+arbitrary page state. Native cleanup success does not prove memory boundedness.
+
+
 This document describes the internal architecture of the `flutter_chromium_webview` plugin. It outlines how the Dart API communicates with the native C++ plugin, and how the Chromium Embedded Framework (CEF) renders HTML frames into Flutter textures.
 
 ## Architecture Diagram
