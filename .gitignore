@@ -50,3 +50,4 @@ docs/validation/macos-investigation/
 docs/validation/public-dependencies/
 
 __pycache__/
+AGENTS.md

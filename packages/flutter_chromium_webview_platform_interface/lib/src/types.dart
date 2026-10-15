@@ -138,3 +138,20 @@ class BrowserEvent {
   /// Event payload. The keys depend on [name].
   final Map<Object?, Object?> arguments;
 }
+
+/// Configures how Chromium handles secure storage and the OS keychain on macOS.
+enum ChromiumKeychainBehavior {
+  /// Uses an in-memory mock keychain and basic password store (`--use-mock-keychain`, `--password-store=basic`).
+  ///
+  /// This prevents macOS from prompting the user with system dialogs such as
+  /// "ChromiumWebViewHost wants to use your confidential information stored in 'Chromium Safe Storage' in your keychain".
+  /// Recommended for media players and embedded webviews that do not require OS-level credential persistence.
+  mock,
+
+  /// Uses the default macOS Keychain Services for Chromium OSCrypt (`--password-store=keychain`).
+  ///
+  /// May prompt the user for their system login keychain password if the app or host
+  /// binary signature changes.
+  system,
+}
+

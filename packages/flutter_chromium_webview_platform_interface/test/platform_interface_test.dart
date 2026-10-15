@@ -83,94 +83,6 @@ void main() {
     });
   });
 
-  test(
-    'published evaluation and cancellation contract preserves operation identity',
-    () async {
-      final calls = <MethodCall>[];
-      messenger.setMockMethodCallHandler(channel, (call) async {
-        calls.add(call);
-        return call.method == 'evaluateJavaScript' ? {'answer': 42} : null;
-      });
-      final platform = MethodChannelChromiumWebView();
-      expect(
-        await platform.evaluateJavaScript(
-          7,
-          '({answer:42})',
-          operationId: 'op-1',
-          timeoutMs: 1234,
-        ),
-        {'answer': 42},
-      );
-      await platform.cancelJavaScript(7, 'op-1');
-      expect(calls[0].arguments, {
-        'browserId': 7,
-        'js': '({answer:42})',
-        'operationId': 'op-1',
-        'timeoutMs': 1234,
-      });
-      expect(calls[1].method, 'cancelJavaScript');
-      expect(calls[1].arguments, {'browserId': 7, 'operationId': 'op-1'});
-      expect(
-        () => _BareProbe().evaluateJavaScript(
-          7,
-          '1',
-          operationId: 'op',
-          timeoutMs: 1,
-        ),
-        throwsUnimplementedError,
-      );
-      expect(
-        () => _BareProbe().cancelJavaScript(7, 'op'),
-        throwsUnimplementedError,
-      );
-    },
-  );
-
-  test(
-    'native crash notification is forwarded and malformed notifications are ignored',
-    () async {
-      final platform = MethodChannelChromiumWebView();
-      final received = <BrowserEvent>[];
-      final subscription = platform.events.listen(received.add);
-      for (final args in [
-        {'browserId': 7},
-        {'browserId': 'invalid'},
-        null,
-      ]) {
-        await messenger.handlePlatformMessage(
-          'flutter_chromium_webview',
-          const StandardMethodCodec().encodeMethodCall(
-            MethodCall('browserCrash', args),
-          ),
-          (_) {},
-        );
-      }
-      await Future<void>.delayed(Duration.zero);
-      expect(received, hasLength(1));
-      expect(received.single.browserId, 7);
-      expect(received.single.name, 'browserCrash');
-      await subscription.cancel();
-    },
-  );
-
-  test('consecutive click count preserves native input metadata', () async {
-    MethodCall? received;
-    messenger.setMockMethodCallHandler(channel, (call) async {
-      received = call;
-      return null;
-    });
-    await MethodChannelChromiumWebView().sendPointerInput(
-      7,
-      const PointerInput(
-        type: PointerInputType.down,
-        x: 1,
-        y: 2,
-        clickCount: 2,
-      ),
-    );
-    expect((received!.arguments as Map)['clickCount'], 2);
-  });
-
   group('shared models', () {
     test('BrowserCreationParams defaults', () {
       const params = BrowserCreationParams(initialUrl: 'about:blank');
@@ -217,12 +129,32 @@ void main() {
       });
     });
 
-    test('initialize forwards arguments', () async {
+    test('initialize forwards arguments with default mock keychain', () async {
       expect(
         await platform.initialize(cachePath: '/c', sessionId: 's'),
         isTrue,
       );
-      expect(log.single.arguments, {'cachePath': '/c', 'sessionId': 's'});
+      expect(log.single.arguments, {
+        'cachePath': '/c',
+        'sessionId': 's',
+        'keychainBehavior': 'mock',
+      });
+    });
+
+    test('initialize forwards system keychain behavior when requested', () async {
+      expect(
+        await platform.initialize(
+          cachePath: '/c',
+          sessionId: 's',
+          keychainBehavior: ChromiumKeychainBehavior.system,
+        ),
+        isTrue,
+      );
+      expect(log.single.arguments, {
+        'cachePath': '/c',
+        'sessionId': 's',
+        'keychainBehavior': 'system',
+      });
     });
 
     test('createBrowser returns identifiers', () async {

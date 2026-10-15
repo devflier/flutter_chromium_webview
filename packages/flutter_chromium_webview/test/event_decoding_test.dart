@@ -641,8 +641,27 @@ void main() {
         );
         final ids = calls.map((c) => (c.arguments as Map)['sessionId']).toSet();
         expect(ids, hasLength(1));
+        final keychains = calls.map((c) => (c.arguments as Map)['keychainBehavior']).toList();
+        expect(keychains, ['mock', 'mock']);
       },
     );
+
+    test('initialize forwards explicit keychainBehavior', () async {
+      calls.clear();
+      messenger.setMockMethodCallHandler(channel, (call) async {
+        calls.add(call);
+        return true;
+      });
+      expect(
+        await ChromiumWebViewController.initialize(
+          cachePath: '/c',
+          keychainBehavior: ChromiumKeychainBehavior.system,
+        ),
+        true,
+      );
+      final keychains = calls.map((c) => (c.arguments as Map)['keychainBehavior']).toList();
+      expect(keychains, ['system']);
+    });
   });
 
   group('pointer API', () {

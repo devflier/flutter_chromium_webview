@@ -83,10 +83,12 @@ class MethodChannelChromiumWebView extends ChromiumWebViewPlatform {
   Future<bool> initialize({
     required String cachePath,
     required String sessionId,
+    ChromiumKeychainBehavior keychainBehavior = ChromiumKeychainBehavior.mock,
   }) async {
     return await methodChannel.invokeMethod<bool>('initialize', {
           'cachePath': cachePath,
           'sessionId': sessionId,
+          'keychainBehavior': keychainBehavior.name,
         }) ??
         false;
   }

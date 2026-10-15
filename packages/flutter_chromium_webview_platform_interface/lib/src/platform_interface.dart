@@ -41,9 +41,12 @@ abstract class ChromiumWebViewPlatform extends PlatformInterface {
   /// [cachePath] must be an absolute path to a writable directory.
   /// [sessionId] is stable for the lifetime of the Dart isolate and lets the
   /// native side recognise repeated initialization.
+  /// [keychainBehavior] controls whether macOS uses a mock in-memory keychain
+  /// (default) or the system login keychain.
   Future<bool> initialize({
     required String cachePath,
     required String sessionId,
+    ChromiumKeychainBehavior keychainBehavior = ChromiumKeychainBehavior.mock,
   }) => throw UnimplementedError('initialize() has not been implemented.');
 
   /// Creates a browser and returns its identifiers.
