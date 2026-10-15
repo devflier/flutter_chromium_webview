@@ -154,4 +154,3 @@ enum ChromiumKeychainBehavior {
   /// binary signature changes.
   system,
 }
-

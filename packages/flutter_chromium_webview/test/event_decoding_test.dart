@@ -641,7 +641,9 @@ void main() {
         );
         final ids = calls.map((c) => (c.arguments as Map)['sessionId']).toSet();
         expect(ids, hasLength(1));
-        final keychains = calls.map((c) => (c.arguments as Map)['keychainBehavior']).toList();
+        final keychains = calls
+            .map((c) => (c.arguments as Map)['keychainBehavior'])
+            .toList();
         expect(keychains, ['mock', 'mock']);
       },
     );
@@ -659,7 +661,9 @@ void main() {
         ),
         true,
       );
-      final keychains = calls.map((c) => (c.arguments as Map)['keychainBehavior']).toList();
+      final keychains = calls
+          .map((c) => (c.arguments as Map)['keychainBehavior'])
+          .toList();
       expect(keychains, ['system']);
     });
   });

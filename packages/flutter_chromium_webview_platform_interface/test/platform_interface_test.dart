@@ -141,21 +141,24 @@ void main() {
       });
     });
 
-    test('initialize forwards system keychain behavior when requested', () async {
-      expect(
-        await platform.initialize(
-          cachePath: '/c',
-          sessionId: 's',
-          keychainBehavior: ChromiumKeychainBehavior.system,
-        ),
-        isTrue,
-      );
-      expect(log.single.arguments, {
-        'cachePath': '/c',
-        'sessionId': 's',
-        'keychainBehavior': 'system',
-      });
-    });
+    test(
+      'initialize forwards system keychain behavior when requested',
+      () async {
+        expect(
+          await platform.initialize(
+            cachePath: '/c',
+            sessionId: 's',
+            keychainBehavior: ChromiumKeychainBehavior.system,
+          ),
+          isTrue,
+        );
+        expect(log.single.arguments, {
+          'cachePath': '/c',
+          'sessionId': 's',
+          'keychainBehavior': 'system',
+        });
+      },
+    );
 
     test('createBrowser returns identifiers', () async {
       final result = await platform.createBrowser(
