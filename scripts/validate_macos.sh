@@ -19,6 +19,7 @@ source "$root/scripts/macos_validation_stages.sh"
 export CHROMIUM_WEBVIEW_MACOS_ARCH="$(uname -m)"
 command -v cmake >/dev/null
 command -v pod >/dev/null
+python3 "$root/scripts/ensure_monorepo_overrides.py"
 cd "$package"
 flutter pub get
 if [[ "$category" == core ]]; then

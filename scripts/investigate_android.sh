@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+python3 "$root/scripts/ensure_monorepo_overrides.py"
 if [[ "${1:-android}" == android-html ]]; then
   cd "$root/packages/flutter_chromium_webview/example"
   flutter pub get

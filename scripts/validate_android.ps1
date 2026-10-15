@@ -9,6 +9,7 @@ New-Item -ItemType Directory -Force -Path $diagnostics | Out-Null
 & java -version 2>&1 | Set-Content (Join-Path $diagnostics 'java-version.txt')
 & python3 -m unittest discover -s $PSScriptRoot -p test_android_diagnostics.py -v
 if ($LASTEXITCODE) { throw 'Android diagnostic wrapper regressions failed' }
+& python3 (Join-Path $PSScriptRoot 'ensure_monorepo_overrides.py')
 Push-Location $packagePath
 try {
   & flutter pub get
