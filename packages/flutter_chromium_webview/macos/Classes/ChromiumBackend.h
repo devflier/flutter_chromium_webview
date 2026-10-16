@@ -12,7 +12,7 @@ class Core;
 class Runtime {
  public:
   static Runtime& Shared();
-  void Initialize(NSString* cache, std::function<void(bool, NSString*)> completion);
+  void Initialize(NSString* cache, NSString* keychainBehavior, std::function<void(bool, NSString*)> completion);
   bool Ready() const { return ready_ && !quitting_; }
   bool PumpRunning() const { return ready_ && !quitting_; }
   int browser_count = 0;

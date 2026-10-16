@@ -84,6 +84,9 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Setup Workspace Overrides
+        run: python3 scripts/ensure_monorepo_overrides.py
+
       - name: Resolve Workspace Dependencies
         run: |
           for dir in $(find . -name pubspec.yaml -exec dirname {} \;); do

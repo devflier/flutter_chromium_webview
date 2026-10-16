@@ -7,6 +7,7 @@ if [[ -n "${WSL_DISTRO_NAME:-}" && "$root" =~ ^/mnt/[a-z]/ ]]; then
 fi
 mkdir -p "$root/docs/validation"
 exec > >(tee "$root/docs/validation/linux-native.log") 2>&1
+python3 "$root/scripts/ensure_monorepo_overrides.py"
 cd "$root/packages/flutter_chromium_webview"
 flutter pub get
 flutter analyze

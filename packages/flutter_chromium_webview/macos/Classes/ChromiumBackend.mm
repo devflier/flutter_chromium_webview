@@ -185,7 +185,7 @@ Runtime& Runtime::Shared() { static Runtime* runtime = new Runtime; return *runt
 void Runtime::Register(Core* core) { cores.insert(core); }
 void Runtime::Unregister(Core* core) { cores.erase(core); }
 
-void Runtime::Initialize(NSString* cache, std::function<void(bool, NSString*)> completion) {
+void Runtime::Initialize(NSString* cache, NSString* keychainBehavior, std::function<void(bool, NSString*)> completion) {
   if (Ready()) {
       if (completion) completion(true, nil);
       return;
@@ -194,7 +194,7 @@ void Runtime::Initialize(NSString* cache, std::function<void(bool, NSString*)> c
   attempted_ = true;
   
   Runtime* _this = this;
-  [[ChromiumHostManager sharedManager] launchHostWithCompletion:^(BOOL success, NSError *error) {
+  [[ChromiumHostManager sharedManager] launchHostWithKeychainBehavior:keychainBehavior completion:^(BOOL success, NSError *error) {
       if (success) {
           _this->ready_ = true;
           if (completion) completion(true, nil);
@@ -326,8 +326,6 @@ void Core::Handle(FlutterMethodCall* call, FlutterResult result) {
     return;
   }
   if ([method isEqualToString:@"getRenderDiagnostics"]) {
-    auto found = browsers_.find([Num(args, @"browserId") longLongValue]);
-    NSDictionary* consumption = found != browsers_.end() ? [found->second->main_ diagnosticConsumption] : @{};
     IPC::Message request;
     request.type = "getRenderDiagnostics";
     request.payload = args;
@@ -335,9 +333,7 @@ void Core::Handle(FlutterMethodCall* call, FlutterResult result) {
       if (response.type != "renderDiagnostics") {
         result(Error(@"DIAGNOSTICS_UNAVAILABLE", @"A Debug host with render diagnostics is required")); return;
       }
-      NSMutableDictionary* diagnostics = [response.payload mutableCopy];
-      diagnostics[@"clientTexture"] = consumption;
-      result(diagnostics);
+      result(response.payload);
     }];
     return;
   }
@@ -361,12 +357,13 @@ void Core::Handle(FlutterMethodCall* call, FlutterResult result) {
   }
   if ([method isEqualToString:@"initialize"]) {
     NSString* cache = String(args, @"cachePath"), *session = String(args, @"sessionId");
+    NSString* keychainBehavior = String(args, @"keychainBehavior", @"mock");
     if (!cache.isAbsolutePath || !session.length) {
       result(Error(@"INVALID_ARGUMENT", @"An absolute cachePath and sessionId are required")); return;
     }
     if (resetting_) { result(Error(@"RESETTING", @"Previous session is closing")); return; }
     
-    runtime.Initialize(cache, [this, session, result](bool success, NSString* error) {
+    runtime.Initialize(cache, keychainBehavior, [this, session, result](bool success, NSString* error) {
         if (!success) { result(Error(@"INIT_FAILED", error)); return; }
         if ([session_ isEqualToString:session]) { result(@YES); return; }
         session_ = [session copy]; resetting_ = true;

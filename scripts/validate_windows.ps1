@@ -2,6 +2,7 @@ param([switch]$SkipRelease, [string]$CMake)
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $packagePath = Join-Path $projectRoot 'packages/flutter_chromium_webview'
+& python3 (Join-Path $PSScriptRoot 'ensure_monorepo_overrides.py')
 Push-Location $packagePath
 try {
   & flutter pub get

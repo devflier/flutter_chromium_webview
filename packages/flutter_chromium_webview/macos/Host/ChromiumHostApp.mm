@@ -396,12 +396,22 @@ void ChromiumHostApp::OnContextInitialized() {
 }
 
 void ChromiumHostApp::OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line) {
-    // Ephemeral integration fixtures must not prompt for a user's Keychain.
-    // Production launches continue using the normal encrypted credential store.
-    const char* inputTest = getenv("CEF_INPUT_TEST_USE_MOCK_KEYCHAIN");
-    if (inputTest && std::string(inputTest) == "1") {
+    // Configurable keychain behavior:
+    // By default, use a mock keychain and basic password store to prevent macOS
+    // from prompting the user for their system login keychain password ("Chromium Safe Storage").
+    // If "--use-system-keychain" or CEF_KEYCHAIN_BEHAVIOR=system is explicitly configured,
+    // allow Chromium to use the macOS system keychain.
+    const char* envKeychain = getenv("CEF_KEYCHAIN_BEHAVIOR");
+    bool forceSystem = (envKeychain && strcmp(envKeychain, "system") == 0) || command_line->HasSwitch("use-system-keychain");
+    bool forceMock = (envKeychain && strcmp(envKeychain, "mock") == 0) || command_line->HasSwitch("use-mock-keychain");
+
+    if (forceSystem && !forceMock) {
+        command_line->AppendSwitchWithValue("password-store", "keychain");
+    } else {
         command_line->AppendSwitch("use-mock-keychain");
+        command_line->AppendSwitchWithValue("password-store", "basic");
     }
+
     command_line->AppendSwitchWithValue("disable-features", "Accessibility");
     command_line->AppendSwitch("disable-renderer-accessibility");
     command_line->AppendSwitch("ignore-gpu-blocklist");

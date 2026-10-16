@@ -156,6 +156,7 @@ class InMemoryBackend extends ChromiumWebViewPlatform {
   Future<bool> initialize({
     required String cachePath,
     required String sessionId,
+    ChromiumKeychainBehavior keychainBehavior = ChromiumKeychainBehavior.mock,
   }) async {
     _initialized = true;
     return true;

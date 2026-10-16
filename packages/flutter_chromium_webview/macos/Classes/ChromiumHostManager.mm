@@ -67,6 +67,10 @@
 }
 
 - (void)launchHostWithCompletion:(void(^)(BOOL success, NSError* error))completion {
+    [self launchHostWithKeychainBehavior:@"mock" completion:completion];
+}
+
+- (void)launchHostWithKeychainBehavior:(NSString*)keychainBehavior completion:(void(^)(BOOL success, NSError* error))completion {
     if (_state == HostStateReady) {
         completion(YES, nil);
         return;
@@ -135,11 +139,27 @@
     if (preserveRunLog) [output seekToEndOfFile];
     _task.standardOutput = output;
     _task.standardError = output;
-    _task.arguments = @[
+    
+    NSMutableArray<NSString*>* taskArguments = [NSMutableArray arrayWithArray:@[
         [NSString stringWithFormat:@"--ipc-socket=%@", _socketPath],
         [NSString stringWithFormat:@"--ipc-token=%@", _token],
-        [NSString stringWithFormat:@"--parent-pid=%d", getpid()]
-    ];
+        [NSString stringWithFormat:@"--parent-pid=%d", getpid()],
+    ]];
+    
+    NSString* envKeychain = NSProcessInfo.processInfo.environment[@"CEF_KEYCHAIN_BEHAVIOR"];
+    NSString* effectiveBehavior = envKeychain.length ? envKeychain : keychainBehavior;
+    if (!effectiveBehavior.length) {
+        effectiveBehavior = @"mock";
+    }
+
+    if ([effectiveBehavior isEqualToString:@"system"]) {
+        [taskArguments addObject:@"--use-system-keychain"];
+        [taskArguments addObject:@"--password-store=keychain"];
+    } else {
+        [taskArguments addObject:@"--use-mock-keychain"];
+        [taskArguments addObject:@"--password-store=basic"];
+    }
+    _task.arguments = taskArguments;
     
     __weak ChromiumHostManager* weakSelf = self;
     _task.terminationHandler = ^(NSTask* t) {
