@@ -4,6 +4,7 @@
 
 @interface ChromiumWebViewApplication () <CefAppProtocol>
 @property(nonatomic) BOOL handlingSendEvent;
+@property(nonatomic) BOOL chromiumShutdownComplete;
 - (void)finishTermination:(id)sender;
 @end
 
@@ -14,9 +15,19 @@
   [super sendEvent:event];
 }
 - (void)terminate:(id)sender {
+  // FlutterAppDelegate may cancel the first AppKit termination while awaiting
+  // Dart's exit response, then call terminate: again. CEF shutdown is one-shot;
+  // the second request must reach AppKit instead of being swallowed by Runtime.
+  if (self.chromiumShutdownComplete) {
+    [super terminate:sender];
+    return;
+  }
   chromium_macos::Runtime::Shared().RequestShutdown([self, sender] { [self finishTermination:sender]; });
 }
-- (void)finishTermination:(id)sender { [super terminate:sender]; }
+- (void)finishTermination:(id)sender {
+  self.chromiumShutdownComplete = YES;
+  [super terminate:sender];
+}
 @end
 
 @implementation FlutterChromiumWebviewPlugin {

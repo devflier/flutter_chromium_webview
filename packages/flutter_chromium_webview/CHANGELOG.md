@@ -1,3 +1,13 @@
+## 0.5.5
+
+* Allow macOS hosts with native media controls to disable Chromium's duplicate system media session with `CEF_SYSTEM_MEDIA_CONTROLS=0`.
+* Find Homebrew and CMake.app installations when building from Xcode's restricted PATH; clarify missing CMake errors.
+* Mark CEF preparation as intentionally running on every build.
+* Support host-coordinated YouTube crash recovery and expose video playback quality diagnostics.
+* Preserve Android autoplay media playback when its Activity is minimized.
+* Preserve cached Metal texture cleanup on resize and browser disposal, and drain paint autorelease pools.
+* Allow macOS termination to finish after Flutter's asynchronous exit response.
+
 ## 0.5.4
 
 * Add configurable `keychainBehavior` parameter (`ChromiumKeychainBehavior.mock` vs `.system`) to `ChromiumWebViewController.initialize`.

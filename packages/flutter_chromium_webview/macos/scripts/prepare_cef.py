@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import shutil
 import subprocess
 import tarfile
 import tempfile
@@ -17,6 +18,17 @@ HASHES = {
     "x86_64": "75639ff6181a63194b1aae1c69ad1aa7fc2033dcc92b11554c57844c86f4e4bb",
 }
 ROOT = Path(__file__).resolve().parent.parent
+
+
+def find_cmake():
+    # Xcode launched from Finder does not inherit the shell's Homebrew PATH.
+    search_path = os.pathsep.join((os.environ.get("PATH", ""),
+                                  "/opt/homebrew/bin", "/usr/local/bin",
+                                  "/Applications/CMake.app/Contents/bin"))
+    cmake = shutil.which("cmake", path=search_path)
+    if cmake is None:
+        raise RuntimeError("CMake was not found. Install it with 'brew install cmake' or install CMake.app.")
+    return cmake
 
 
 def verify_archive(path, expected):
@@ -52,6 +64,7 @@ def safe_extract(archive, destination):
 def prepare(arch):
     if platform.system() != "Darwin":
         raise RuntimeError("CEF macOS preparation requires a Mac with Xcode and CMake")
+    cmake = find_cmake()
     cache = ROOT / "cef"
     cache.mkdir(exist_ok=True)
     config_path = cache / "config.json"
@@ -80,10 +93,10 @@ def prepare(arch):
             safe_extract(archive, staging)
             (staging / distribution).rename(cef_root)
     build = cache / "build"
-    subprocess.run(["cmake", "-S", str(ROOT), "-B", str(build), "-G", "Unix Makefiles",
+    subprocess.run([cmake, "-S", str(ROOT), "-B", str(build), "-G", "Unix Makefiles",
                     f"-DCEF_ROOT={cef_root}", f"-DCMAKE_OSX_ARCHITECTURES={arch}",
                     "-DCMAKE_BUILD_TYPE=Release", "-DPROJECT_ARCH=" + ("arm64" if arch == "arm64" else "x86_64")], check=True)
-    subprocess.run(["cmake", "--build", str(build), "--parallel", "2"], check=True)
+    subprocess.run([cmake, "--build", str(build), "--parallel", "2"], check=True)
     config_path.write_text(json.dumps({"arch": arch, "version": VERSION}) + "\n")
     print(f"CEF prepared for {arch}", flush=True)
 

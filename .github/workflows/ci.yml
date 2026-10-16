@@ -22,7 +22,7 @@ on:
         type: boolean
         default: false
       public_dependencies:
-        description: 'Verify plugin against already published interface 0.1.6'
+        description: 'Verify plugin against already published interface 0.1.7'
         type: boolean
         default: false
 
@@ -342,7 +342,7 @@ jobs:
           flutter-version: '3.47.4'
           channel: stable
           cache: true
-      - name: Resolve actual published dependency (fails if 0.1.6 unavailable)
+      - name: Resolve actual published dependency (fails if 0.1.7 unavailable)
         run: bash scripts/verify_public_dependencies.sh
       - uses: actions/upload-artifact@v7
         if: always()

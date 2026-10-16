@@ -51,9 +51,11 @@ public:
                          const CefString& method,
                          const void* params,
                          size_t params_size) override {
-        if (method != "Media.playerPropertiesChanged") return;
+        if (method.ToString().find("Media.") != 0) return;
         if (!params || params_size == 0) return;
         std::string json(static_cast<const char*>(params), params_size);
+        NSLog(@"[MediaDevTools] Method: %s, JSON: %s", method.ToString().c_str(), json.c_str());
+        if (method != "Media.playerPropertiesChanged") return;
         auto value = CefParseJSON(json, JSON_PARSER_ALLOW_TRAILING_COMMAS);
         if (value && value->GetType() == VTYPE_DICTIONARY) {
             auto dict = value->GetDictionary();
@@ -69,6 +71,17 @@ public:
                     }
                 }
             }
+        }
+    }
+    void OnDevToolsMethodResult(CefRefPtr<CefBrowser> browser,
+                                int message_id,
+                                bool success,
+                                const void* result,
+                                size_t result_size) override {
+        NSLog(@"[MediaDevTools] MethodResult id=%d success=%d", message_id, success);
+        if (result && result_size > 0) {
+            std::string json(static_cast<const char*>(result), result_size);
+            NSLog(@"[MediaDevTools] Result JSON: %s", json.c_str());
         }
     }
     IMPLEMENT_REFCOUNTING(MediaDevToolsObserver);
@@ -252,6 +265,11 @@ void HostBrowserClient::CreateBrowser(int64_t browser_id, const std::string& url
         return;
     }
     NSLog(@"[CEFHost] browserCreated id=%lld", browser_id);
+    created.media_observer = new MediaDevToolsObserver(this, browser_id);
+    created.media_observer_registration = browser->GetHost()->AddDevToolsMessageObserver(created.media_observer);
+    CefRefPtr<CefDictionaryValue> params = CefDictionaryValue::Create();
+    browser->GetHost()->ExecuteDevToolsMethod(0, "Media.enable", params);
+
     IPC::Message ack;
     ack.type = "browserCreated";
     ack.requestId = request_id;
@@ -381,6 +399,15 @@ void HostBrowserClient::ResizeBrowser(int64_t browser_id, int width, int height,
         it->second.height = height;
         it->second.deviceScaleFactor = scale_factor;
         it->second.generation++;
+        // Metal textures retain the IOSurfaces they were created from. Drop
+        // them before replacing the surface ring, otherwise subsequent paints
+        // keep writing the previous generation while Flutter reads empty ones.
+        // Paints and resizes run on the CEF UI thread, and each blit completes
+        // before OnAcceleratedPaint returns.
+        for (auto texture : it->second.dest_metal_textures) {
+            if (texture) CFRelease(texture);
+        }
+        it->second.dest_metal_textures.clear();
         
         for (auto surface : it->second.io_surfaces) {
             if (surface) {
@@ -439,9 +466,6 @@ void HostBrowserClient::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
     // for the initial view rect/screen scale. Bind only the active request.
     if (auto* session = GetSession(creating_browser_id_)) {
         session->browser = browser;
-        session->media_observer = new MediaDevToolsObserver(this, creating_browser_id_);
-        session->media_observer_registration = browser->GetHost()->AddDevToolsMessageObserver(session->media_observer);
-        browser->GetHost()->ExecuteDevToolsMethod(0, "Media.enable", nullptr);
     }
 }
 
@@ -468,6 +492,16 @@ void HostBrowserClient::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
             }
             it->second.io_surfaces.clear();
             
+            for (auto tex : it->second.dest_metal_textures) {
+                if (tex) CFRelease(tex);
+            }
+            it->second.dest_metal_textures.clear();
+
+            for (auto pair : it->second.source_metal_textures) {
+                if (pair.second) CFRelease(pair.second);
+            }
+            it->second.source_metal_textures.clear();
+
             _sessions.erase(it);
             g_counters.activeBrowsers--;
                 }
@@ -501,6 +535,7 @@ void HostBrowserClient::OnPaint(CefRefPtr<CefBrowser> browser,
                                 const RectList& dirtyRects,
                                 const void* buffer,
                                 int width, int height) {
+    @autoreleasepool {
     if (type == PET_POPUP) return; // Ignore popups for now in this simplest implementation
     
     int64_t id = GetBrowserId(browser);
@@ -557,12 +592,14 @@ void HostBrowserClient::OnPaint(CefRefPtr<CefBrowser> browser,
         session->lastPrintTime = now;
         session->totalGpuBlitTimeMs = 0;
     }
+    }
 }
 
 void HostBrowserClient::OnAcceleratedPaint(CefRefPtr<CefBrowser> browser,
                                            PaintElementType type,
                                            const RectList& dirtyRects,
                                            const CefAcceleratedPaintInfo& info) {
+    @autoreleasepool {
     if (type == PET_POPUP) return;
     
     int64_t b_id = GetBrowserId(browser);
@@ -589,12 +626,20 @@ void HostBrowserClient::OnAcceleratedPaint(CefRefPtr<CefBrowser> browser,
     IOSurfaceRef cefSurface = (IOSurfaceRef)info.shared_texture_io_surface;
     if (!cefSurface) return;
     
-    MTLTextureDescriptor* sourceDesc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm
-                                                                                        width:IOSurfaceGetWidth(cefSurface)
-                                                                                       height:IOSurfaceGetHeight(cefSurface)
-                                                                                    mipmapped:NO];
-    id<MTLTexture> source = [device newTextureWithDescriptor:sourceDesc iosurface:cefSurface plane:0];
-    TrackMetalTexture(source);
+    id<MTLTexture> source = nil;
+    uint32_t sourceId = IOSurfaceGetID(cefSurface);
+    auto source_it = session->source_metal_textures.find(sourceId);
+    if (source_it != session->source_metal_textures.end()) {
+        source = (__bridge id<MTLTexture>)source_it->second;
+    } else {
+        MTLTextureDescriptor* sourceDesc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm
+                                                                                            width:IOSurfaceGetWidth(cefSurface)
+                                                                                           height:IOSurfaceGetHeight(cefSurface)
+                                                                                        mipmapped:NO];
+        source = [device newTextureWithDescriptor:sourceDesc iosurface:cefSurface plane:0];
+        session->source_metal_textures[sourceId] = (void*)CFBridgingRetain(source);
+        TrackMetalTexture(source);
+    }
     if (!source) {
         NSLog(@"[CEFHost] Failed to create source texture from CEF IOSurface. Format: %d", IOSurfaceGetPixelFormat(cefSurface));
         return;
@@ -604,12 +649,21 @@ void HostBrowserClient::OnAcceleratedPaint(CefRefPtr<CefBrowser> browser,
     IOSurfaceRef destinationSurface = session->io_surfaces[slot];
     
     if (!destinationSurface) return;
-    MTLTextureDescriptor* destinationDesc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm
-                                                                                             width:IOSurfaceGetWidth(destinationSurface)
-                                                                                            height:IOSurfaceGetHeight(destinationSurface)
-                                                                                         mipmapped:NO];
-    id<MTLTexture> destination = [device newTextureWithDescriptor:destinationDesc iosurface:destinationSurface plane:0];
-    TrackMetalTexture(destination);
+    id<MTLTexture> destination = nil;
+    if (slot < session->dest_metal_textures.size() && session->dest_metal_textures[slot] != nullptr) {
+        destination = (__bridge id<MTLTexture>)session->dest_metal_textures[slot];
+    } else {
+        MTLTextureDescriptor* destinationDesc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm
+                                                                                                 width:IOSurfaceGetWidth(destinationSurface)
+                                                                                                height:IOSurfaceGetHeight(destinationSurface)
+                                                                                             mipmapped:NO];
+        destination = [device newTextureWithDescriptor:destinationDesc iosurface:destinationSurface plane:0];
+        if (session->dest_metal_textures.size() <= slot) {
+            session->dest_metal_textures.resize(slot + 1, nullptr);
+        }
+        session->dest_metal_textures[slot] = (void*)CFBridgingRetain(destination);
+        TrackMetalTexture(destination);
+    }
     if (!destination) {
         NSLog(@"[CEFHost] Failed to create destination texture. Format: %d", IOSurfaceGetPixelFormat(destinationSurface));
         return;
@@ -688,6 +742,7 @@ void HostBrowserClient::OnAcceleratedPaint(CefRefPtr<CefBrowser> browser,
               session->softwareFrames, session->acceleratedFrames, avgBlitMs, elapsedMs);
         session->lastPrintTime = now;
         session->totalGpuBlitTimeMs = 0;
+    }
     }
 }
 

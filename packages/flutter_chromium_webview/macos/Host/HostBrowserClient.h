@@ -44,6 +44,10 @@ public:
         CefRefPtr<CefRegistration> media_observer_registration;
         
         std::vector<IOSurfaceRef> io_surfaces;
+        std::vector<void*> dest_metal_textures;
+        std::unordered_map<uint32_t, void*> source_metal_textures;
+
+
         uint32_t current_surface_slot = 0;
         
 #if DEBUG

@@ -18,6 +18,7 @@ class ChromiumYoutubePlayerController {
     String? profileName,
     this.readyTimeout = const Duration(seconds: 30),
     this.commandTimeout = const Duration(seconds: 5),
+    this.recoverAutomatically = true,
     @visibleForTesting this.iframeApiUrl = 'https://www.youtube.com/iframe_api',
   }) {
     final document = _httpUrl(documentUrl);
@@ -37,6 +38,7 @@ class ChromiumYoutubePlayerController {
         ),
       ],
       onBrowserCrashed: _onBrowserCrashed,
+      automaticallyRecoverFromCrash: recoverAutomatically,
     );
   }
 
@@ -50,11 +52,18 @@ class ChromiumYoutubePlayerController {
       if (!completion.isCompleted) completion.completeError(error);
     }
     _pending.clear();
+    if (!recoverAutomatically) {
+      _events.add(const {'BrowserCrashed': true});
+      return;
+    }
     unawaited(reload().catchError((Object _) {}));
   }
 
   /// HTTP(S) document URL chosen by the host; supplies origin and referrer.
   final String documentUrl;
+
+  /// Disable when the host coordinates generation-aware recovery.
+  final bool recoverAutomatically;
 
   /// The maximum duration to wait for the player to become ready.
   final Duration readyTimeout;
@@ -436,6 +445,15 @@ class ChromiumYoutubePlayerController {
     return Map<String, Object?>.unmodifiable(value);
   });
 
+  /// Returns the video playback quality statistics.
+  Future<Map<String, Object?>> get videoPlaybackQuality => _enqueue(() async {
+    final value = await _request('getVideoPlaybackQuality', []);
+    if (value is! Map<String, dynamic>) {
+      throw StateError('Invalid video playback quality');
+    }
+    return Map<String, Object?>.unmodifiable(value);
+  });
+
   /// Rebuild the player and restore the last reported position and host intent.
   Future<void> reload() => _enqueue(() async {
     await _loadDocument();
@@ -505,6 +523,13 @@ const methods=new Set(['loadVideoById','cueVideoById','loadPlaylist','cuePlaylis
 window.__chromiumYoutubeDispatch=function(request){
  if(request.generation!==config.generation)return;
  try{
+  if(request.method==='getVideoPlaybackQuality'){
+    const v=document.querySelector('video');
+    if(!v||!v.getVideoPlaybackQuality)throw new Error('Video quality not available');
+    const q=v.getVideoPlaybackQuality();
+    send('Result',{id:request.id,value:{creationTime:q.creationTime,totalVideoFrames:q.totalVideoFrames,droppedVideoFrames:q.droppedVideoFrames}});
+    return;
+  }
   if(!player||!methods.has(request.method)||!Array.isArray(request.args))throw new Error('Invalid player command');
   const value=player[request.method](...request.args);
   send('Result',{id:request.id,value:value===undefined?null:value});
@@ -523,6 +548,8 @@ window.onYouTubeIframeAPIReady=function(){
        perfTimestamp: performance.now(),
        state: state,
        currentTime: time,
+       loadedFraction: player && player.getVideoLoadedFraction ? player.getVideoLoadedFraction() : null,
+       duration: player && player.getDuration ? player.getDuration() : null,
        playlistIndex: idx,
        hidden: document.hidden,
        visibility: document.visibilityState

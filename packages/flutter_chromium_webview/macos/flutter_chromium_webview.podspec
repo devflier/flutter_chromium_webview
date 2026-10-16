@@ -22,6 +22,7 @@ Pod::Spec.new do |s|
     :name => 'Prepare CEF Framework',
     :script => 'python3 "${PODS_TARGET_SRCROOT}/scripts/prepare_cef.py" --arch ${ARCHS%% *}',
     :execution_position => :before_compile,
+    :always_out_of_date => '1',
   }
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',

@@ -295,11 +295,21 @@ public final class FlutterChromiumWebviewPlugin implements FlutterPlugin, Method
     int nextDialog;
     @SuppressLint("SetJavaScriptEnabled") Browser(int id, MethodCall call) throws Exception {
       this.id = id;
+      final boolean backgroundMedia = Boolean.FALSE.equals(call.argument("mediaPlaybackRequiresUserGesture"));
       viewContext = new MutableContextWrapper(activityContext == null ? context : activityContext);
       web = new WebView(viewContext) {
         @Override
+        public int getWindowVisibility() {
+          // Chromium also queries this during provider/container updates.
+          return backgroundMedia ? View.VISIBLE : super.getWindowVisibility();
+        }
+        @Override
         protected void onWindowVisibilityChanged(int visibility) {
-          super.onWindowVisibilityChanged(visibility);
+          // Autoplay media browsers keep their single player alive when the
+          // Activity is minimized. A foreground service alone does not prevent
+          // Chromium from hiding the document and suspending its media here.
+          // Ordinary browsing WebViews retain Android's visibility behavior.
+          super.onWindowVisibilityChanged(backgroundMedia ? View.VISIBLE : visibility);
           android.util.Log.i("ChromiumBG", "webview=" + hashCode() + " onWindowVisibilityChanged visibility=" + visibility);
         }
         @Override

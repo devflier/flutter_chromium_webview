@@ -21,6 +21,26 @@ embed = load("embed_cef")
 
 
 class DistributionTests(unittest.TestCase):
+    def test_cmake_is_found_with_xcode_path(self):
+        with patch.dict(prepare.os.environ, {"PATH": "/usr/bin:/bin"}), \
+                patch.object(prepare.shutil, "which", return_value="/opt/homebrew/bin/cmake") as which:
+            self.assertEqual(prepare.find_cmake(), "/opt/homebrew/bin/cmake")
+            which.assert_called_once_with("cmake", path=(
+                "/usr/bin:/bin:/opt/homebrew/bin:/usr/local/bin:/Applications/CMake.app/Contents/bin"))
+
+    def test_cmake_on_path_takes_precedence(self):
+        with tempfile.TemporaryDirectory() as directory:
+            cmake = Path(directory) / "cmake"
+            cmake.write_text("#!/bin/sh\n")
+            cmake.chmod(0o755)
+            with patch.dict(prepare.os.environ, {"PATH": directory}):
+                self.assertEqual(prepare.find_cmake(), str(cmake))
+
+    def test_missing_cmake_has_install_instructions(self):
+        with patch.object(prepare.shutil, "which", return_value=None):
+            with self.assertRaisesRegex(RuntimeError, "brew install cmake"):
+                prepare.find_cmake()
+
     def test_clean_runner_build_compiles_host_without_a_prebuilt_host_app(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
