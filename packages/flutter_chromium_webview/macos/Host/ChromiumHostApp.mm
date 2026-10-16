@@ -412,7 +412,16 @@ void ChromiumHostApp::OnBeforeCommandLineProcessing(const CefString& process_typ
         command_line->AppendSwitchWithValue("password-store", "basic");
     }
 
-    command_line->AppendSwitchWithValue("disable-features", "Accessibility");
+    // Hosts that publish their own native media controls can opt out of
+    // Chromium's separate OS session, including cross-origin iframe sessions.
+    std::string disabled_features = command_line->GetSwitchValue("disable-features").ToString();
+    if (!disabled_features.empty()) disabled_features += ",";
+    disabled_features += "Accessibility";
+    const char* systemMediaControls = getenv("CEF_SYSTEM_MEDIA_CONTROLS");
+    if (systemMediaControls && strcmp(systemMediaControls, "0") == 0) {
+        disabled_features += ",HardwareMediaKeyHandling,MediaSessionService";
+    }
+    command_line->AppendSwitchWithValue("disable-features", disabled_features);
     command_line->AppendSwitch("disable-renderer-accessibility");
     command_line->AppendSwitch("ignore-gpu-blocklist");
     command_line->AppendSwitch("enable-gpu");

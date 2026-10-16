@@ -231,4 +231,41 @@ void main() {
     expect(commands.last['method'], 'playVideoAt');
     expect((commands.last['args'] as List).first, 5);
   });
+  test(
+    'host-coordinated crash emits once without a second browser or autoplay',
+    () async {
+      await player.dispose();
+      player = ChromiumYoutubePlayerController(
+        documentUrl: 'https://player.example/embed',
+        recoverAutomatically: false,
+      );
+      final events = <Map<String, Object?>>[];
+      final subscription = player.events.listen(events.add);
+      await player.initialize();
+      await player.cueVideoById(videoId: 'M7lc1UVf-VE', startSeconds: 4);
+      final documentGeneration = generation;
+      await messenger.handlePlatformMessage(
+        channel.name,
+        const StandardMethodCodec().encodeMethodCall(
+          const MethodCall('onBrowserEvent', {
+            'browserId': 1,
+            'event': 'browserCrash',
+            'args': <String, Object?>{},
+          }),
+        ),
+        (_) {},
+      );
+      await Future<void>.delayed(Duration.zero);
+      expect(
+        events.where((event) => event['BrowserCrashed'] == true),
+        hasLength(1),
+      );
+      expect(generation, documentGeneration);
+      expect(
+        commands.where((request) => request['method'] == 'loadVideoById'),
+        isEmpty,
+      );
+      await subscription.cancel();
+    },
+  );
 }

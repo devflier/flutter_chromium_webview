@@ -143,3 +143,17 @@ requires a native Mac build/runtime pass. Remaining work includes:
 
 ppplayer's repository was read for compatibility planning; no app files, playback
 dependencies or release settings were modified.
+
+## Hosts with native media controls
+
+Chromium publishes system media controls by default. If your app owns
+`MPNowPlayingInfoCenter` and `MPRemoteCommandCenter`, set
+`CEF_SYSTEM_MEDIA_CONTROLS=0` in the app process before the first
+`ChromiumWebViewController.initialize` call. The host inherits this environment
+variable and disables Chromium's system media session and hardware media-key
+handling before CEF starts. This prevents duplicate Now Playing entries from
+embedded players, including cross-origin iframes. Audio/video playback remains available. Restart the app after changing
+this setting.
+
+For a Swift macOS runner, call `setenv("CEF_SYSTEM_MEDIA_CONTROLS", "0", 1)`
+in `applicationDidFinishLaunching` before starting playback.
