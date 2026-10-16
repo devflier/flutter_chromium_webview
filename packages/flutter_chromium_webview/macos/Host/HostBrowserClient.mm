@@ -497,10 +497,10 @@ void HostBrowserClient::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
             }
             it->second.dest_metal_textures.clear();
 
-            for (auto pair : it->second.source_metal_textures) {
-                if (pair.second) CFRelease(pair.second);
+            if (it->second.source_metal_texture) {
+                CFRelease(it->second.source_metal_texture);
+                it->second.source_metal_texture = nullptr;
             }
-            it->second.source_metal_textures.clear();
 
             _sessions.erase(it);
             g_counters.activeBrowsers--;
@@ -628,16 +628,22 @@ void HostBrowserClient::OnAcceleratedPaint(CefRefPtr<CefBrowser> browser,
     
     id<MTLTexture> source = nil;
     uint32_t sourceId = IOSurfaceGetID(cefSurface);
-    auto source_it = session->source_metal_textures.find(sourceId);
-    if (source_it != session->source_metal_textures.end()) {
-        source = (__bridge id<MTLTexture>)source_it->second;
+    if (session->source_metal_texture && session->source_surface_id == sourceId) {
+        source = (__bridge id<MTLTexture>)session->source_metal_texture;
     } else {
+        // Keep only the current source alongside the three destination textures.
+        // Retaining every CEF surface ID grows the cache throughout playback.
+        if (session->source_metal_texture) {
+            CFRelease(session->source_metal_texture);
+            session->source_metal_texture = nullptr;
+        }
         MTLTextureDescriptor* sourceDesc = [MTLTextureDescriptor texture2DDescriptorWithPixelFormat:MTLPixelFormatBGRA8Unorm
                                                                                             width:IOSurfaceGetWidth(cefSurface)
                                                                                            height:IOSurfaceGetHeight(cefSurface)
                                                                                         mipmapped:NO];
         source = [device newTextureWithDescriptor:sourceDesc iosurface:cefSurface plane:0];
-        session->source_metal_textures[sourceId] = (void*)CFBridgingRetain(source);
+        session->source_metal_texture = (void*)CFBridgingRetain(source);
+        session->source_surface_id = sourceId;
         TrackMetalTexture(source);
     }
     if (!source) {

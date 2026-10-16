@@ -5,7 +5,7 @@
 * Mark CEF preparation as intentionally running on every build.
 * Support host-coordinated YouTube crash recovery and expose video playback quality diagnostics.
 * Preserve Android autoplay media playback when its Activity is minimized.
-* Preserve cached Metal texture cleanup on resize and browser disposal, and drain paint autorelease pools.
+* Bound the Metal texture cache to one source and three destinations, clean it up on resize/disposal, and drain paint autorelease pools.
 * Allow macOS termination to finish after Flutter's asynchronous exit response.
 
 ## 0.5.4

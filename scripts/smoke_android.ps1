@@ -9,7 +9,7 @@ function Invoke-Android([string[]]$Arguments) {
   & $Adb -s $Device @Arguments
   if ($LASTEXITCODE) { throw "Android command failed: $($Arguments[0])" }
 }
-function Wait-Node([string]$Name, [scriptblock]$Match) {
+function Wait-Node([string]$Name, [scriptblock]$Match, [scriptblock]$Retry) {
   $deadline = (Get-Date).AddSeconds(25)
   do {
     & $Adb -s $Device shell uiautomator dump /sdcard/chromium-smoke-ui.xml 2>&1 | Out-Null
@@ -21,6 +21,7 @@ function Wait-Node([string]$Name, [scriptblock]$Match) {
       $global:lastSuccessfulNode = $Name
       return $nodes[0] 
     }
+    if ($Retry) { & $Retry $snapshot }
   } while ((Get-Date) -lt $deadline)
   throw "Wait-Node Timeout: Expected Android UI node '$Name' not found. Last successful checkpoint: '$global:lastSuccessfulNode'. Inspect $snapshotPath for current UI state."
 }
@@ -40,7 +41,15 @@ try {
   Tap-Node (Wait-Node -Name 'Input test item' { $_.'content-desc' -eq 'Input test' -or $_.text -eq 'Input test' })
   Tap-Node (Wait-Node -Name 'First field input' { $_.hint -eq 'First field' -or $_.text -eq 'First field' -or $_.'content-desc' -eq 'First field' })
   # Wait for the keyboard and viewport resize to settle before injecting keys.
-  Wait-Node -Name 'First field focused' { ($_.hint -eq 'First field' -or $_.text -eq 'First field' -or $_.'content-desc' -eq 'First field') -and $_.focused -eq 'true' } | Out-Null
+  Wait-Node -Name 'First field focused' -Match { ($_.hint -eq 'First field' -or $_.text -eq 'First field' -or $_.'content-desc' -eq 'First field') -and $_.focused -eq 'true' } -Retry {
+    param($CurrentSnapshot)
+    # The first tap may focus the platform view while the page is still laying
+    # out. Retry using current bounds; keep requiring DOM input focus and text.
+    $field = @($CurrentSnapshot.SelectNodes('//node') | Where-Object {
+      $_.'resource-id' -eq 'first' -and $_.bounds -ne '[0,0][0,0]'
+    })
+    if ($field.Count) { Tap-Node $field[0] }
+  } | Out-Null
   Invoke-Android @('shell', 'input', 'text', 'ppplayer-android')
   Wait-Node -Name 'Input updated text' { $_.text -match 'ppplayer-android' -or $_.'content-desc' -match 'ppplayer-android' } | Out-Null
   Invoke-Android @('shell', 'input', 'keyevent', 'KEYCODE_BACK')
