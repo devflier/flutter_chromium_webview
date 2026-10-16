@@ -53,7 +53,23 @@ try {
   Invoke-Android @('shell', 'input', 'text', 'ppplayer-android')
   Wait-Node -Name 'Input updated text' { $_.text -match 'ppplayer-android' -or $_.'content-desc' -match 'ppplayer-android' } | Out-Null
   Invoke-Android @('shell', 'input', 'keyevent', 'KEYCODE_BACK')
-  Tap-Node (Wait-Node -Name 'Alert button' { $_.text -eq 'Alert' -or $_.'content-desc' -eq 'Alert' })
+  Tap-Node (Wait-Node -Name 'Alert button' -Match {
+    ($_.text -eq 'Alert' -or $_.'content-desc' -eq 'Alert') -and $_.bounds -ne '[0,0][0,0]'
+  } -Retry {
+    param($CurrentSnapshot)
+    # Small emulator viewports expose off-screen nodes with zero bounds. Scroll
+    # the actual WebView until the button is visible before attempting a tap.
+    $webView = $CurrentSnapshot.SelectSingleNode('//node[@class="android.webkit.WebView"]')
+    if ($webView) {
+      $bounds = @([regex]::Matches($webView.bounds, '\d+') | ForEach-Object { [int]$_.Value })
+      if ($bounds.Count -eq 4) {
+        $x = [int](($bounds[0] + $bounds[2]) / 2)
+        $startY = $bounds[3] - 60
+        $endY = $bounds[1] + 60
+        Invoke-Android @('shell', 'input', 'swipe', "$x", "$startY", "$x", "$endY", '350')
+      }
+    }
+  })
   Wait-Node -Name 'Chromium alert dialog' { $_.'content-desc' -match 'Hello from Chromium!' -or $_.text -match 'Hello from Chromium!' } | Out-Null
   Tap-Node (Wait-Node -Name 'Alert OK button' { $_.'content-desc' -eq 'OK' -or $_.text -eq 'OK' })
   Wait-Node -Name 'Check input persists' { $_.text -match 'ppplayer-android' -or $_.'content-desc' -match 'ppplayer-android' } | Out-Null
