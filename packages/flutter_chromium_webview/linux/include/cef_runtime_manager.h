@@ -29,7 +29,11 @@ class CefRuntimeManager {
   void BrowserOpened() { ++browser_count_; }
   void BrowserClosed() { --browser_count_; }
   int browser_count() const { return browser_count_; }
-  bool pump_running() const { return pump_id_ != 0; }
+  bool pump_running() const { return pump_id_ != 0 || loop_running_; }
+
+  // Ends CefRunMessageLoop(), or prevents its start.
+  // Called when the last application window is removed and on shutdown.
+  void QuitMessageLoop();
 
  private:
   CefRuntimeManager();
@@ -40,7 +44,10 @@ class CefRuntimeManager {
 
   CefRuntimeState state_;
   std::mutex state_mutex_;
+  // Pending idle source that starts CefRunMessageLoop().
   guint pump_id_ = 0;
+  bool loop_running_ = false;
+  bool quit_requested_ = false;
   int browser_count_ = 0;
 };
 

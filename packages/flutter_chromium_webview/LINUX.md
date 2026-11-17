@@ -60,7 +60,7 @@ graph LR
 1. **Off-Screen Rendering (OSR)**: CEF renders pages into memory buffers without creating top-level native X11 windows.
 2. **Pixel Buffer Flow**: Frames delivered via `CefRenderHandler::OnPaint` are copied into a stable frame buffer managed by `CefTexture`.
 3. **Flutter Texture**: The texture is registered with the Flutter Engine's texture registry (`flutter::TextureRegistrar`), making the webview an ordinary Flutter widget that can be positioned, clipped, transformed, and layered.
-4. **Message Loop Integration**: CEF runs its message pump cooperatively on the GTK main loop via `CefDoMessageLoopWork` scheduled by GTK timeouts.
+4. **Message Loop Integration**: CEF runs `CefRunMessageLoop()` on the main thread. Its GLib pump iterates the default main context, so GTK and Flutter sources are dispatched by the same loop. The loop is entered once from an idle callback after initialization and quits when the last application window is removed.
 
 ## Input and Keyboard Handling
 

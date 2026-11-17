@@ -1,3 +1,7 @@
+## Unreleased
+
+* Linux: fix the GTK main loop spinning one CPU core at 100% while CEF runs. CEF now runs `CefRunMessageLoop()` (entered once from an idle callback and quit when the last window is removed) instead of the external message pump with a 10 ms `CefDoMessageLoopWork` timer.
+
 ## 0.5.5
 
 * Allow macOS hosts with native media controls to disable Chromium's duplicate system media session with `CEF_SYSTEM_MEDIA_CONTROLS=0`.

@@ -1,4 +1,5 @@
 #include "include/cef_runtime_manager.h"
+#include <gtk/gtk.h>
 #include <iostream>
 #include <unistd.h>
 #include <linux/limits.h>
@@ -50,10 +51,14 @@ bool CefRuntimeManager::Initialize(const std::string& cache_path, int argc, char
   // Keep Chromium's sandbox enabled. Unsupported hosts must fail explicitly;
   // no automatic --no-sandbox fallback is permitted.
   settings.windowless_rendering_enabled = true;
-  // Use CEF's external pump instead of a nested GLib pump. The latter can
-  // keep dispatching GTK sources inside a timer call and starve window events.
-  // Our periodic main-thread timer also services delayed Chromium work.
-  settings.external_message_pump = true;
+  // Run CefRunMessageLoop() instead of an external pump.
+  // Chromium's MessagePumpGlib attaches a work source to the main thread's
+  // default GLib context. Its prepare() reports a 0 ms timeout whenever the
+  // pump is not inside Run(), so with an external pump the GTK main loop never
+  // blocks and spins one core at 100%. CefRunMessageLoop() keeps the pump in
+  // Run(); it iterates the same default context, so GTK and Flutter sources
+  // are still dispatched (the same arrangement Chrome itself uses on Linux).
+  settings.external_message_pump = false;
 
   // Set paths
   CefString(&settings.cache_path) = cache_path;
@@ -83,10 +88,31 @@ bool CefRuntimeManager::Initialize(const std::string& cache_path, int argc, char
   
   if (success) {
     state_ = CefRuntimeState::kReady;
-    pump_id_ = g_timeout_add(10, [](gpointer) -> gboolean {
-      CefDoMessageLoopWork();
-      return G_SOURCE_CONTINUE;
-    }, nullptr);
+    // Entered once, from an idle callback, so this method call returns first.
+    // The loop then runs for the lifetime of the app and ends when the last
+    // application window is removed (or on Shutdown()).
+    pump_id_ = g_idle_add(
+        [](gpointer data) -> gboolean {
+          auto* self = static_cast<CefRuntimeManager*>(data);
+          self->pump_id_ = 0;
+          if (!self->quit_requested_) {
+            self->loop_running_ = true;
+            CefRunMessageLoop();
+            self->loop_running_ = false;
+          }
+          return G_SOURCE_REMOVE;
+        },
+        this);
+    GApplication* application = g_application_get_default();
+    if (application && GTK_IS_APPLICATION(application)) {
+      g_signal_connect(application, "window-removed",
+                       G_CALLBACK(+[](GtkApplication* app, GtkWindow*, gpointer data) {
+                         if (gtk_application_get_windows(app) == nullptr) {
+                           static_cast<CefRuntimeManager*>(data)->QuitMessageLoop();
+                         }
+                       }),
+                       this);
+    }
   } else {
     // CEF initialization is a one-shot operation, including early exits.
     state_ = CefRuntimeState::kShutdown;
@@ -102,10 +128,7 @@ void CefRuntimeManager::Shutdown() {
   }
 
   state_ = CefRuntimeState::kShuttingDown;
-  if (pump_id_) {
-    g_source_remove(pump_id_);
-    pump_id_ = 0;
-  }
+  QuitMessageLoop();
   // Plugin shutdown handlers request closure before this after-handler runs.
   // Continue CEF work until all CloseBrowser requests have been acknowledged.
   const gint64 deadline = g_get_monotonic_time() + 5 * G_TIME_SPAN_SECOND;
@@ -120,6 +143,18 @@ void CefRuntimeManager::Shutdown() {
   CefShutdown();
   state_ = CefRuntimeState::kShutdown;
   std::cerr << "[CEF] Shutdown complete" << std::endl;
+}
+
+void CefRuntimeManager::QuitMessageLoop() {
+  quit_requested_ = true;
+  if (pump_id_) {
+    g_source_remove(pump_id_);
+    pump_id_ = 0;
+  }
+  if (loop_running_) {
+    // Returns from CefRunMessageLoop(), so GApplication's own loop can exit.
+    CefQuitMessageLoop();
+  }
 }
 
 CefRuntimeState CefRuntimeManager::GetState() const {
