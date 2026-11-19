@@ -4,7 +4,7 @@ A high-performance Chromium web view plugin for Flutter on **Windows**, **macOS*
 
 Desktop platforms bundle a pinned Chromium engine through [CEF (Chromium Embedded Framework)](https://bitbucket.org/chromiumembedded/cef) with Off-Screen Rendering (OSR) directly into Flutter textures. Android integrates the system Chromium WebView using Flutter's hybrid composition platform view.
 
-> **Target Release: `0.5.3`**  
+> **Target Release: `0.5.6`**  
 > Companion platform interface: [`flutter_chromium_webview_platform_interface: ^0.1.6`](https://pub.dev/packages/flutter_chromium_webview_platform_interface)
 
 ---
@@ -89,7 +89,7 @@ Add the package to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_chromium_webview: ^0.5.3
+  flutter_chromium_webview: ^0.5.6
 ```
 
 Because desktop platforms require native runtime bootstrapping, follow the platform-specific instructions below:

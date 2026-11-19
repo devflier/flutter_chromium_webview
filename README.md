@@ -12,7 +12,7 @@ On desktop operating systems, it embeds the [Chromium Embedded Framework (CEF)](
 
 ## Target Versions
 
-- **`flutter_chromium_webview`**: `0.5.3`
+- **`flutter_chromium_webview`**: `0.5.6`
 - **`flutter_chromium_webview_platform_interface`**: `0.1.6`
 
 ---
@@ -83,7 +83,7 @@ Add `flutter_chromium_webview` to your dependencies in `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_chromium_webview: ^0.5.3
+  flutter_chromium_webview: ^0.5.6
 ```
 
 ### Platform Setup Guides
@@ -191,7 +191,7 @@ flutter run -d <android-device-id>
 ```
 flutter_chromium_webview/
 ├── packages/
-│   ├── flutter_chromium_webview/                   # Main Flutter plugin (0.5.3)
+│   ├── flutter_chromium_webview/                   # Main Flutter plugin (0.5.6)
 │   │   ├── example/                                # Example browser app
 │   │   ├── lib/                                    # Dart API
 │   │   ├── macos/                                  # macOS CEF & Metal backend
