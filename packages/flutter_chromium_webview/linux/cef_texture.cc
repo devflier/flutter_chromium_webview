@@ -27,8 +27,21 @@ static gboolean flutter_chromium_texture_copy_pixels(FlPixelBufferTexture* textu
                                                      uint32_t* width,
                                                      uint32_t* height,
                                                      GError** error) {
+  static const uint8_t transparent_pixel[4] = {0, 0, 0, 0};
   FlutterChromiumTexture* self = FLUTTER_CHROMIUM_TEXTURE(texture);
+  if (!self->mutex) {
+    *buffer = transparent_pixel;
+    *width = 1;
+    *height = 1;
+    return TRUE;
+  }
   std::lock_guard<std::mutex> lock(*(self->mutex));
+  if (!self->front_buffer || !self->staging_buffer) {
+    *buffer = transparent_pixel;
+    *width = 1;
+    *height = 1;
+    return TRUE;
+  }
 
   if (self->clear_requested) {
     std::vector<uint8_t>().swap(*self->front_buffer);
@@ -54,7 +67,6 @@ static gboolean flutter_chromium_texture_copy_pixels(FlPixelBufferTexture* textu
     // Flutter may sample the texture before CEF delivers its first frame.
     // Return a valid transparent pixel instead of a failed callback with no
     // GError (which some engine versions dereference while reporting failure).
-    static const uint8_t transparent_pixel[4] = {0, 0, 0, 0};
     *buffer = transparent_pixel;
     *width = 1;
     *height = 1;
@@ -71,22 +83,33 @@ static void flutter_chromium_texture_dispose(GObject* object) {
   FlutterChromiumTexture* self = FLUTTER_CHROMIUM_TEXTURE(object);
 
   if (self->mutex) {
-    self->mutex->lock();
+    std::lock_guard<std::mutex> lock(*(self->mutex));
     delete self->staging_buffer;
     self->staging_buffer = nullptr;
     delete self->front_buffer;
     self->front_buffer = nullptr;
-    self->mutex->unlock();
-    delete self->mutex;
-    self->mutex = nullptr;
+    self->staging_width = 0;
+    self->staging_height = 0;
+    self->front_width = 0;
+    self->front_height = 0;
+    self->has_new_frame = false;
+    self->clear_requested = false;
   }
 
   G_OBJECT_CLASS(flutter_chromium_texture_parent_class)->dispose(object);
 }
 
+static void flutter_chromium_texture_finalize(GObject* object) {
+  FlutterChromiumTexture* self = FLUTTER_CHROMIUM_TEXTURE(object);
+  delete self->mutex;
+  self->mutex = nullptr;
+  G_OBJECT_CLASS(flutter_chromium_texture_parent_class)->finalize(object);
+}
+
 static void flutter_chromium_texture_class_init(FlutterChromiumTextureClass* klass) {
   GObjectClass* object_class = G_OBJECT_CLASS(klass);
   object_class->dispose = flutter_chromium_texture_dispose;
+  object_class->finalize = flutter_chromium_texture_finalize;
 
   FlPixelBufferTextureClass* pb_class = FL_PIXEL_BUFFER_TEXTURE_CLASS(klass);
   pb_class->copy_pixels = flutter_chromium_texture_copy_pixels;
@@ -110,7 +133,7 @@ FlutterChromiumTexture* flutter_chromium_texture_new() {
 
 void flutter_chromium_texture_update_buffer(FlutterChromiumTexture* self, const void* buffer, int width, int height) {
   // Reject invalid dimensions before signed arithmetic or allocation.
-  if (!self || !buffer || width <= 0 || height <= 0 || width > 16384 || height > 16384) return;
+  if (!self || !self->mutex || !buffer || width <= 0 || height <= 0 || width > 16384 || height > 16384) return;
 
   std::lock_guard<std::mutex> lock(*(self->mutex));
   if (!self->staging_buffer) return;

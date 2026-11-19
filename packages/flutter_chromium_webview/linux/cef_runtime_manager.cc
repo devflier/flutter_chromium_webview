@@ -1,11 +1,24 @@
 #include "include/cef_runtime_manager.h"
-#include <dlfcn.h>
-#include <gtk/gtk.h>
+#include <chrono>
 #include <iostream>
-#include <unistd.h>
 #include <linux/limits.h>
+#include <unistd.h>
+#include <utility>
+#include "include/cef_task.h"
 
 namespace {
+class LambdaCefTask : public CefTask {
+ public:
+  explicit LambdaCefTask(std::function<void()> fn) : fn_(std::move(fn)) {}
+  void Execute() override {
+    if (fn_) fn_();
+  }
+
+ private:
+  std::function<void()> fn_;
+  IMPLEMENT_REFCOUNTING(LambdaCefTask);
+};
+
 class SoftwareRenderingApp : public CefApp {
  public:
   void OnBeforeCommandLineProcessing(const CefString& process_type,
@@ -14,7 +27,7 @@ class SoftwareRenderingApp : public CefApp {
     // CPU off-screen rendering is the supported v0.1.0 path.
     command_line->AppendSwitch("disable-gpu");
     command_line->AppendSwitch("disable-gpu-compositing");
-    // Opt-out for A/B measurement or hosts needing the stock Chromium behavior.
+    // Opt-out for A/B measurement or hosts needing stock Chromium behavior.
     const char* low_memory = g_getenv("FLUTTER_CHROMIUM_WEBVIEW_LOW_MEMORY");
     const bool apply_low_memory = !(low_memory && std::string(low_memory) == "0");
     if (process_type.empty() && apply_low_memory) {
@@ -33,48 +46,11 @@ class SoftwareRenderingApp : public CefApp {
           "OptimizationTargetPrediction,MediaRouter,Translate,BackForwardCache");
     }
   }
+
  private:
   IMPLEMENT_REFCOUNTING(SoftwareRenderingApp);
 };
-
-using GAppFn = void (*)(GApplication*);
-
-GAppFn ResolveGioFn(const char* name) {
-  return reinterpret_cast<GAppFn>(dlsym(RTLD_NEXT, name));
-}
 }  // namespace
-
-extern "C" {
-__attribute__((visibility("default"))) void g_application_hold(GApplication* application) {
-  static GAppFn real_fn = ResolveGioFn("g_application_hold");
-  if (real_fn) {
-    real_fn(application);
-  }
-  if (application && G_IS_APPLICATION(application)) {
-    CefRuntimeManager::GetInstance()->OnApplicationHold(application);
-  }
-}
-
-__attribute__((visibility("default"))) void g_application_release(GApplication* application) {
-  static GAppFn real_fn = ResolveGioFn("g_application_release");
-  if (real_fn) {
-    real_fn(application);
-  }
-  if (application && G_IS_APPLICATION(application)) {
-    CefRuntimeManager::GetInstance()->OnApplicationRelease(application);
-  }
-}
-
-__attribute__((visibility("default"))) void g_application_quit(GApplication* application) {
-  static GAppFn real_fn = ResolveGioFn("g_application_quit");
-  if (real_fn) {
-    real_fn(application);
-  }
-  if (application && G_IS_APPLICATION(application)) {
-    CefRuntimeManager::GetInstance()->OnApplicationQuit(application);
-  }
-}
-}  // extern "C"
 
 CefRuntimeManager* CefRuntimeManager::instance_ = nullptr;
 std::mutex CefRuntimeManager::instance_mutex_;
@@ -91,13 +67,53 @@ CefRuntimeManager* CefRuntimeManager::GetInstance() {
   return instance_;
 }
 
+bool CefRuntimeManager::PostToCefUi(std::function<void()> task) {
+  if (!task) return false;
+  if (CefCurrentlyOn(TID_UI)) {
+    task();
+    return true;
+  }
+  return CefPostTask(TID_UI, new LambdaCefTask(std::move(task)));
+}
+
+void CefRuntimeManager::PostToGtkMain(std::function<void()> task, gint priority) {
+  if (!task) return;
+  auto* heap_task = new std::function<void()>(std::move(task));
+  g_idle_add_full(
+      priority,
+      [](gpointer data) -> gboolean {
+        auto* fn = static_cast<std::function<void()>*>(data);
+        if (fn && *fn) {
+          (*fn)();
+        }
+        return G_SOURCE_REMOVE;
+      },
+      heap_task,
+      [](gpointer data) {
+        delete static_cast<std::function<void()>*>(data);
+      });
+}
+
+void CefRuntimeManager::BrowserPending() {
+  active_browsers_.fetch_add(1, std::memory_order_acq_rel);
+}
+
+void CefRuntimeManager::BrowserClosed() {
+  int prev = active_browsers_.fetch_sub(1, std::memory_order_acq_rel);
+  if (prev <= 1) {
+    std::lock_guard<std::mutex> lock(shutdown_mutex_);
+    shutdown_cv_.notify_all();
+  }
+}
+
 bool CefRuntimeManager::Initialize(const std::string& cache_path, int argc, char** argv) {
   std::lock_guard<std::mutex> lock(state_mutex_);
-  if (state_ != CefRuntimeState::kUninitialized) {
-    return state_ == CefRuntimeState::kReady;
+  const auto current = state_.load(std::memory_order_acquire);
+  if (current != CefRuntimeState::kUninitialized) {
+    return current == CefRuntimeState::kReady;
   }
 
-  state_ = CefRuntimeState::kInitializing;
+  state_.store(CefRuntimeState::kInitializing, std::memory_order_release);
 
   // Chromium expects argv[0] even when invoked through a Flutter channel.
   char program_name[] = "flutter_chromium_webview";
@@ -108,25 +124,18 @@ bool CefRuntimeManager::Initialize(const std::string& cache_path, int argc, char
   // Keep Chromium's sandbox enabled. Unsupported hosts must fail explicitly;
   // no automatic --no-sandbox fallback is permitted.
   settings.windowless_rendering_enabled = true;
-  // Run CefRunMessageLoop() instead of an external pump.
-  // Chromium's MessagePumpGlib attaches a work source to the main thread's
-  // default GLib context. Its prepare() reports a 0 ms timeout whenever the
-  // pump is not inside Run(), so with an external pump the GTK main loop never
-  // blocks and spins one core at 100%. CefRunMessageLoop() keeps the pump in
-  // Run(); it iterates the same default context, so GTK and Flutter sources
-  // are still dispatched (the same arrangement Chrome itself uses on Linux).
-  //
-  // Note: In CEF 149+, CefRunMessageLoop() is strictly one-shot per process
-  // lifetime; calling it a second time after CefQuitMessageLoop() triggers a
-  // fatal CHECK (SIGTRAP) in KeepAliveRegistry::Register(). Therefore the loop
-  // is entered once and kept running until GApplication itself is ready to exit.
+
+  // Run CEF's browser-process UI message loop on its own dedicated thread so
+  // GTK's g_application_run() runs unmodified with zero idle CPU spin and zero
+  // global GApplication symbol interposition.
+  settings.multi_threaded_message_loop = true;
   settings.external_message_pump = false;
 
-  // Set paths
+  // Set paths.
   CefString(&settings.cache_path) = cache_path;
   CefString(&settings.root_cache_path) = cache_path;
 
-  // The subprocess path
+  // The subprocess path.
   char exe_path[PATH_MAX];
   ssize_t count = readlink("/proc/self/exe", exe_path, PATH_MAX);
   std::string dir;
@@ -138,52 +147,21 @@ bool CefRuntimeManager::Initialize(const std::string& cache_path, int argc, char
   std::string subprocess_path = dir + "/lib/flutter_chromium_webview_subprocess";
   CefString(&settings.browser_subprocess_path) = subprocess_path;
 
-  // CEF resources are in the 'lib' dir when bundled
+  // CEF resources are in the 'lib' dir when bundled.
   std::string resources_path = dir + "/lib";
   CefString(&settings.resources_dir_path) = resources_path;
   CefString(&settings.locales_dir_path) = resources_path;
 
-  // Initialize CEF
+  // Initialize CEF on the GTK/Flutter main thread (required for MTML).
   std::cerr << "[CEF] Initializing runtime" << std::endl;
   bool success = CefInitialize(main_args, settings, new SoftwareRenderingApp(), nullptr);
   std::cerr << "[CEF] Initialization result: " << success << std::endl;
 
   if (success) {
-    state_ = CefRuntimeState::kReady;
-    // Entered once, from an idle callback, so this method call returns first.
-    // The loop runs for the lifetime of GApplication and exits when all holds
-    // and windows are released (or when g_application_quit / Shutdown runs).
-    pump_id_ = g_idle_add(
-        [](gpointer data) -> gboolean {
-          auto* self = static_cast<CefRuntimeManager*>(data);
-          self->pump_id_ = 0;
-          if (!self->quit_requested_) {
-            self->loop_running_ = true;
-            CefRunMessageLoop();
-            self->loop_running_ = false;
-          }
-          return G_SOURCE_REMOVE;
-        },
-        this);
-    GApplication* application = g_application_get_default();
-    app_ = application;
-    if (application && GTK_IS_APPLICATION(application)) {
-      window_removed_id_ = g_signal_connect(application, "window-removed",
-                       G_CALLBACK(+[](GtkApplication* app, GtkWindow*, gpointer data) {
-                         auto* self = static_cast<CefRuntimeManager*>(data);
-                         // Fallback only if g_application_hold interposition was
-                         // bypassed. When hold tracking is active, OnApplicationRelease
-                         // quits the loop only when use_count actually reaches zero.
-                         if (!self->hold_tracking_active_ &&
-                             gtk_application_get_windows(app) == nullptr) {
-                           self->QuitMessageLoop();
-                         }
-                       }),
-                       this);
-    }
+    state_.store(CefRuntimeState::kReady, std::memory_order_release);
   } else {
     // CEF initialization is a one-shot operation, including early exits.
-    state_ = CefRuntimeState::kShutdown;
+    state_.store(CefRuntimeState::kShutdown, std::memory_order_release);
   }
 
   return success;
@@ -191,116 +169,48 @@ bool CefRuntimeManager::Initialize(const std::string& cache_path, int argc, char
 
 void CefRuntimeManager::Shutdown() {
   std::lock_guard<std::mutex> lock(state_mutex_);
-  if (state_ != CefRuntimeState::kReady) {
+  if (state_.load(std::memory_order_acquire) != CefRuntimeState::kReady) {
     return;
   }
 
-  state_ = CefRuntimeState::kShuttingDown;
-  QuitMessageLoop();
-  // Plugin shutdown handlers request closure before this after-handler runs.
-  // Continue CEF work until all CloseBrowser requests have been acknowledged.
-  const gint64 deadline = g_get_monotonic_time() + 5 * G_TIME_SPAN_SECOND;
-  while (browser_count_ > 0 && g_get_monotonic_time() < deadline) {
-    if (!loop_running_) {
-      CefDoMessageLoopWork();
-    }
-    g_main_context_iteration(nullptr, FALSE);
-    g_usleep(1000);
+  state_.store(CefRuntimeState::kShuttingDown, std::memory_order_release);
+
+  // Plugin shutdown handlers request CloseAll() before this after-handler runs.
+  // Wait for all pending/open browsers to finish OnBeforeClose on TID_UI.
+  // TID_UI never blocks on the GTK main thread, so waiting here cannot deadlock.
+  const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+  {
+    std::unique_lock<std::mutex> lk(shutdown_mutex_);
+    shutdown_cv_.wait_until(lk, deadline, [this]() {
+      return active_browsers_.load(std::memory_order_acquire) <= 0;
+    });
   }
-  if (browser_count_ != 0) {
-    g_warning("CEF shutdown timed out with %d browsers; skipping unsafe CefShutdown", browser_count_);
+
+  const int remaining = active_browsers_.load(std::memory_order_acquire);
+  if (remaining > 0) {
+    g_warning("CEF shutdown timed out with %d browsers; skipping unsafe CefShutdown", remaining);
     return;
   }
-  // Drain any ready GLib and CEF main-thread callbacks before CefShutdown()
-  // destroys Chromium's AtExitManager, and mark GApplication as quit so
-  // g_application_run() does not iterate the default GMainContext after
-  // CefShutdown() returns.
-  // The drain is bounded by both an iteration cap and a monotonic deadline so a
-  // perpetual G_SOURCE_CONTINUE idle source can never deadlock shutdown.
-  if (!loop_running_) {
-    const gint64 drain_deadline = g_get_monotonic_time() + 500 * G_TIME_SPAN_MILLISECOND;
-    for (int i = 0; i < 4; ++i) {
-      CefDoMessageLoopWork();
-      int iterations = 0;
-      while (iterations++ < 1000 && g_get_monotonic_time() < drain_deadline &&
-             g_main_context_iteration(nullptr, FALSE)) {}
-    }
+
+  // Round-trip barrier on TID_UI: ensures all previously posted TID_UI tasks
+  // (CloseBrowser, SetFocus(false), UserAgent::Cancel, etc.) have completed
+  // and released their CefRefPtr references before CefShutdown() executes.
+  struct Barrier {
+    std::mutex mutex;
+    std::condition_variable cv;
+    bool done = false;
+  };
+  auto barrier = std::make_shared<Barrier>();
+  if (CefPostTask(TID_UI, new LambdaCefTask([barrier]() {
+        std::lock_guard<std::mutex> lk(barrier->mutex);
+        barrier->done = true;
+        barrier->cv.notify_all();
+      }))) {
+    std::unique_lock<std::mutex> lk(barrier->mutex);
+    barrier->cv.wait_for(lk, std::chrono::seconds(2), [&barrier]() { return barrier->done; });
   }
-  if (app_ && window_removed_id_ &&
-      g_signal_handler_is_connected(app_, window_removed_id_)) {
-    g_signal_handler_disconnect(app_, window_removed_id_);
-  }
-  window_removed_id_ = 0;
-  if (GApplication* app = g_application_get_default()) {
-    static GAppFn real_quit = ResolveGioFn("g_application_quit");
-    if (real_quit) {
-      real_quit(app);
-    }
-  }
+
   CefShutdown();
-  state_ = CefRuntimeState::kShutdown;
+  state_.store(CefRuntimeState::kShutdown, std::memory_order_release);
   std::cerr << "[CEF] Shutdown complete" << std::endl;
-}
-
-void CefRuntimeManager::CancelInactivityTimer() {
-  if (inactivity_quit_id_) {
-    g_source_remove(inactivity_quit_id_);
-    inactivity_quit_id_ = 0;
-  }
-}
-
-void CefRuntimeManager::OnApplicationHold(GApplication*) {
-  hold_tracking_active_ = true;
-  ++app_hold_count_;
-  CancelInactivityTimer();
-}
-
-void CefRuntimeManager::OnApplicationRelease(GApplication* app) {
-  hold_tracking_active_ = true;
-  if (app_hold_count_ > 0) {
-    --app_hold_count_;
-  }
-  if (app_hold_count_ == 0 && state_ == CefRuntimeState::kReady) {
-    CancelInactivityTimer();
-    guint timeout_ms = app ? g_application_get_inactivity_timeout(app) : 0;
-    if (timeout_ms == 0) {
-      QuitMessageLoop();
-    } else {
-      inactivity_quit_id_ = g_timeout_add(
-          timeout_ms,
-          [](gpointer data) -> gboolean {
-            auto* self = static_cast<CefRuntimeManager*>(data);
-            self->inactivity_quit_id_ = 0;
-            if (self->app_hold_count_ == 0) {
-              self->QuitMessageLoop();
-            }
-            return G_SOURCE_REMOVE;
-          },
-          this);
-    }
-  }
-}
-
-void CefRuntimeManager::OnApplicationQuit(GApplication*) {
-  CancelInactivityTimer();
-  if (state_ == CefRuntimeState::kReady || state_ == CefRuntimeState::kInitializing) {
-    QuitMessageLoop();
-  }
-}
-
-void CefRuntimeManager::QuitMessageLoop() {
-  CancelInactivityTimer();
-  quit_requested_ = true;
-  if (pump_id_) {
-    g_source_remove(pump_id_);
-    pump_id_ = 0;
-  }
-  if (loop_running_) {
-    // Returns from CefRunMessageLoop(), so GApplication's own loop can exit.
-    CefQuitMessageLoop();
-  }
-}
-
-CefRuntimeState CefRuntimeManager::GetState() const {
-  return state_;
 }

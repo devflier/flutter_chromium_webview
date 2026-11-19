@@ -62,11 +62,19 @@ TEST(CefTexture, ProducerCannotInvalidateRasterSnapshot) {
   uint8_t next[] = {9, 8, 7, 255, 6, 5, 4, 255};
   flutter_chromium_texture_update_buffer(tex, next, 2, 1);
   EXPECT_EQ(pixels[0], 1); // Old snapshot remains valid until next raster copy.
-  const uint8_t* old_snapshot = pixels;
   ASSERT_TRUE(klass->copy_pixels(FL_PIXEL_BUFFER_TEXTURE(tex), &pixels, &width, &height, nullptr));
   EXPECT_EQ(width, 2u);
   EXPECT_EQ(pixels[0], 7);
-  EXPECT_EQ(old_snapshot[0], 1); // Resizing does not free a previously returned allocation.
+  // Clearing the producer buffer must not invalidate the active raster front buffer until next copy_pixels.
+  flutter_chromium_texture_clear(tex);
+  EXPECT_EQ(pixels[0], 7);
+  ASSERT_TRUE(klass->copy_pixels(FL_PIXEL_BUFFER_TEXTURE(tex), &pixels, &width, &height, nullptr));
+  EXPECT_EQ(width, 1u);
+  EXPECT_EQ(pixels[3], 0);
+  // Invalid dimensions after a valid frame must not corrupt the last valid frame.
+  flutter_chromium_texture_update_buffer(tex, next, 2, 1);
+  ASSERT_TRUE(klass->copy_pixels(FL_PIXEL_BUFFER_TEXTURE(tex), &pixels, &width, &height, nullptr));
+  EXPECT_EQ(width, 2u);
   flutter_chromium_texture_update_buffer(tex, next, -1, 1);
   flutter_chromium_texture_update_buffer(tex, next, 2147483647, 2147483647);
   ASSERT_TRUE(klass->copy_pixels(FL_PIXEL_BUFFER_TEXTURE(tex), &pixels, &width, &height, nullptr));

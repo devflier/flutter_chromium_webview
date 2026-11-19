@@ -1,17 +1,18 @@
 #ifndef FLUTTER_CHROMIUM_WEBVIEW_CEF_KEYBOARD_H_
 #define FLUTTER_CHROMIUM_WEBVIEW_CEF_KEYBOARD_H_
 #include <gtk/gtk.h>
-#include "include/cef_browser.h"
+#include "cef_browser_handler.h"
 
 // Intercepts the toplevel's native events only while the WebView has Flutter
-// focus. GTK owns layout/dead-key/IME translation; CEF owns editing shortcuts.
+// focus. GTK owns layout/dead-key/IME translation on the GTK main thread;
+// CEF input/IME delivery is marshaled to TID_UI via CefBrowserHandler.
 class CefKeyboard {
  public:
   explicit CefKeyboard(GtkWidget* window);
   ~CefKeyboard();
-  void SetBrowser(CefRefPtr<CefBrowser> browser);
-  bool focused() const { return browser_ != nullptr; }
-  bool HasBrowser(CefRefPtr<CefBrowser> browser) const { return browser_ == browser; }
+  void SetHandler(CefRefPtr<CefBrowserHandler> handler);
+  bool focused() const { return handler_ != nullptr; }
+  bool HasHandler(const CefRefPtr<CefBrowserHandler>& handler) const { return handler_ == handler; }
  private:
   static gboolean Key(GtkWidget*, GdkEventKey*, gpointer);
   static gboolean FocusIn(GtkWidget*, GdkEventFocus*, gpointer);
@@ -20,6 +21,6 @@ class CefKeyboard {
   static void Preedit(GtkIMContext*, gpointer);
   GtkWidget* window_;
   GtkIMContext* im_;
-  CefRefPtr<CefBrowser> browser_;
+  CefRefPtr<CefBrowserHandler> handler_;
 };
 #endif
