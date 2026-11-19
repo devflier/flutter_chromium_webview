@@ -1,6 +1,7 @@
 #include "include/cef_browser_handler.h"
 #include "include/cef_runtime_manager.h"
 #include <algorithm>
+#include <malloc.h>
 
 bool CefBrowserHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
     CefRefPtr<CefFrame> frame, CefProcessId source, CefRefPtr<CefProcessMessage> message) {
@@ -46,9 +47,13 @@ void CefBrowserHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
     fl_texture_registrar_unregister_texture(registrar_, FL_TEXTURE(texture_));
     fl_texture_registrar_unregister_texture(registrar_, FL_TEXTURE(popup_texture_));
   }
+  flutter_chromium_texture_clear(texture_);
+  flutter_chromium_texture_clear(popup_texture_);
   OnResetDialogState(nullptr);
   browser_ = nullptr;
   CefRuntimeManager::GetInstance()->BrowserClosed();
+  // Return freed frame-buffer and browser-host pages to the OS promptly.
+  malloc_trim(0);
   auto callbacks = std::move(close_callbacks_);
   for (auto& callback : callbacks) callback();
 }
@@ -93,8 +98,11 @@ void CefBrowserHandler::Close(std::function<void()> on_closed) {
     fl_texture_registrar_unregister_texture(registrar_, FL_TEXTURE(texture_));
     fl_texture_registrar_unregister_texture(registrar_, FL_TEXTURE(popup_texture_));
   }
+  flutter_chromium_texture_clear(texture_);
+  flutter_chromium_texture_clear(popup_texture_);
   OnResetDialogState(nullptr);
   if (browser_) {
+    browser_->GetHost()->WasHidden(true);
     browser_->GetHost()->SetFocus(false);
     browser_->GetHost()->CloseBrowser(true);
   } else {
@@ -130,6 +138,9 @@ void CefBrowserHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType 
 }
 
 void CefBrowserHandler::OnPopupShow(CefRefPtr<CefBrowser> browser, bool show) {
+  if (!show) {
+    flutter_chromium_texture_clear(popup_texture_);
+  }
   if (on_event_) {
     g_autoptr(FlValue) args = fl_value_new_map();
     fl_value_set_string_take(args, "show", fl_value_new_bool(show));

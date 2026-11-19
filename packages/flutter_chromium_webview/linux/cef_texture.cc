@@ -1,21 +1,23 @@
 #include "include/cef_texture.h"
 #include <cstring>
 #include <cstdlib>
+#include <utility>
 #include <vector>
 
 struct _FlutterChromiumTexture {
   FlPixelBufferTexture parent_instance;
   std::mutex* mutex;
-  uint8_t* rgba_buffer;
-  std::vector<uint8_t>* render_buffer;
-  std::vector<std::vector<uint8_t>>* retired_buffers;
-  uint32_t width;
-  uint32_t height;
-  // True while render_buffer already holds the latest rgba_buffer frame, so
-  // repeated raster samples without a new OnPaint do not copy the frame again.
-  bool snapshot_valid;
-  uint32_t snapshot_width;
-  uint32_t snapshot_height;
+  std::vector<uint8_t>* staging_buffer;
+  // Owned exclusively by Flutter's raster thread during copy_pixels / GL upload
+  // and freed only on the raster thread (when clear_requested is handled) or in
+  // GObject dispose after unregistration.
+  std::vector<uint8_t>* front_buffer;
+  uint32_t staging_width;
+  uint32_t staging_height;
+  uint32_t front_width;
+  uint32_t front_height;
+  bool has_new_frame;
+  bool clear_requested;
 };
 
 G_DEFINE_TYPE(FlutterChromiumTexture, flutter_chromium_texture, fl_pixel_buffer_texture_get_type())
@@ -26,12 +28,29 @@ static gboolean flutter_chromium_texture_copy_pixels(FlPixelBufferTexture* textu
                                                      uint32_t* height,
                                                      GError** error) {
   FlutterChromiumTexture* self = FLUTTER_CHROMIUM_TEXTURE(texture);
+  std::lock_guard<std::mutex> lock(*(self->mutex));
 
-  // Only the raster thread updates this snapshot. CEF can replace the producer
-  // buffer after this callback without invalidating Flutter's returned pixels.
-  self->mutex->lock();
+  if (self->clear_requested) {
+    std::vector<uint8_t>().swap(*self->front_buffer);
+    self->front_width = 0;
+    self->front_height = 0;
+    self->clear_requested = false;
+  }
 
-  if (!self->rgba_buffer || self->width == 0 || self->height == 0) {
+  if (self->has_new_frame) {
+    // Swap staging_buffer into front_buffer in O(1) without a second frame copy,
+    // then release the old buffer in staging_buffer so idle textures hold only
+    // a single exact-sized frame buffer in physical memory.
+    std::swap(*self->front_buffer, *self->staging_buffer);
+    std::vector<uint8_t>().swap(*self->staging_buffer);
+    self->front_width = self->staging_width;
+    self->front_height = self->staging_height;
+    self->staging_width = 0;
+    self->staging_height = 0;
+    self->has_new_frame = false;
+  }
+
+  if (self->front_buffer->empty() || self->front_width == 0 || self->front_height == 0) {
     // Flutter may sample the texture before CEF delivers its first frame.
     // Return a valid transparent pixel instead of a failed callback with no
     // GError (which some engine versions dereference while reporting failure).
@@ -39,59 +58,28 @@ static gboolean flutter_chromium_texture_copy_pixels(FlPixelBufferTexture* textu
     *buffer = transparent_pixel;
     *width = 1;
     *height = 1;
-    self->mutex->unlock();
     return TRUE;
   }
 
-  if (self->snapshot_valid && self->snapshot_width == self->width &&
-      self->snapshot_height == self->height) {
-    // No new frame since the last sample: reuse the snapshot, no copy.
-    *buffer = self->render_buffer->data();
-    *width = self->width;
-    *height = self->height;
-    self->mutex->unlock();
-    return TRUE;
-  }
-  const size_t bytes = static_cast<size_t>(self->width) * self->height * 4;
-  if (bytes > self->render_buffer->capacity()) {
-    // Flutter's API requires returned allocations to survive unregistration.
-    // Geometric growth bounds retained allocation sizes across repeated resizes.
-    size_t capacity = 4;
-    while (capacity < bytes) capacity *= 2;
-    std::vector<uint8_t> replacement;
-    replacement.reserve(capacity);
-    self->retired_buffers->push_back(std::move(*self->render_buffer));
-    *self->render_buffer = std::move(replacement);
-  }
-  self->render_buffer->assign(self->rgba_buffer, self->rgba_buffer + bytes);
-  *buffer = self->render_buffer->data();
-  *width = self->width;
-  *height = self->height;
-  self->snapshot_valid = true;
-  self->snapshot_width = self->width;
-  self->snapshot_height = self->height;
-
-  self->mutex->unlock();
+  *buffer = self->front_buffer->data();
+  *width = self->front_width;
+  *height = self->front_height;
   return TRUE;
 }
 
 static void flutter_chromium_texture_dispose(GObject* object) {
   FlutterChromiumTexture* self = FLUTTER_CHROMIUM_TEXTURE(object);
-  
+
   if (self->mutex) {
     self->mutex->lock();
-    if (self->rgba_buffer) {
-      free(self->rgba_buffer);
-      self->rgba_buffer = nullptr;
-    }
+    delete self->staging_buffer;
+    self->staging_buffer = nullptr;
+    delete self->front_buffer;
+    self->front_buffer = nullptr;
     self->mutex->unlock();
     delete self->mutex;
     self->mutex = nullptr;
   }
-  delete self->render_buffer;
-  self->render_buffer = nullptr;
-  delete self->retired_buffers;
-  self->retired_buffers = nullptr;
 
   G_OBJECT_CLASS(flutter_chromium_texture_parent_class)->dispose(object);
 }
@@ -106,14 +94,14 @@ static void flutter_chromium_texture_class_init(FlutterChromiumTextureClass* kla
 
 static void flutter_chromium_texture_init(FlutterChromiumTexture* self) {
   self->mutex = new std::mutex();
-  self->rgba_buffer = nullptr;
-  self->render_buffer = new std::vector<uint8_t>();
-  self->retired_buffers = new std::vector<std::vector<uint8_t>>();
-  self->width = 0;
-  self->height = 0;
-  self->snapshot_valid = false;
-  self->snapshot_width = 0;
-  self->snapshot_height = 0;
+  self->staging_buffer = new std::vector<uint8_t>();
+  self->front_buffer = new std::vector<uint8_t>();
+  self->staging_width = 0;
+  self->staging_height = 0;
+  self->front_width = 0;
+  self->front_height = 0;
+  self->has_new_frame = false;
+  self->clear_requested = false;
 }
 
 FlutterChromiumTexture* flutter_chromium_texture_new() {
@@ -125,29 +113,41 @@ void flutter_chromium_texture_update_buffer(FlutterChromiumTexture* self, const 
   if (!self || !buffer || width <= 0 || height <= 0 || width > 16384 || height > 16384) return;
 
   std::lock_guard<std::mutex> lock(*(self->mutex));
+  if (!self->staging_buffer) return;
 
-  size_t required_size = static_cast<size_t>(width) * static_cast<size_t>(height) * 4;
-  if (!self->rgba_buffer || self->width != width || self->height != height) {
-    auto* replacement = static_cast<uint8_t*>(malloc(required_size));
-    if (!replacement) return; // Preserve the last valid frame on allocation failure.
-    free(self->rgba_buffer);
-    self->rgba_buffer = replacement;
-    self->width = width;
-    self->height = height;
+  const size_t required_size = static_cast<size_t>(width) * static_cast<size_t>(height) * 4;
+  if (self->staging_buffer->capacity() > required_size * 2) {
+    std::vector<uint8_t>(required_size).swap(*self->staging_buffer);
+  } else {
+    self->staging_buffer->resize(required_size);
   }
 
-  if (self->rgba_buffer) {
-    const uint8_t* bgra = static_cast<const uint8_t*>(buffer);
-    uint8_t* rgba = self->rgba_buffer;
+  self->staging_width = static_cast<uint32_t>(width);
+  self->staging_height = static_cast<uint32_t>(height);
 
-    // BGRA to RGBA conversion, one 32-bit word at a time (little-endian:
-    // 0xAARRGGBB -> 0xAABBGGRR).
-    for (size_t i = 0; i < required_size; i += 4) {
-      uint32_t v;
-      memcpy(&v, bgra + i, 4);
-      v = (v & 0xFF00FF00u) | ((v & 0xFFu) << 16) | ((v >> 16) & 0xFFu);
-      memcpy(rgba + i, &v, 4);
-    }
-    self->snapshot_valid = false;
+  const uint8_t* bgra = static_cast<const uint8_t*>(buffer);
+  uint8_t* rgba = self->staging_buffer->data();
+
+  // BGRA to RGBA conversion, one 32-bit word at a time (little-endian:
+  // 0xAARRGGBB -> 0xAABBGGRR).
+  for (size_t i = 0; i < required_size; i += 4) {
+    uint32_t v;
+    memcpy(&v, bgra + i, 4);
+    v = (v & 0xFF00FF00u) | ((v & 0xFFu) << 16) | ((v >> 16) & 0xFFu);
+    memcpy(rgba + i, &v, 4);
   }
+  self->has_new_frame = true;
+  self->clear_requested = false;
+}
+
+void flutter_chromium_texture_clear(FlutterChromiumTexture* self) {
+  if (!self || !self->mutex) return;
+  std::lock_guard<std::mutex> lock(*(self->mutex));
+  if (self->staging_buffer) {
+    std::vector<uint8_t>().swap(*self->staging_buffer);
+  }
+  self->staging_width = 0;
+  self->staging_height = 0;
+  self->has_new_frame = false;
+  self->clear_requested = true;
 }

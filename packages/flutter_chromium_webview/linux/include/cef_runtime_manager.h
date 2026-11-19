@@ -4,6 +4,7 @@
 #include <string>
 #include <mutex>
 #include <memory>
+#include <gio/gio.h>
 #include <glib.h>
 #include "include/cef_app.h"
 
@@ -32,12 +33,20 @@ class CefRuntimeManager {
   bool pump_running() const { return pump_id_ != 0 || loop_running_; }
 
   // Ends CefRunMessageLoop(), or prevents its start.
-  // Called when the last application window is removed and on shutdown.
+  // Called when GApplication is ready to exit its main loop and on shutdown.
   void QuitMessageLoop();
+
+  // Tracks GApplication hold/release/quit lifecycle so CefRunMessageLoop()
+  // stays active while the application is held alive (even with zero windows)
+  // and exits cleanly when the final hold/window is released or quit is called.
+  void OnApplicationHold(GApplication* app);
+  void OnApplicationRelease(GApplication* app);
+  void OnApplicationQuit(GApplication* app);
 
  private:
   CefRuntimeManager();
   ~CefRuntimeManager();
+  void CancelInactivityTimer();
 
   static CefRuntimeManager* instance_;
   static std::mutex instance_mutex_;
@@ -46,8 +55,13 @@ class CefRuntimeManager {
   std::mutex state_mutex_;
   // Pending idle source that starts CefRunMessageLoop().
   guint pump_id_ = 0;
+  guint inactivity_quit_id_ = 0;
   bool loop_running_ = false;
   bool quit_requested_ = false;
+  bool hold_tracking_active_ = false;
+  int app_hold_count_ = 0;
+  GApplication* app_ = nullptr;      // Application CEF was initialized under.
+  gulong window_removed_id_ = 0;
   int browser_count_ = 0;
 };
 

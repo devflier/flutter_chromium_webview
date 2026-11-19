@@ -771,6 +771,7 @@ class ChromiumWebViewController extends ChangeNotifier {
   void Function(bool next)? onTakeFocus;
 
   bool _isDisposed = false;
+  bool _isDetached = false;
   Future<void>? _creation;
   Future<void>? _disposal;
 
@@ -911,11 +912,19 @@ class ChromiumWebViewController extends ChangeNotifier {
   /// Runs [operation] against the native browser once it exists. Does nothing
   /// when the controller is disposed or no browser could be created.
   Future<void> _invoke(Future<void> Function(int browserId) operation) async {
-    if (_isDisposed) return;
+    if (_isDisposed || _isDetached) return;
     await _creation;
     final id = _browserId;
-    if (_isDisposed || id == null) return;
-    await operation(id);
+    if (_isDisposed || _isDetached || id == null) return;
+    try {
+      await operation(id);
+    } on PlatformException catch (error) {
+      if (error.code == 'DETACHED') {
+        _isDetached = true;
+        return;
+      }
+      rethrow;
+    }
   }
 
   void _closeDialog(int dialogId, bool success, String userInput) {
@@ -1014,7 +1023,7 @@ class ChromiumWebViewController extends ChangeNotifier {
         'Expected JavaScript up to 1 MiB and timeout 1–60000 ms',
       );
     }
-    if (_isDisposed) {
+    if (_isDisposed || _isDetached) {
       throw const JavaScriptException('browser_closed', 'Browser disposed');
     }
     await _creation;
@@ -1046,6 +1055,7 @@ class ChromiumWebViewController extends ChangeNotifier {
     try {
       return await future;
     } on PlatformException catch (error) {
+      if (error.code == 'DETACHED') _isDetached = true;
       final details = error.details;
       throw JavaScriptException(
         error.code,
@@ -1161,7 +1171,16 @@ class ChromiumWebViewController extends ChangeNotifier {
     if (id != null) {
       _controllers.remove(id);
       _pendingEvents.remove(id);
-      await _platform.disposeBrowser(id);
+      if (_isDetached) return;
+      try {
+        await _platform.disposeBrowser(id);
+      } on PlatformException catch (error) {
+        if (error.code == 'DETACHED') {
+          _isDetached = true;
+          return;
+        }
+        rethrow;
+      }
     }
   }
 }

@@ -327,4 +327,56 @@ void main() {
     expect(finalResizeCalls, 1);
     expect(finalFocusCalls, greaterThanOrEqualTo(1));
   });
+
+  test('DETACHED stops subsequent calls cleanly without swallowing other errors', () async {
+    final calls = <String>[];
+    var detached = false;
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+          const MethodChannel('flutter_chromium_webview'),
+          (MethodCall methodCall) async {
+            calls.add(methodCall.method);
+            if (methodCall.method == 'createBrowser') {
+              return {'browserId': 77, 'textureId': 770, 'popupTextureId': -1};
+            }
+            if (methodCall.method == 'loadRequest') {
+              throw PlatformException(
+                code: 'INVALID_URL',
+                message: 'URL must not be empty',
+              );
+            }
+            if (detached) {
+              throw PlatformException(
+                code: 'DETACHED',
+                message: 'Flutter view has been detached',
+              );
+            }
+            return null;
+          },
+        );
+
+    final controller = ChromiumWebViewController();
+    await controller.createBrowser();
+
+    // Unrelated PlatformExceptions must still propagate.
+    await expectLater(
+      controller.loadRequest('   '),
+      throwsA(
+        isA<PlatformException>().having((e) => e.code, 'code', 'INVALID_URL'),
+      ),
+    );
+
+    // Once native reports DETACHED, the failing call completes cleanly and
+    // subsequent platform calls (including dispose) are skipped.
+    detached = true;
+    calls.clear();
+    await controller.executeJavaScript('console.log(1);');
+    expect(calls, ['executeJavaScript']);
+
+    await controller.reload();
+    await controller.setFocus(false);
+    await controller.dispose();
+    expect(calls, ['executeJavaScript']);
+  });
 }
+

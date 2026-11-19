@@ -1,3 +1,4 @@
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 /// Tracks only browser-owned transient routes, leaving application routes alone.

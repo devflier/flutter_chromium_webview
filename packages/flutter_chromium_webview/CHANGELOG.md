@@ -1,6 +1,10 @@
 ## Unreleased
 
-* Linux: fix the GTK main loop spinning one CPU core at 100% while CEF runs. CEF now runs `CefRunMessageLoop()` (entered once from an idle callback and quit when the last window is removed) instead of the external message pump with a 10 ms `CefDoMessageLoopWork` timer.
+* Linux: fix the GTK main loop spinning one CPU core at 100% while CEF runs (issue #12). CEF now runs `CefRunMessageLoop()` once on the main thread (`external_message_pump = false`) instead of polling `CefDoMessageLoopWork` on a 10 ms timer, reducing isolated idle main-thread CPU from ~99.9% to `0.0–0.3%`.
+* Linux: fix GTK/CEF message-loop lifecycle across multi-window apps, `g_application_hold()` window removal/re-addition (avoiding CEF 149 `KeepAliveRegistry::Register()` `SIGTRAP` on second `CefRunMessageLoop()`), direct `g_application_quit()` calls, and post-`CefShutdown()` `base::AtExitManager::RegisterCallback` traps.
+* Linux: reduce runtime memory footprint without disabling sandboxing or site isolation by disabling speculative spare renderers (`SpareRendererForSitePerProcess`) and unused desktop Chrome background services (opt-out via `FLUTTER_CHROMIUM_WEBVIEW_LOW_MEMORY=0`), eliminating redundant frame copies and `retired_buffers` retention in `FlutterChromiumTexture`, releasing popup/browser buffers via `flutter_chromium_texture_clear`, calling `WasHidden(true)` on close, and invoking `malloc_trim(0)` on `OnBeforeClose`.
+* Dart: handle `PlatformException(DETACHED)` cleanly in `ChromiumWebViewController` during host view detachment without swallowing unrelated errors, and cancel periodic JS bridge timers on app exit/detach in the example app.
+* Tooling: add Linux lifecycle, CPU, and 12-scenario memory benchmark scripts (`scripts/test_linux_lifecycle.sh`, `scripts/benchmark_linux_cpu.sh`, `scripts/benchmark_linux_memory.sh`, `scripts/check_linux_idle_cpu.sh`) and Flutter 3.50 analyzer compatibility in `scripts/validate_linux.sh`.
 
 ## 0.5.5
 
