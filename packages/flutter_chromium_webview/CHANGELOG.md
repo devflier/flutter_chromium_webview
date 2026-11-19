@@ -1,4 +1,4 @@
-## Unreleased
+## 0.5.6
 
 * Linux: refactor CEF lifecycle to `multi_threaded_message_loop = true` (CEF 149.0.4), eliminating the 100% idle CPU spin (issue #12), removing `CefRunMessageLoop()` re-entry `SIGTRAP` crashes, and requiring zero global `GApplication` symbol interposition. Isolated idle main-thread CPU drops from ~99.9% to `0.0–0.2%` (`0.9%` full process tree on static idle page), and active navigation GTK main-thread CPU drops by ~47% (`8.38% → 4.41%`).
 * Linux: enforce strict GTK main-thread vs CEF `TID_UI` thread affinity across browser creation, input/IME (`CefKeyboard`), dialogs, context menus, texture registration, coalesced `OnPaint` notifications, and condition-variable + `TID_UI` barrier shutdown across multi-window, `g_application_hold()` window reopen, and direct `g_application_quit()` flows.

@@ -210,12 +210,12 @@ Automated verification (`test_linux_stress_and_compat.sh`, 20 checks + 7 Flutter
 
 ## I. Release Decision
 
-**Verdict: `READY WITH DOCUMENTED LIMITATIONS`** (for the refactored `exp/linux-cef-mtml-0.5.6` branch, pending maintainer review and approval to merge into the release branch; all Critical and High findings are resolved and independently verified in the Ubuntu x86_64 VM with CEF `149.0.4`).
+**Verdict: `READY WITH DOCUMENTED LIMITATIONS`** (for the refactored `exp/linux-cef-mtml-0.5.6` branch, since merged to `main` in PR #13; all Critical and High findings are resolved and independently verified in the Ubuntu x86_64 VM with CEF `149.0.4`).
 
 ---
 
 ## J. Git Status
 
-- Preserved working baseline: `fix/linux-cef-lifecycle-0.5.6` (intact, untouched).
-- Active refactored branch: `exp/linux-cef-mtml-0.5.6` (uncommitted working changes ready for review).
-- Release branch (`release/0.5.6` / `main`): **untouched**. Nothing has been merged, pushed, tagged, or published.
+- Superseded checkpoint: `fix/linux-cef-lifecycle-0.5.6` (one-shot `CefRunMessageLoop()` design).
+- The refactored `exp/linux-cef-mtml-0.5.6` branch was merged to `main` in PR #13 (issue #12). The CI run for that merge passed on Linux, Windows, Android and macOS (the macOS RSS job passed on rerun after a runner cancellation).
+- Release: version `0.5.6` is prepared on `release/0.5.6`. It is not published until the `v0.5.6` tag is pushed and the `Publish main package` job succeeds.
