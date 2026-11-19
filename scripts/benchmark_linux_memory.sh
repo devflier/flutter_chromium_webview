@@ -45,6 +45,7 @@ export DISPLAY="${DISPLAY:-:0}"
 
 cat > "$probe_dart" <<'DART'
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 // ignore: deprecated_member_use
@@ -52,9 +53,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_chromium_webview/flutter_chromium_webview.dart';
 
-Future<void> _mark(String msg) async {
+final StreamIterator<String> _ackLines =
+    StreamIterator(stdin.transform(utf8.decoder).transform(const LineSplitter()));
+
+Future<void> _mark(String msg, {bool waitAck = false}) async {
   stderr.writeln(msg);
   await stderr.flush();
+  if (waitAck) {
+    await _ackLines.moveNext().timeout(const Duration(seconds: 15), onTimeout: () => false);
+  }
 }
 
 void main(List<String> args) {
@@ -112,12 +119,12 @@ class _MemBenchAppState extends State<MemBenchApp> {
 
     // Scenario 1: Flutter app without initializing CEF
     await Future.delayed(const Duration(seconds: 3));
-    await _mark('MEM_SAMPLE:01_no_cef');
+    await _mark('MEM_SAMPLE:01_no_cef', waitAck: true);
 
     // Scenario 2: CEF initialized, 0 WebViews
     await ChromiumWebViewController.initialize(cachePath: cacheDir.path);
     await Future.delayed(const Duration(seconds: 4));
-    await _mark('MEM_SAMPLE:02_cef_init_only');
+    await _mark('MEM_SAMPLE:02_cef_init_only', waitAck: true);
 
     // Scenario 3: 1 WebView showing blank page
     var c1 = ChromiumWebViewController(initialUrl: 'about:blank');
@@ -125,21 +132,21 @@ class _MemBenchAppState extends State<MemBenchApp> {
     setState(() => _controllers.add(c1));
     await w;
     await Future.delayed(const Duration(seconds: 3));
-    await _mark('MEM_SAMPLE:03_blank_page');
+    await _mark('MEM_SAMPLE:03_blank_page', waitAck: true);
 
     // Scenario 4: 1 WebView showing local static HTML
     w = _waitLoaded(c1);
     await c1.loadRequest('http://127.0.0.1:$port/static');
     await w;
     await Future.delayed(const Duration(seconds: 3));
-    await _mark('MEM_SAMPLE:04_static_html');
+    await _mark('MEM_SAMPLE:04_static_html', waitAck: true);
 
     // Scenario 5: 1 WebView showing remote website (https://example.com)
     w = _waitLoaded(c1);
     await c1.loadRequest('https://example.com');
     await w;
     await Future.delayed(const Duration(seconds: 4));
-    await _mark('MEM_SAMPLE:05_remote_website');
+    await _mark('MEM_SAMPLE:05_remote_website', waitAck: true);
 
     // Reset to local static pages for multi-webview measurements
     w = _waitLoaded(c1);
@@ -153,7 +160,7 @@ class _MemBenchAppState extends State<MemBenchApp> {
     setState(() => _controllers.addAll([c2, c3]));
     await Future.wait([w2, w3]);
     await Future.delayed(const Duration(seconds: 4));
-    await _mark('MEM_SAMPLE:06_three_webviews');
+    await _mark('MEM_SAMPLE:06_three_webviews', waitAck: true);
 
     // Scenario 7: 5 simultaneous WebViews
     final c4 = ChromiumWebViewController(initialUrl: 'http://127.0.0.1:$port/view/4');
@@ -162,7 +169,7 @@ class _MemBenchAppState extends State<MemBenchApp> {
     setState(() => _controllers.addAll([c4, c5]));
     await Future.wait([w4, w5]);
     await Future.delayed(const Duration(seconds: 4));
-    await _mark('MEM_SAMPLE:07_five_webviews');
+    await _mark('MEM_SAMPLE:07_five_webviews', waitAck: true);
 
     // Collapse back to 1 WebView before 20-page navigation test
     setState(() => _controllers.removeRange(1, 5));
@@ -178,12 +185,12 @@ class _MemBenchAppState extends State<MemBenchApp> {
       await Future.delayed(const Duration(milliseconds: 250));
     }
     await Future.delayed(const Duration(seconds: 3));
-    await _mark('MEM_SAMPLE:08_nav_20_pages');
+    await _mark('MEM_SAMPLE:08_nav_20_pages', waitAck: true);
 
     // Scenario 9: All WebViews disposed
     await _closeAll();
     await Future.delayed(const Duration(seconds: 4));
-    await _mark('MEM_SAMPLE:09_all_disposed');
+    await _mark('MEM_SAMPLE:09_all_disposed', waitAck: true);
 
     // Scenario 10: WebView recreated after disposal
     final cRec = ChromiumWebViewController(initialUrl: 'http://127.0.0.1:$port/recreated');
@@ -191,7 +198,7 @@ class _MemBenchAppState extends State<MemBenchApp> {
     setState(() => _controllers.add(cRec));
     await wRec;
     await Future.delayed(const Duration(seconds: 3));
-    await _mark('MEM_SAMPLE:10_recreated_after_disposal');
+    await _mark('MEM_SAMPLE:10_recreated_after_disposal', waitAck: true);
 
     // Scenario 11: Repeated create/dispose cycles (10 cycles)
     await _closeAll();
@@ -204,7 +211,7 @@ class _MemBenchAppState extends State<MemBenchApp> {
       await ct.dispose();
     }
     await Future.delayed(const Duration(seconds: 4));
-    await _mark('MEM_SAMPLE:11_after_10_create_dispose_cycles');
+    await _mark('MEM_SAMPLE:11_after_10_create_dispose_cycles', waitAck: true);
 
     // Scenario 12: Idle soak (optional, default 600s = 10 minutes with 1 static WebView)
     if (widget.soakSeconds > 0) {
@@ -213,14 +220,14 @@ class _MemBenchAppState extends State<MemBenchApp> {
       setState(() => _controllers.add(cSoak));
       await wSoak;
       await Future.delayed(const Duration(seconds: 5));
-      await _mark('MEM_SAMPLE:12_soak_t0');
+      await _mark('MEM_SAMPLE:12_soak_t0', waitAck: true);
       int elapsed = 0;
       const step = 60;
       while (elapsed < widget.soakSeconds) {
         final sleepNow = (widget.soakSeconds - elapsed) < step ? (widget.soakSeconds - elapsed) : step;
         await Future.delayed(Duration(seconds: sleepNow));
         elapsed += sleepNow;
-        await _mark('MEM_SAMPLE:12_soak_t${elapsed}s');
+        await _mark('MEM_SAMPLE:12_soak_t${elapsed}s', waitAck: true);
       }
       await _closeAll();
     }
@@ -291,20 +298,36 @@ def classify(p, main_pid, cmd):
         return "zygote_broker"
     return "other"
 
+def descendant_pids(root_pid):
+    children = {}
+    for e in os.listdir("/proc"):
+        if not e.isdigit(): continue
+        p = int(e)
+        try:
+            s = open(f"/proc/{p}/stat").read()
+            rp = s.rfind(")")
+            ppid = int(s[rp + 2:].split()[1])
+            children.setdefault(ppid, []).append(p)
+        except OSError:
+            pass
+    result = []
+    stack = [root_pid]
+    seen = set()
+    while stack:
+        cur = stack.pop()
+        if cur in seen: continue
+        seen.add(cur)
+        result.append(cur)
+        stack.extend(children.get(cur, []))
+    return sorted(result)
+
 def sample_tree(main_pid):
     totals = {"rss_kb": 0, "pss_kb": 0, "uss_kb": 0, "shared_kb": 0, "anon_kb": 0, "vmhwm_kb": 0}
     roles = {}
     procs = []
-    for e in sorted(os.listdir("/proc"), key=lambda x: int(x) if x.isdigit() else 999999):
-        if not e.isdigit(): continue
-        p = int(e)
+    for p in descendant_pids(main_pid):
         try:
-            comm = open(f"/proc/{p}/comm").read().strip()
             cmd = open(f"/proc/{p}/cmdline").read().replace("\0", " ").strip()
-            if p != main_pid and "flutter_chromiu" not in comm and "flutter_chromiu" not in cmd:
-                continue
-            if "python3" in cmd:
-                continue
             vals = {}
             for ln in open(f"/proc/{p}/smaps_rollup"):
                 if ":" in ln and "kB" in ln:
@@ -353,7 +376,7 @@ env = os.environ.copy()
 env["GDK_BACKEND"] = "x11"
 p = subprocess.Popen(
     [os.path.join(bundle, "flutter_chromium_webview_example"), soak_s],
-    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1, env=env,
+    stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1, env=env,
 )
 pid = p.pid
 samples = []
@@ -386,6 +409,11 @@ while True:
                 s["nav_peak_pss_mb"] = round(max(peak_nav_pss, s["pss_mb"]), 1)
             samples.append(s)
             print(f"MEM[{label}:{name}] procs={s['process_count']} rend={s['renderer_count']} PSS={s['pss_mb']}MB RSS={s['rss_mb']}MB USS={s['uss_mb']}MB Anon={s['anon_mb']}MB MainPSS={s['browser_main_pss_mb']}MB RendPSS={s['renderer_pss_mb']}MB GpuPSS={s['gpu_pss_mb']}MB PeakHWM={s['peak_vmhwm_mb']}MB", flush=True)
+            try:
+                p.stdin.write("ACK\n")
+                p.stdin.flush()
+            except OSError:
+                pass
     elif p.poll() is not None:
         for line in p.stdout:
             log_lines.append(line.rstrip("\n"))

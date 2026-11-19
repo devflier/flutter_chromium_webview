@@ -179,7 +179,29 @@ def read_stat(path):
     rp = s.rfind(")")
     comm = s[s.find("(") + 1:rp]
     f = s[rp + 2:].split()
-    return comm, int(f[1]), int(f[11]) + int(f[12])
+    # f[1]=ppid, f[11]=utime, f[12]=stime, f[19]=starttime
+    return comm, int(f[1]), int(f[11]) + int(f[12]), int(f[19])
+
+def descendant_pids(root_pid):
+    children = {}
+    for e in os.listdir("/proc"):
+        if not e.isdigit(): continue
+        p = int(e)
+        try:
+            _, ppid, _, _ = read_stat(f"/proc/{p}/stat")
+            children.setdefault(ppid, []).append(p)
+        except OSError:
+            pass
+    result = []
+    stack = [root_pid]
+    seen = set()
+    while stack:
+        cur = stack.pop()
+        if cur in seen: continue
+        seen.add(cur)
+        result.append(cur)
+        stack.extend(children.get(cur, []))
+    return result
 
 def proc_role(p, main_pid, cmd):
     if p == main_pid:
@@ -200,19 +222,16 @@ def snapshot(main_pid):
     if os.path.isdir(tdir):
         for tid in os.listdir(tdir):
             try:
-                comm, _, ticks = read_stat(f"{tdir}/{tid}/stat")
-                threads[int(tid)] = (comm, ticks)
+                comm, _, ticks, st = read_stat(f"{tdir}/{tid}/stat")
+                threads[int(tid)] = (comm, ticks, st)
             except OSError:
                 pass
     procs = {}
-    for e in os.listdir("/proc"):
-        if not e.isdigit(): continue
-        p = int(e)
+    for p in descendant_pids(main_pid):
         try:
-            comm, ppid, ticks = read_stat(f"/proc/{p}/stat")
+            comm, _, ticks, st = read_stat(f"/proc/{p}/stat")
             cmd = open(f"/proc/{p}/cmdline").read().replace("\0", " ").strip()
-            if p == main_pid or ppid == main_pid or "flutter_chromiu" in comm:
-                procs[p] = (proc_role(p, main_pid, cmd), comm, ticks)
+            procs[p] = (proc_role(p, main_pid, cmd), comm, ticks, st)
         except OSError:
             pass
     return threads, procs
@@ -242,16 +261,19 @@ for line in p.stdout:
         dt = time.monotonic() - t0
         th0, pr0 = s0
         th1, pr1 = s1
-        main_ticks = th1.get(pid, ("", 0))[1] - th0.get(pid, ("", 0))[1]
+        main_ticks = th1.get(pid, ("", 0, 0))[1] - th0.get(pid, ("", 0, 0))[1]
         main_pct = main_ticks * 100.0 / (dt * clk)
         flutter_pct = 0.0
-        for tid, (comm, t_val) in th1.items():
+        for tid, (comm, t_val, st) in th1.items():
             if comm.startswith("io.flutter.") or comm.startswith("llvmpipe"):
-                flutter_pct += (t_val - th0.get(tid, (comm, t_val))[1]) * 100.0 / (dt * clk)
+                prev_entry = th0.get(tid)
+                prev_t = prev_entry[1] if (prev_entry and prev_entry[2] == st) else 0
+                flutter_pct += (t_val - prev_t) * 100.0 / (dt * clk)
         by_role = {"browser_main": 0.0, "renderer": 0.0, "gpu_process": 0.0, "utility": 0.0, "zygote_broker": 0.0, "other_subproc": 0.0}
-        for pp, (role, comm, t_val) in pr1.items():
-            prev = pr0.get(pp, (role, comm, t_val))[2]
-            by_role[role] = by_role.get(role, 0.0) + (t_val - prev) * 100.0 / (dt * clk)
+        for pp, (role, comm, t_val, st) in pr1.items():
+            prev_entry = pr0.get(pp)
+            prev_t = prev_entry[2] if (prev_entry and prev_entry[3] == st) else 0
+            by_role[role] = by_role.get(role, 0.0) + (t_val - prev_t) * 100.0 / (dt * clk)
         subprocs_pct = sum(v for k, v in by_role.items() if k != "browser_main")
         total_pct = by_role["browser_main"] + subprocs_pct
         row = {
