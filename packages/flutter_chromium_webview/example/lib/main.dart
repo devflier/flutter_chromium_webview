@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:ui';
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_chromium_webview/flutter_chromium_webview.dart';
 import 'package:path_provider/path_provider.dart';
@@ -93,6 +95,8 @@ class _BrowserScreenState extends State<BrowserScreen> {
 
   Timer? _periodicTimer;
   Timer? _crashTimer;
+  AppLifecycleListener? _lifecycleListener;
+  bool _exiting = false;
   late final String _uiRouteName = 'cef-ui-${identityHashCode(this)}';
 
   @override
@@ -105,6 +109,7 @@ class _BrowserScreenState extends State<BrowserScreen> {
           name: 'TestChannel',
           allowedOrigins: {'https://example.com'},
           onMessageReceived: (message) {
+            if (!mounted || _exiting) return;
             debugPrint(
               'JS_BRIDGE_TEST: Received message from ${message.origin}: ${message.message}',
             );
@@ -129,13 +134,33 @@ class _BrowserScreenState extends State<BrowserScreen> {
       }
     };
 
+    _lifecycleListener = AppLifecycleListener(
+      onExitRequested: () async {
+        _exiting = true;
+        _periodicTimer?.cancel();
+        _crashTimer?.cancel();
+        return AppExitResponse.exit;
+      },
+      onDetach: () {
+        _exiting = true;
+        _periodicTimer?.cancel();
+        _crashTimer?.cancel();
+      },
+    );
+
     _periodicTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      if (!mounted) {
+      if (!mounted || _exiting) {
         timer.cancel();
         return;
       }
-      _controller.executeJavaScript(
-        "window.chromiumPostMessage('TestChannel', 'Hello from JS bridge loop!');",
+      unawaited(
+        _controller
+            .executeJavaScript(
+              "window.chromiumPostMessage('TestChannel', 'Hello from JS bridge loop!');",
+            )
+            .catchError((Object error) {
+              debugPrint('Periodic JS bridge skipped: $error');
+            }),
       );
     });
 
@@ -279,6 +304,8 @@ class _BrowserScreenState extends State<BrowserScreen> {
 
   @override
   void dispose() {
+    _exiting = true;
+    _lifecycleListener?.dispose();
     _periodicTimer?.cancel();
     _crashTimer?.cancel();
     _controller.dispose();

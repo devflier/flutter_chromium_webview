@@ -10,14 +10,20 @@ exec > >(tee "$root/docs/validation/linux-native.log") 2>&1
 python3 "$root/scripts/ensure_monorepo_overrides.py"
 cd "$root/packages/flutter_chromium_webview"
 flutter pub get
-flutter analyze
+# Use --no-fatal-infos so Flutter >=3.47 informational deprecations on
+# package:flutter/material.dart (required while pubspec supports Flutter >=3.44)
+# do not block validation, while all analyzer warnings and errors remain fatal.
+flutter analyze --no-fatal-infos
 flutter test --reporter expanded
 cd example
 flutter pub get
-flutter analyze
+flutter analyze --no-fatal-infos
 flutter test test --reporter expanded
 # Use a fresh desktop log reader for each process, see validate_windows.ps1.
 for suite in plugin_integration_test input_scaling_test native_ui_test javascript_bridge_test html_loading_test browser_settings_test youtube_adapter_test; do
   flutter test "integration_test/$suite.dart" -d linux --no-pub --reporter expanded
 done
 flutter build linux --release --no-pub
+
+cd "$root"
+bash "$root/scripts/check_linux_idle_cpu.sh"

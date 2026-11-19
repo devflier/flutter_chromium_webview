@@ -34,6 +34,20 @@ struct _FlutterChromiumWebviewPlugin {
 G_DEFINE_TYPE(FlutterChromiumWebviewPlugin, flutter_chromium_webview_plugin, G_TYPE_OBJECT)
 
 namespace {
+template <typename T>
+std::shared_ptr<T> RetainOnGtk(T* obj) {
+  if (!obj) return {};
+  g_object_ref(obj);
+  return std::shared_ptr<T>(obj, [](T* value) {
+    if (!value) return;
+    if (g_main_context_is_owner(g_main_context_default())) {
+      g_object_unref(value);
+    } else {
+      CefRuntimeManager::PostToGtkMain([value]() { g_object_unref(value); });
+    }
+  });
+}
+
 FlValue* Lookup(FlValue* args, const char* key) {
   return args && fl_value_get_type(args) == FL_VALUE_TYPE_MAP
       ? fl_value_lookup_string(args, key) : nullptr;
@@ -64,15 +78,19 @@ void Error(FlMethodCall* call, const char* code, const char* message) {
   fl_method_call_respond_error(call, code, message, nullptr, nullptr);
 }
 
-// Keep the reply alive until CEF acknowledges OnBeforeClose.
+// Keep the reply alive until CEF acknowledges OnBeforeClose on TID_UI and
+// dispatches completion back to the GTK main thread.
 std::function<void()> CloseReply(FlMethodCall* call) {
-  auto retained = std::shared_ptr<FlMethodCall>(
-      FL_METHOD_CALL(g_object_ref(call)), [](FlMethodCall* value) { g_object_unref(value); });
+  auto retained = RetainOnGtk(call);
   return [retained] { Success(retained.get()); };
 }
+
 void CloseAll(FlutterChromiumWebviewPlugin* self, std::function<void()> done = {}) {
-  if (self->keyboard) self->keyboard->SetBrowser(nullptr);
-  if (!self->browsers) { if (done) done(); return; }
+  if (self->keyboard) self->keyboard->SetHandler(nullptr);
+  if (!self->browsers) {
+    if (done) done();
+    return;
+  }
   auto browsers = std::move(*self->browsers);
   self->browsers->clear();
   if (browsers.empty()) {
@@ -86,11 +104,12 @@ void CloseAll(FlutterChromiumWebviewPlugin* self, std::function<void()> done = {
     });
   }
 }
+
 void ViewDestroyed(GtkWidget*, FlutterChromiumWebviewPlugin* self) {
   self->detached = true;
   CloseAll(self);
 }
-}
+}  // namespace
 
 static void handle_method(FlutterChromiumWebviewPlugin* self, FlMethodCall* call) {
   const char* method = fl_method_call_get_name(call);
@@ -131,11 +150,8 @@ static void handle_method(FlutterChromiumWebviewPlugin* self, FlMethodCall* call
     self->resetting = true;
     g_free(self->session);
     self->session = g_strdup(session.c_str());
-    auto retained_self = std::shared_ptr<FlutterChromiumWebviewPlugin>(
-        FLUTTER_CHROMIUM_WEBVIEW_PLUGIN(g_object_ref(self)),
-        [](FlutterChromiumWebviewPlugin* value) { g_object_unref(value); });
-    auto retained_call = std::shared_ptr<FlMethodCall>(
-        FL_METHOD_CALL(g_object_ref(call)), [](FlMethodCall* value) { g_object_unref(value); });
+    auto retained_self = RetainOnGtk(self);
+    auto retained_call = RetainOnGtk(call);
     CloseAll(self, [retained_self, retained_call] {
       retained_self->resetting = false;
       g_autoptr(FlValue) result = fl_value_new_bool(TRUE);
@@ -192,42 +208,55 @@ static void handle_method(FlutterChromiumWebviewPlugin* self, FlMethodCall* call
       fl_method_channel_invoke_method(channel, "onBrowserEvent", message, nullptr, nullptr, nullptr);
     };
 
-    CefRefPtr<CefBrowserHandler> handler = new CefBrowserHandler(registrar, texture, popup_texture, std::move(on_event));
+    auto bridge = GtkBrowserBridge::Create(registrar, texture, popup_texture, std::move(on_event));
+    g_object_unref(texture);        // Owned by registrar and bridge.
+    g_object_unref(popup_texture);  // Owned by registrar and bridge.
+
+    runtime->BrowserPending();
+    CefRefPtr<CefBrowserHandler> handler = new CefBrowserHandler(std::move(bridge), /*runtime_slot_held=*/true);
     handler->javascript_policy.Configure(String(args, "javascriptChannels", "{}"));
-    g_object_unref(texture); // The handler and registrar now own the texture.
-    g_object_unref(popup_texture);
-    CefWindowInfo info;
-    info.SetAsWindowless(0);
-    CefBrowserSettings settings;
-    settings.windowless_frame_rate = 60;
-    settings.background_color = 0;
-    // GTK and CEF share the UI thread. Returning only after creation means Dart
-    // can immediately navigate, resize, or dispose without racing OnAfterCreated.
+    (*self->browsers)[browser_id] = handler;
+
     const bool requires_gesture = Boolean(args, "mediaPlaybackRequiresUserGesture", true);
     std::string profile_name = String(args, "profileName", "");
-    auto context = chromium_settings::CustomContext(requires_gesture, profile_name);
-    if (!requires_gesture && !context) {
-      handler->Close(); Error(call, "SETTINGS_FAILED", "Could not create a private autoplay context"); return;
-    }
-    auto browser = CefBrowserHost::CreateBrowserSync(info, handler,
-        String(args, "initialUrl", "about:blank"), settings, nullptr, context);
-    if (!browser) {
-      handler->Close();
-      Error(call, "CREATE_FAILED", "CEF could not create the browser");
-      return;
-    }
-    std::string settings_error;
-    if (!requires_gesture && !chromium_settings::AllowAutoplay(browser, settings_error)) {
-      handler->Close();
-      Error(call, "SETTINGS_FAILED", settings_error.c_str());
-      return;
-    }
-    (*self->browsers)[browser_id] = handler;
-    g_autoptr(FlValue) result = fl_value_new_map();
-    fl_value_set_string_take(result, "browserId", fl_value_new_int(browser_id));
-    fl_value_set_string_take(result, "textureId", fl_value_new_int(texture_id));
-    fl_value_set_string_take(result, "popupTextureId", fl_value_new_int(popup_texture_id));
-    Success(call, result);
+    std::string initial_url = String(args, "initialUrl", "about:blank");
+
+    auto retained_self = RetainOnGtk(self);
+    auto retained_call = RetainOnGtk(call);
+
+    // Create the browser asynchronously on CEF's UI thread (TID_UI) and return
+    // to Dart on the GTK main thread only after OnAfterCreated has run.
+    handler->CreateBrowserAsync(
+        std::move(initial_url), requires_gesture, std::move(profile_name),
+        [retained_self, retained_call, browser_id, texture_id, popup_texture_id](
+            bool success, const std::string& error_code, const std::string& error_message) {
+          auto* plugin = retained_self.get();
+          if (!plugin->browsers) {
+            Error(retained_call.get(), "DETACHED", "Browser was closed before creation completed");
+            return;
+          }
+          auto found = plugin->browsers->find(browser_id);
+          if (!success) {
+            if (found != plugin->browsers->end()) {
+              auto failed_handler = found->second;
+              plugin->browsers->erase(found);
+              failed_handler->Close();
+            }
+            Error(retained_call.get(),
+                  error_code.empty() ? "CREATE_FAILED" : error_code.c_str(),
+                  error_message.empty() ? "CEF could not create the browser" : error_message.c_str());
+            return;
+          }
+          if (plugin->detached || found == plugin->browsers->end()) {
+            Error(retained_call.get(), "DETACHED", "Browser was closed before creation completed");
+            return;
+          }
+          g_autoptr(FlValue) result = fl_value_new_map();
+          fl_value_set_string_take(result, "browserId", fl_value_new_int(browser_id));
+          fl_value_set_string_take(result, "textureId", fl_value_new_int(texture_id));
+          fl_value_set_string_take(result, "popupTextureId", fl_value_new_int(popup_texture_id));
+          Success(retained_call.get(), result);
+        });
     return;
   }
 
@@ -238,26 +267,25 @@ static void handle_method(FlutterChromiumWebviewPlugin* self, FlMethodCall* call
       return;
     }
     auto handler = it->second;
-    if (self->keyboard && self->keyboard->HasBrowser(handler->GetBrowser()))
-      self->keyboard->SetBrowser(nullptr);
+    if (self->keyboard && self->keyboard->HasHandler(handler)) {
+      self->keyboard->SetHandler(nullptr);
+    }
     self->browsers->erase(it);
     handler->Close(CloseReply(call));
     return;
   }
-  if (it == self->browsers->end() || !it->second->GetBrowser()) {
+  if (it == self->browsers->end() || it->second->IsClosing()) {
     Error(call, "BROWSER_NOT_FOUND", "Browser has been disposed or does not exist");
     return;
   }
   auto handler = it->second;
-  auto browser = handler->GetBrowser();
-  auto host = browser->GetHost();
   if (strcmp(method, "setUserAgent") == 0) {
-    auto reply = std::shared_ptr<FlMethodCall>(FL_METHOD_CALL(g_object_ref(call)),
-      [](FlMethodCall* value) { g_object_unref(value); });
-    handler->user_agent->Set(browser, String(args, "userAgent"),
-      [reply](bool success, const std::string& error) {
-        if (success) Success(reply.get()); else Error(reply.get(), "SETTINGS_FAILED", error.c_str());
-      });
+    auto reply = RetainOnGtk(call);
+    handler->SetUserAgent(String(args, "userAgent"),
+        [reply](bool success, const std::string& error) {
+          if (success) Success(reply.get());
+          else Error(reply.get(), "SETTINGS_FAILED", error.c_str());
+        });
     return;
   } else if (strcmp(method, "loadRequest") == 0) {
     const auto url = String(args, "url");
@@ -265,32 +293,31 @@ static void handle_method(FlutterChromiumWebviewPlugin* self, FlMethodCall* call
       Error(call, "INVALID_URL", "URL must not be empty");
       return;
     }
-    handler->html_documents->Clear();
-    browser->GetMainFrame()->LoadURL(url);
+    handler->LoadUrl(url);
   } else if (strcmp(method, "loadHtmlString") == 0) {
     std::string url;
     if (!handler->html_documents->Set(String(args, "html"), String(args, "baseUrl"), url)) {
       Error(call, "INVALID_HTML", "HTML must be within 4 MiB and baseUrl must be an HTTP(S) URL without credentials or a fragment");
       return;
     }
-    browser->GetMainFrame()->LoadURL(url);
+    handler->LoadHtmlUrl(std::move(url));
   } else if (strcmp(method, "reload") == 0) {
-    browser->Reload();
+    handler->Reload();
   } else if (strcmp(method, "executeJavaScript") == 0) {
-    const auto script = String(args, "js");
-    if (!script.empty())
-      browser->GetMainFrame()->ExecuteJavaScript(script, browser->GetMainFrame()->GetURL(), 0);
+    handler->ExecuteJavaScript(String(args, "js"));
   } else if (strcmp(method, "closeJSDialog") == 0) {
     handler->CloseJSDialog(Integer(args, "dialogId"), Boolean(args, "success"), String(args, "userInput"));
   } else if (strcmp(method, "closeContextMenu") == 0) {
     handler->CloseContextMenu(Integer(args, "menuId"), Integer(args, "commandId", -1));
   } else if (strcmp(method, "goBack") == 0) {
-    if (browser->CanGoBack()) browser->GoBack();
+    handler->GoBack();
   } else if (strcmp(method, "goForward") == 0) {
-    if (browser->CanGoForward()) browser->GoForward();
+    handler->GoForward();
   } else if (strcmp(method, "setFocus") == 0) {
-    if (self->keyboard && (Boolean(args, "focused") || self->keyboard->HasBrowser(browser)))
-      self->keyboard->SetBrowser(Boolean(args, "focused") ? browser : nullptr);
+    const bool focused = Boolean(args, "focused");
+    if (self->keyboard && (focused || self->keyboard->HasHandler(handler))) {
+      self->keyboard->SetHandler(focused ? handler : nullptr);
+    }
   } else if (strcmp(method, "updateBrowserSize") == 0) {
     double width = Number(args, "width"), height = Number(args, "height"), dpr = Number(args, "dpr", 1);
     if (!std::isfinite(width) || !std::isfinite(height) || !std::isfinite(dpr) ||
@@ -298,8 +325,9 @@ static void handle_method(FlutterChromiumWebviewPlugin* self, FlMethodCall* call
       Error(call, "INVALID_SIZE", "Browser dimensions must be finite and within 16384 physical pixels");
       return;
     }
-    handler->SetDevicePixelRatio(dpr);
-    handler->SetSize(std::lround(width), std::lround(height));
+    handler->UpdateSize(static_cast<int>(std::lround(width)),
+                        static_cast<int>(std::lround(height)),
+                        static_cast<float>(dpr));
   } else if (strcmp(method, "sendPointerEvent") == 0) {
     CefMouseEvent event;
     // CEF's windowless view and input events use logical (DIP) coordinates.
@@ -308,19 +336,17 @@ static void handle_method(FlutterChromiumWebviewPlugin* self, FlMethodCall* call
     event.y = Integer(args, "y");
     event.modifiers = Integer(args, "modifiers");
     int type = Integer(args, "type");
-    if (type == 3) {
-      host->SendMouseWheelEvent(event, Integer(args, "deltaX"), Integer(args, "deltaY"));
-    } else if (type == 2 || type == 4) {
-      host->SendMouseMoveEvent(event, type == 4);
-    } else {
-      int button = Integer(args, "button");
+    int button = 0;
+    if (type != 2 && type != 3 && type != 4) {
+      button = Integer(args, "button");
       if (button < 1 || button > 3) {
         Error(call, "INVALID_BUTTON", "Expected left, right, or middle mouse button");
         return;
       }
-      host->SendMouseClickEvent(event, button == 2 ? MBT_RIGHT : button == 3 ? MBT_MIDDLE : MBT_LEFT,
-                               type == 1, 1);
     }
+    handler->SendPointerEvent(event, type, button,
+                              static_cast<int>(Integer(args, "deltaX")),
+                              static_cast<int>(Integer(args, "deltaY")));
   } else {
     fl_method_call_respond_not_implemented(call, nullptr);
     return;
@@ -343,39 +369,48 @@ static void flutter_chromium_webview_plugin_dispose(GObject* object) {
   g_clear_object(&self->registrar);
   G_OBJECT_CLASS(flutter_chromium_webview_plugin_parent_class)->dispose(object);
 }
+
 static void flutter_chromium_webview_plugin_class_init(FlutterChromiumWebviewPluginClass* klass) {
   G_OBJECT_CLASS(klass)->dispose = flutter_chromium_webview_plugin_dispose;
 }
+
 static void flutter_chromium_webview_plugin_init(FlutterChromiumWebviewPlugin* self) {
   self->browsers = new std::map<int64_t, CefRefPtr<CefBrowserHandler>>();
 }
+
 static void method_call_cb(FlMethodChannel*, FlMethodCall* call, gpointer data) {
   handle_method(FLUTTER_CHROMIUM_WEBVIEW_PLUGIN(data), call);
 }
+
 void flutter_chromium_webview_plugin_register_with_registrar(FlPluginRegistrar* registrar) {
   auto* self = FLUTTER_CHROMIUM_WEBVIEW_PLUGIN(g_object_new(flutter_chromium_webview_plugin_get_type(), nullptr));
   self->registrar = FL_PLUGIN_REGISTRAR(g_object_ref(registrar));
   auto view = fl_plugin_registrar_get_view(registrar);
+  GApplication* application = nullptr;
   if (view) {
     auto window = gtk_widget_get_toplevel(GTK_WIDGET(view));
     self->keyboard = new CefKeyboard(window);
     g_signal_connect_object(view, "destroy", G_CALLBACK(ViewDestroyed), self, G_CONNECT_DEFAULT);
     if (GTK_IS_WINDOW(window)) {
-      auto application = gtk_window_get_application(GTK_WINDOW(window));
-      // Flutter may quit without destroying its windows. Close every plugin's
-      // browsers before the shared runtime's after-handler drains CEF.
-      if (application) {
-        g_signal_connect_object(application, "shutdown", G_CALLBACK(+[](GApplication*, FlutterChromiumWebviewPlugin* plugin) {
-          plugin->detached = true;
-          CloseAll(plugin);
-        }), self, G_CONNECT_DEFAULT);
-      }
-      if (application && !g_object_get_data(G_OBJECT(application), "cef-shutdown-connected")) {
-        g_object_set_data(G_OBJECT(application), "cef-shutdown-connected", GINT_TO_POINTER(1));
-        g_signal_connect_after(application, "shutdown", G_CALLBACK(+[](GApplication*, gpointer) {
-          CefRuntimeManager::GetInstance()->Shutdown();
-        }), nullptr);
-      }
+      application = G_APPLICATION(gtk_window_get_application(GTK_WINDOW(window)));
+    }
+  }
+  if (!application) {
+    application = g_application_get_default();
+  }
+  // Flutter may quit without destroying its windows. Close every plugin's
+  // browsers before the shared runtime's after-handler waits for TID_UI and
+  // executes CefShutdown().
+  if (application) {
+    g_signal_connect_object(application, "shutdown", G_CALLBACK(+[](GApplication*, FlutterChromiumWebviewPlugin* plugin) {
+      plugin->detached = true;
+      CloseAll(plugin);
+    }), self, G_CONNECT_DEFAULT);
+    if (!g_object_get_data(G_OBJECT(application), "cef-shutdown-connected")) {
+      g_object_set_data(G_OBJECT(application), "cef-shutdown-connected", GINT_TO_POINTER(1));
+      g_signal_connect_after(application, "shutdown", G_CALLBACK(+[](GApplication*, gpointer) {
+        CefRuntimeManager::GetInstance()->Shutdown();
+      }), nullptr);
     }
   }
   g_autoptr(FlStandardMethodCodec) codec = fl_standard_method_codec_new();

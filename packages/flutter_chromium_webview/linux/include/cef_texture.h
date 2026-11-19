@@ -16,6 +16,11 @@ FlutterChromiumTexture* flutter_chromium_texture_new();
 // Converts BGRA to RGBA internally.
 void flutter_chromium_texture_update_buffer(FlutterChromiumTexture* self, const void* buffer, int width, int height);
 
+// Releases staging memory immediately on the UI thread and schedules the
+// raster-owned front buffer to be freed on the next copy_pixels (or dispose).
+// Safe to call even while the texture is still registered with Flutter.
+void flutter_chromium_texture_clear(FlutterChromiumTexture* self);
+
 G_END_DECLS
 
 #endif  // FLUTTER_CHROMIUM_WEBVIEW_CEF_TEXTURE_H_

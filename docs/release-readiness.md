@@ -109,9 +109,15 @@ The software baseline uses `LIBGL_ALWAYS_SOFTWARE=1`,
   are bounded and retained only while browser creation is pending.
 - Widget-owned focus callbacks are detached when replacing/removing a widget.
 - GTK application shutdown requests browser closure before runtime shutdown.
-- Linux uses CEF's external message pump with a periodic main-thread timer.
-  The nested GLib pump caused a busy UI thread in the copied release app; the
-  external pump restores normal window events and shutdown.
+- Linux runs one-shot `CefRunMessageLoop()` from a GLib idle callback and
+  coordinates quit via `GApplication` hold/release/quit lifecycle tracking so
+  multi-window apps, `g_application_hold()` window reopen, and direct
+  `g_application_quit()` exit cleanly without triggering CEF 149's
+  `KeepAliveRegistry::Register()` trap or post-`CefShutdown()` `AtExitManager`
+  traps. `scripts/check_linux_idle_cpu.sh`, `scripts/test_linux_lifecycle.sh`,
+  `scripts/benchmark_linux_cpu.sh`, and `scripts/benchmark_linux_memory.sh`
+  guard idle CPU, lifecycle stability, and RAM consumption (see
+  `docs/linux-0.5.6-benchmarks.md`).
 - Windows uses the CEF M138+ sandbox bootstrap and a client runner DLL, with
   sandbox information passed to process dispatch and initialization. Its child
   Flutter HWND forwards keyboard/IME input while the browser owns focus.

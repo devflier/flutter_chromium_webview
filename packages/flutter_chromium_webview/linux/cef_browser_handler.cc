@@ -1,56 +1,213 @@
 #include "include/cef_browser_handler.h"
 #include "include/cef_runtime_manager.h"
 #include <algorithm>
+#include <malloc.h>
+#include <utility>
+
+namespace {
+struct MenuItemData {
+  int command_id = 0;
+  std::string label;
+  int type = 0;
+  bool is_enabled = false;
+  bool is_checked = false;
+  std::vector<MenuItemData> sub_menu;
+};
+
+std::vector<MenuItemData> SnapshotMenuModel(CefRefPtr<CefMenuModel> model) {
+  std::vector<MenuItemData> items;
+  if (!model) return items;
+  const size_t count = model->GetCount();
+  items.reserve(count);
+  for (size_t i = 0; i < count; ++i) {
+    MenuItemData item;
+    item.command_id = model->GetCommandIdAt(i);
+    item.label = model->GetLabelAt(i).ToString();
+    item.type = model->GetTypeAt(i);
+    item.is_enabled = model->IsEnabledAt(i);
+    item.is_checked = model->IsCheckedAt(i);
+    if (item.type == MENUITEMTYPE_SUBMENU) {
+      item.sub_menu = SnapshotMenuModel(model->GetSubMenuAt(i));
+    }
+    items.push_back(std::move(item));
+  }
+  return items;
+}
+
+FlValue* BuildMenuModelValue(const std::vector<MenuItemData>& items) {
+  FlValue* list = fl_value_new_list();
+  for (const auto& item : items) {
+    FlValue* entry = fl_value_new_map();
+    fl_value_set_string_take(entry, "commandId", fl_value_new_int(item.command_id));
+    fl_value_set_string_take(entry, "label", fl_value_new_string(item.label.c_str()));
+    fl_value_set_string_take(entry, "type", fl_value_new_int(item.type));
+    fl_value_set_string_take(entry, "isEnabled", fl_value_new_bool(item.is_enabled));
+    fl_value_set_string_take(entry, "isChecked", fl_value_new_bool(item.is_checked));
+    if (item.type == MENUITEMTYPE_SUBMENU) {
+      fl_value_set_string_take(entry, "subMenu", BuildMenuModelValue(item.sub_menu));
+    }
+    fl_value_append_take(list, entry);
+  }
+  return list;
+}
+}  // namespace
+
+std::shared_ptr<GtkBrowserBridge> GtkBrowserBridge::Create(
+    FlTextureRegistrar* registrar,
+    FlutterChromiumTexture* texture,
+    FlutterChromiumTexture* popup_texture,
+    EventCallback on_event) {
+  auto* raw = new GtkBrowserBridge();
+  raw->registrar = registrar ? FL_TEXTURE_REGISTRAR(g_object_ref(registrar)) : nullptr;
+  raw->texture = texture ? FLUTTER_CHROMIUM_TEXTURE(g_object_ref(texture)) : nullptr;
+  raw->popup_texture = popup_texture ? FLUTTER_CHROMIUM_TEXTURE(g_object_ref(popup_texture)) : nullptr;
+  raw->on_event = std::move(on_event);
+  return std::shared_ptr<GtkBrowserBridge>(raw, [](GtkBrowserBridge* bridge) {
+    FlTextureRegistrar* reg = bridge->registrar;
+    FlutterChromiumTexture* tex = bridge->texture;
+    FlutterChromiumTexture* pop = bridge->popup_texture;
+    bridge->registrar = nullptr;
+    bridge->texture = nullptr;
+    bridge->popup_texture = nullptr;
+    delete bridge;
+    if (!reg && !tex && !pop) return;
+    auto release = [reg, tex, pop]() {
+      if (pop) g_object_unref(pop);
+      if (tex) g_object_unref(tex);
+      if (reg) g_object_unref(reg);
+    };
+    if (g_main_context_is_owner(g_main_context_default())) {
+      release();
+    } else {
+      CefRuntimeManager::PostToGtkMain(std::move(release));
+    }
+  });
+}
+
+void GtkBrowserBridge::UnregisterAndCloseOnGtk() {
+  closed = true;
+  on_event = {};
+  if (!unregistered) {
+    unregistered = true;
+    if (registrar && texture) {
+      fl_texture_registrar_unregister_texture(registrar, FL_TEXTURE(texture));
+    }
+    if (registrar && popup_texture) {
+      fl_texture_registrar_unregister_texture(registrar, FL_TEXTURE(popup_texture));
+    }
+    if (texture) {
+      flutter_chromium_texture_clear(texture);
+    }
+    if (popup_texture) {
+      flutter_chromium_texture_clear(popup_texture);
+    }
+    g_clear_object(&registrar);
+  }
+}
+
+void GtkBrowserBridge::NotifyFrameOnGtk(bool is_popup) {
+  if (is_popup) {
+    popup_frame_pending.store(false, std::memory_order_release);
+  } else {
+    frame_pending.store(false, std::memory_order_release);
+  }
+  if (unregistered || !registrar) return;
+  FlutterChromiumTexture* target = is_popup ? popup_texture : texture;
+  if (target) {
+    fl_texture_registrar_mark_texture_frame_available(registrar, FL_TEXTURE(target));
+  }
+}
+
+void GtkBrowserBridge::DispatchEventOnGtk(const char* event_name,
+                                          const std::function<FlValue*()>& build_args) {
+  if (closed || !on_event) return;
+  g_autoptr(FlValue) args = build_args ? build_args() : nullptr;
+  on_event(event_name, args);
+}
+
+CefBrowserHandler::CefBrowserHandler(std::shared_ptr<GtkBrowserBridge> bridge,
+                                     bool runtime_slot_held)
+    : bridge_(std::move(bridge)),
+      runtime_slot_held_(runtime_slot_held),
+      creation_pending_on_ui_(runtime_slot_held) {}
+
+CefBrowserHandler::~CefBrowserHandler() = default;
+
+void CefBrowserHandler::EmitEventOnUi(const char* event_name,
+                                      std::function<FlValue*()> build_args) {
+  if (closing_.load(std::memory_order_acquire) || !bridge_) return;
+  std::weak_ptr<GtkBrowserBridge> weak = bridge_;
+  CefRuntimeManager::PostToGtkMain([weak, event_name, build = std::move(build_args)]() {
+    if (auto bridge = weak.lock()) {
+      bridge->DispatchEventOnGtk(event_name, build);
+    }
+  });
+}
+
+void CefBrowserHandler::ReleaseRuntimeSlotOnUi() {
+  if (runtime_slot_held_) {
+    runtime_slot_held_ = false;
+    CefRuntimeManager::GetInstance()->BrowserClosed();
+  }
+}
+
+void CefBrowserHandler::FlushCloseCallbacksOnUi() {
+  if (close_callbacks_.empty()) return;
+  auto callbacks = std::make_shared<std::vector<std::function<void()>>>(std::move(close_callbacks_));
+  close_callbacks_.clear();
+  CefRuntimeManager::PostToGtkMain([callbacks]() {
+    for (auto& cb : *callbacks) {
+      if (cb) cb();
+    }
+  });
+}
 
 bool CefBrowserHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
     CefRefPtr<CefFrame> frame, CefProcessId source, CefRefPtr<CefProcessMessage> message) {
   if (message->GetName() != chromium_bridge::kMessage) return false;
-  if (closing_ || !browser_ || !browser_->IsSame(browser)) return true;
-  if (auto value = javascript_policy.Receive(frame, source, message); value && on_event_) {
-    g_autoptr(FlValue) args = fl_value_new_map();
-    fl_value_set_string_take(args, "channel", fl_value_new_string(value->channel.c_str()));
-    fl_value_set_string_take(args, "message", fl_value_new_string(value->message.c_str()));
-    fl_value_set_string_take(args, "origin", fl_value_new_string(value->origin.c_str()));
-    on_event_("javascriptMessage", args);
+  if (closing_.load(std::memory_order_acquire) || !browser_ || !browser_->IsSame(browser)) return true;
+  if (auto value = javascript_policy.Receive(frame, source, message); value) {
+    auto payload = *value;
+    EmitEventOnUi("javascriptMessage", [payload = std::move(payload)]() {
+      FlValue* args = fl_value_new_map();
+      fl_value_set_string_take(args, "channel", fl_value_new_string(payload.channel.c_str()));
+      fl_value_set_string_take(args, "message", fl_value_new_string(payload.message.c_str()));
+      fl_value_set_string_take(args, "origin", fl_value_new_string(payload.origin.c_str()));
+      return args;
+    });
   }
   return true;
 }
 
-CefBrowserHandler::CefBrowserHandler(FlTextureRegistrar* registrar,
-                                   FlutterChromiumTexture* texture,
-                                   FlutterChromiumTexture* popup_texture,
-                                   EventCallback on_event)
-    : registrar_(FL_TEXTURE_REGISTRAR(g_object_ref(registrar))),
-      texture_(FLUTTER_CHROMIUM_TEXTURE(g_object_ref(texture))),
-      popup_texture_(FLUTTER_CHROMIUM_TEXTURE(g_object_ref(popup_texture))),
-      on_event_(std::move(on_event)) {}
-
-CefBrowserHandler::~CefBrowserHandler() {
-  g_object_unref(popup_texture_);
-  g_object_unref(texture_);
-  g_object_unref(registrar_);
-}
-
 void CefBrowserHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
   browser_ = browser;
-  CefRuntimeManager::GetInstance()->BrowserOpened();
+  if (!runtime_slot_held_) {
+    runtime_slot_held_ = true;
+    CefRuntimeManager::GetInstance()->BrowserPending();
+  }
 }
 
 void CefBrowserHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
   user_agent->Cancel();
   html_documents->Clear();
-  closing_ = true;
-  on_event_ = {};
-  if (registered_) {
-    registered_ = false;
-    fl_texture_registrar_unregister_texture(registrar_, FL_TEXTURE(texture_));
-    fl_texture_registrar_unregister_texture(registrar_, FL_TEXTURE(popup_texture_));
-  }
+  closing_.store(true, std::memory_order_release);
   OnResetDialogState(nullptr);
+  if (bridge_) {
+    if (bridge_->texture) flutter_chromium_texture_clear(bridge_->texture);
+    if (bridge_->popup_texture) flutter_chromium_texture_clear(bridge_->popup_texture);
+    std::weak_ptr<GtkBrowserBridge> weak = bridge_;
+    CefRuntimeManager::PostToGtkMain([weak]() {
+      if (auto bridge = weak.lock()) {
+        bridge->UnregisterAndCloseOnGtk();
+      }
+    });
+  }
   browser_ = nullptr;
-  CefRuntimeManager::GetInstance()->BrowserClosed();
-  auto callbacks = std::move(close_callbacks_);
-  for (auto& callback : callbacks) callback();
+  ReleaseRuntimeSlotOnUi();
+  // Return freed frame-buffer and browser-host pages to the OS promptly on
+  // CEF's UI thread (never blocking the GTK/Flutter main thread).
+  malloc_trim(0);
+  FlushCloseCallbacksOnUi();
 }
 
 bool CefBrowserHandler::OnBeforePopup(
@@ -67,40 +224,311 @@ bool CefBrowserHandler::OnBeforePopup(
     CefBrowserSettings& settings,
     CefRefPtr<CefDictionaryValue>& extra_info,
     bool* no_javascript_access) {
+  std::string url = target_url.ToString();
+  std::string frame_name = target_frame_name.ToString();
+  int disposition = static_cast<int>(target_disposition);
+  EmitEventOnUi("newWindowRequested",
+                [url = std::move(url), frame_name = std::move(frame_name), disposition, user_gesture]() {
+                  FlValue* args = fl_value_new_map();
+                  fl_value_set_string_take(args, "url", fl_value_new_string(url.c_str()));
+                  fl_value_set_string_take(args, "targetFrameName", fl_value_new_string(frame_name.c_str()));
+                  fl_value_set_string_take(args, "targetDisposition", fl_value_new_int(disposition));
+                  fl_value_set_string_take(args, "userGesture", fl_value_new_bool(user_gesture));
+                  return args;
+                });
+  return true;  // Cancel default CEF popup creation.
+}
 
-  if (on_event_) {
-    g_autoptr(FlValue) args = fl_value_new_map();
-    fl_value_set_string_take(args, "url", fl_value_new_string(target_url.ToString().c_str()));
-    fl_value_set_string_take(args, "targetFrameName", fl_value_new_string(target_frame_name.ToString().c_str()));
-    fl_value_set_string_take(args, "targetDisposition", fl_value_new_int(target_disposition));
-    fl_value_set_string_take(args, "userGesture", fl_value_new_bool(user_gesture));
-    on_event_("newWindowRequested", args);
+void CefBrowserHandler::CreateBrowserAsync(std::string initial_url,
+                                           bool requires_gesture,
+                                           std::string profile_name,
+                                           CreateCallback on_created) {
+  CefRefPtr<CefBrowserHandler> self(this);
+  auto notify = [cb = std::move(on_created)](bool ok, std::string code, std::string msg) mutable {
+    if (!cb) return;
+    auto shared_cb = std::make_shared<CreateCallback>(std::move(cb));
+    CefRuntimeManager::PostToGtkMain(
+        [shared_cb, ok, code = std::move(code), msg = std::move(msg)]() {
+          (*shared_cb)(ok, code, msg);
+        });
+  };
+
+  bool posted = CefRuntimeManager::PostToCefUi(
+      [self, initial_url = std::move(initial_url), requires_gesture,
+       profile_name = std::move(profile_name), notify]() mutable {
+        self->creation_pending_on_ui_ = false;
+        if (self->closing_.load(std::memory_order_acquire)) {
+          self->ReleaseRuntimeSlotOnUi();
+          self->FlushCloseCallbacksOnUi();
+          notify(false, "DETACHED", "Browser was closed before creation completed");
+          return;
+        }
+        auto context = chromium_settings::CustomContext(requires_gesture, profile_name);
+        if (!requires_gesture && !context) {
+          self->closing_.store(true, std::memory_order_release);
+          self->ReleaseRuntimeSlotOnUi();
+          self->FlushCloseCallbacksOnUi();
+          notify(false, "SETTINGS_FAILED", "Could not create a private autoplay context");
+          return;
+        }
+        CefWindowInfo info;
+        info.SetAsWindowless(0);
+        CefBrowserSettings settings;
+        settings.windowless_frame_rate = 60;
+        settings.background_color = 0;
+        auto browser = CefBrowserHost::CreateBrowserSync(
+            info, self, initial_url, settings, nullptr, context);
+        if (!browser) {
+          self->closing_.store(true, std::memory_order_release);
+          self->ReleaseRuntimeSlotOnUi();
+          self->FlushCloseCallbacksOnUi();
+          notify(false, "CREATE_FAILED", "CEF could not create the browser");
+          return;
+        }
+        std::string settings_error;
+        if (!requires_gesture && !chromium_settings::AllowAutoplay(browser, settings_error)) {
+          self->closing_.store(true, std::memory_order_release);
+          self->CloseOnUi({});
+          notify(false, "SETTINGS_FAILED", settings_error);
+          return;
+        }
+        if (self->closing_.load(std::memory_order_acquire)) {
+          self->CloseOnUi({});
+          notify(false, "DETACHED", "Browser was closed during creation");
+          return;
+        }
+        notify(true, "", "");
+      });
+
+  if (!posted) {
+    closing_.store(true, std::memory_order_release);
+    if (runtime_slot_held_) {
+      runtime_slot_held_ = false;
+      CefRuntimeManager::GetInstance()->BrowserClosed();
+    }
+    notify(false, "NOT_READY", "CEF UI thread is not running");
   }
-
-  return true; // Cancel default CEF popup creation
 }
 
 void CefBrowserHandler::Close(std::function<void()> on_closed) {
+  closing_.store(true, std::memory_order_release);
+  if (bridge_) {
+    bridge_->UnregisterAndCloseOnGtk();
+  }
+  CefRefPtr<CefBrowserHandler> self(this);
+  auto shared_cb = on_closed ? std::make_shared<std::function<void()>>(std::move(on_closed)) : nullptr;
+  bool posted = CefRuntimeManager::PostToCefUi([self, shared_cb]() {
+    self->CloseOnUi(shared_cb ? std::move(*shared_cb) : std::function<void()>{});
+  });
+  if (!posted && shared_cb && *shared_cb) {
+    (*shared_cb)();
+  }
+}
+
+void CefBrowserHandler::CloseOnUi(std::function<void()> on_closed) {
   user_agent->Cancel();
   html_documents->Clear();
   if (on_closed) close_callbacks_.push_back(std::move(on_closed));
-  if (closing_ && browser_) return;
-  closing_ = true;
-  on_event_ = {};
-  // Stop new frames before unregistering; there are no queued notifications.
-  if (registered_) {
-    registered_ = false;
-    fl_texture_registrar_unregister_texture(registrar_, FL_TEXTURE(texture_));
-    fl_texture_registrar_unregister_texture(registrar_, FL_TEXTURE(popup_texture_));
-  }
+  if (close_requested_on_ui_ && browser_) return;
+  closing_.store(true, std::memory_order_release);
+  close_requested_on_ui_ = true;
   OnResetDialogState(nullptr);
   if (browser_) {
+    browser_->GetHost()->WasHidden(true);
     browser_->GetHost()->SetFocus(false);
     browser_->GetHost()->CloseBrowser(true);
-  } else {
-    auto callbacks = std::move(close_callbacks_);
-    for (auto& callback : callbacks) callback();
+  } else if (!creation_pending_on_ui_) {
+    ReleaseRuntimeSlotOnUi();
+    FlushCloseCallbacksOnUi();
   }
+}
+
+void CefBrowserHandler::LoadUrl(std::string url) {
+  html_documents->Clear();
+  CefRefPtr<CefBrowserHandler> self(this);
+  CefRuntimeManager::PostToCefUi([self, url = std::move(url)]() {
+    if (auto browser = self->ActiveBrowserOnUi()) {
+      browser->GetMainFrame()->LoadURL(url);
+    }
+  });
+}
+
+void CefBrowserHandler::LoadHtmlUrl(std::string canonical_url) {
+  CefRefPtr<CefBrowserHandler> self(this);
+  CefRuntimeManager::PostToCefUi([self, url = std::move(canonical_url)]() {
+    if (auto browser = self->ActiveBrowserOnUi()) {
+      browser->GetMainFrame()->LoadURL(url);
+    }
+  });
+}
+
+void CefBrowserHandler::Reload() {
+  CefRefPtr<CefBrowserHandler> self(this);
+  CefRuntimeManager::PostToCefUi([self]() {
+    if (auto browser = self->ActiveBrowserOnUi()) {
+      browser->Reload();
+    }
+  });
+}
+
+void CefBrowserHandler::ExecuteJavaScript(std::string script) {
+  if (script.empty()) return;
+  CefRefPtr<CefBrowserHandler> self(this);
+  CefRuntimeManager::PostToCefUi([self, script = std::move(script)]() {
+    if (auto browser = self->ActiveBrowserOnUi()) {
+      auto frame = browser->GetMainFrame();
+      frame->ExecuteJavaScript(script, frame->GetURL(), 0);
+    }
+  });
+}
+
+void CefBrowserHandler::GoBack() {
+  CefRefPtr<CefBrowserHandler> self(this);
+  CefRuntimeManager::PostToCefUi([self]() {
+    if (auto browser = self->ActiveBrowserOnUi(); browser && browser->CanGoBack()) {
+      browser->GoBack();
+    }
+  });
+}
+
+void CefBrowserHandler::GoForward() {
+  CefRefPtr<CefBrowserHandler> self(this);
+  CefRuntimeManager::PostToCefUi([self]() {
+    if (auto browser = self->ActiveBrowserOnUi(); browser && browser->CanGoForward()) {
+      browser->GoForward();
+    }
+  });
+}
+
+void CefBrowserHandler::SetUserAgent(std::string user_agent_value,
+                                     std::function<void(bool, const std::string&)> on_done) {
+  CefRefPtr<CefBrowserHandler> self(this);
+  auto shared_done = std::make_shared<std::function<void(bool, const std::string&)>>(std::move(on_done));
+  auto dispatch = [shared_done](bool ok, const std::string& err) {
+    CefRuntimeManager::PostToGtkMain([shared_done, ok, err]() {
+      if (shared_done && *shared_done) (*shared_done)(ok, err);
+    });
+  };
+  bool posted = CefRuntimeManager::PostToCefUi(
+      [self, value = std::move(user_agent_value), dispatch]() {
+        auto browser = self->ActiveBrowserOnUi();
+        if (!browser) {
+          dispatch(false, "Browser has been disposed");
+          return;
+        }
+        self->user_agent->Set(browser, value, dispatch);
+      });
+  if (!posted && shared_done && *shared_done) {
+    (*shared_done)(false, "CEF UI thread is not running");
+  }
+}
+
+void CefBrowserHandler::CloseJSDialog(int dialog_id, bool success, std::string user_input) {
+  CefRefPtr<CefBrowserHandler> self(this);
+  CefRuntimeManager::PostToCefUi([self, dialog_id, success, input = std::move(user_input)]() {
+    auto callback = self->pending_dialogs_.Take(dialog_id);
+    if (callback) {
+      callback->Continue(success, input);
+    }
+  });
+}
+
+void CefBrowserHandler::CloseContextMenu(int menu_id, int command_id) {
+  CefRefPtr<CefBrowserHandler> self(this);
+  CefRuntimeManager::PostToCefUi([self, menu_id, command_id]() {
+    auto callback = self->pending_menus_.Take(menu_id);
+    if (callback) {
+      if (command_id != -1) {
+        callback->Continue(command_id, EVENTFLAG_NONE);
+      } else {
+        callback->Cancel();
+      }
+    }
+  });
+}
+
+void CefBrowserHandler::UpdateSize(int width, int height, float dpr) {
+  CefRefPtr<CefBrowserHandler> self(this);
+  CefRuntimeManager::PostToCefUi([self, width, height, dpr]() {
+    self->dpr_ = dpr > 0 ? dpr : 1.0f;
+    self->width_ = std::max(width, 1);
+    self->height_ = std::max(height, 1);
+    if (auto browser = self->ActiveBrowserOnUi()) {
+      auto host = browser->GetHost();
+      host->NotifyScreenInfoChanged();
+      host->WasResized();
+    }
+  });
+}
+
+void CefBrowserHandler::SendPointerEvent(CefMouseEvent event, int type, int button,
+                                         int delta_x, int delta_y) {
+  CefRefPtr<CefBrowserHandler> self(this);
+  CefRuntimeManager::PostToCefUi([self, event, type, button, delta_x, delta_y]() {
+    auto browser = self->ActiveBrowserOnUi();
+    if (!browser) return;
+    auto host = browser->GetHost();
+    if (type == 3) {
+      host->SendMouseWheelEvent(event, delta_x, delta_y);
+    } else if (type == 2 || type == 4) {
+      host->SendMouseMoveEvent(event, type == 4);
+    } else {
+      host->SendMouseClickEvent(
+          event, button == 2 ? MBT_RIGHT : button == 3 ? MBT_MIDDLE : MBT_LEFT,
+          type == 1, 1);
+    }
+  });
+}
+
+void CefBrowserHandler::SetFocus(bool focused) {
+  CefRefPtr<CefBrowserHandler> self(this);
+  CefRuntimeManager::PostToCefUi([self, focused]() {
+    if (auto browser = self->ActiveBrowserOnUi()) {
+      browser->GetHost()->SetFocus(focused);
+    }
+  });
+}
+
+void CefBrowserHandler::SendKeyEvent(CefKeyEvent event) {
+  CefRefPtr<CefBrowserHandler> self(this);
+  CefRuntimeManager::PostToCefUi([self, event]() {
+    if (auto browser = self->ActiveBrowserOnUi()) {
+      browser->GetHost()->SendKeyEvent(event);
+    }
+  });
+}
+
+void CefBrowserHandler::ImeCommitText(std::string text) {
+  CefRefPtr<CefBrowserHandler> self(this);
+  CefRuntimeManager::PostToCefUi([self, text = std::move(text)]() {
+    if (auto browser = self->ActiveBrowserOnUi()) {
+      browser->GetHost()->ImeCommitText(text, CefRange(-1, -1), 0);
+    }
+  });
+}
+
+void CefBrowserHandler::ImeCancelComposition() {
+  CefRefPtr<CefBrowserHandler> self(this);
+  CefRuntimeManager::PostToCefUi([self]() {
+    if (auto browser = self->ActiveBrowserOnUi()) {
+      browser->GetHost()->ImeCancelComposition();
+    }
+  });
+}
+
+void CefBrowserHandler::ImeSetComposition(std::string text, size_t prefix_length) {
+  CefRefPtr<CefBrowserHandler> self(this);
+  CefRuntimeManager::PostToCefUi([self, text = std::move(text), prefix_length]() {
+    if (auto browser = self->ActiveBrowserOnUi()) {
+      CefString composition(text);
+      CefCompositionUnderline underline;
+      underline.range = CefRange(0, composition.length());
+      underline.color = 0xff000000;
+      browser->GetHost()->ImeSetComposition(
+          composition, {underline}, CefRange(-1, -1),
+          CefRange(prefix_length, prefix_length));
+    }
+  });
 }
 
 void CefBrowserHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect) {
@@ -117,46 +545,51 @@ bool CefBrowserHandler::GetScreenInfo(CefRefPtr<CefBrowser> browser, CefScreenIn
 void CefBrowserHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type,
                                const RectList& dirtyRects, const void* buffer,
                                int width, int height) {
-  if (closing_ || !registered_) return;
-  if (type == PET_VIEW) {
-    flutter_chromium_texture_update_buffer(texture_, buffer, width, height);
-    // CEF uses our single-threaded GTK message pump. OnPaint is a CEF UI-thread
-    // callback, so there is no idle callback that can outlive unregistration.
-    fl_texture_registrar_mark_texture_frame_available(registrar_, FL_TEXTURE(texture_));
-  } else if (type == PET_POPUP) {
-    flutter_chromium_texture_update_buffer(popup_texture_, buffer, width, height);
-    fl_texture_registrar_mark_texture_frame_available(registrar_, FL_TEXTURE(popup_texture_));
+  if (closing_.load(std::memory_order_acquire) || !bridge_) return;
+  if (type == PET_VIEW && bridge_->texture) {
+    flutter_chromium_texture_update_buffer(bridge_->texture, buffer, width, height);
+    if (!bridge_->frame_pending.exchange(true, std::memory_order_acq_rel)) {
+      std::weak_ptr<GtkBrowserBridge> weak = bridge_;
+      CefRuntimeManager::PostToGtkMain([weak]() {
+        if (auto bridge = weak.lock()) {
+          bridge->NotifyFrameOnGtk(false);
+        }
+      }, G_PRIORITY_HIGH_IDLE);
+    }
+  } else if (type == PET_POPUP && bridge_->popup_texture) {
+    flutter_chromium_texture_update_buffer(bridge_->popup_texture, buffer, width, height);
+    if (!bridge_->popup_frame_pending.exchange(true, std::memory_order_acq_rel)) {
+      std::weak_ptr<GtkBrowserBridge> weak = bridge_;
+      CefRuntimeManager::PostToGtkMain([weak]() {
+        if (auto bridge = weak.lock()) {
+          bridge->NotifyFrameOnGtk(true);
+        }
+      }, G_PRIORITY_HIGH_IDLE);
+    }
   }
 }
 
 void CefBrowserHandler::OnPopupShow(CefRefPtr<CefBrowser> browser, bool show) {
-  if (on_event_) {
-    g_autoptr(FlValue) args = fl_value_new_map();
-    fl_value_set_string_take(args, "show", fl_value_new_bool(show));
-    on_event_("popupShow", args);
+  if (!show && bridge_ && bridge_->popup_texture) {
+    flutter_chromium_texture_clear(bridge_->popup_texture);
   }
+  EmitEventOnUi("popupShow", [show]() {
+    FlValue* args = fl_value_new_map();
+    fl_value_set_string_take(args, "show", fl_value_new_bool(show));
+    return args;
+  });
 }
 
 void CefBrowserHandler::OnPopupSize(CefRefPtr<CefBrowser> browser, const CefRect& rect) {
-  if (on_event_) {
-    g_autoptr(FlValue) args = fl_value_new_map();
-    fl_value_set_string_take(args, "x", fl_value_new_int(rect.x));
-    fl_value_set_string_take(args, "y", fl_value_new_int(rect.y));
-    fl_value_set_string_take(args, "width", fl_value_new_int(rect.width));
-    fl_value_set_string_take(args, "height", fl_value_new_int(rect.height));
-    on_event_("popupSize", args);
-  }
-}
-
-void CefBrowserHandler::SetSize(int width, int height) {
-  width_ = std::max(width, 1);
-  height_ = std::max(height, 1);
-  if (GetBrowser()) browser_->GetHost()->WasResized();
-}
-
-void CefBrowserHandler::SetDevicePixelRatio(float dpr) {
-  dpr_ = dpr > 0 ? dpr : 1;
-  if (GetBrowser()) browser_->GetHost()->NotifyScreenInfoChanged();
+  int x = rect.x, y = rect.y, w = rect.width, h = rect.height;
+  EmitEventOnUi("popupSize", [x, y, w, h]() {
+    FlValue* args = fl_value_new_map();
+    fl_value_set_string_take(args, "x", fl_value_new_int(x));
+    fl_value_set_string_take(args, "y", fl_value_new_int(y));
+    fl_value_set_string_take(args, "width", fl_value_new_int(w));
+    fl_value_set_string_take(args, "height", fl_value_new_int(h));
+    return args;
+  });
 }
 
 bool CefBrowserHandler::StartDragging(CefRefPtr<CefBrowser> browser, CefRefPtr<CefDragData> drag_data,
@@ -166,40 +599,52 @@ bool CefBrowserHandler::StartDragging(CefRefPtr<CefBrowser> browser, CefRefPtr<C
 
 void CefBrowserHandler::UpdateDragCursor(CefRefPtr<CefBrowser> browser, DragOperation operation) {}
 
-void CefBrowserHandler::OnAddressChange(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& url) {
-  if (frame->IsMain() && on_event_) {
-    g_autoptr(FlValue) args = fl_value_new_map();
-    fl_value_set_string_take(args, "url", fl_value_new_string(url.ToString().c_str()));
-    on_event_("urlChanged", args);
+void CefBrowserHandler::OnAddressChange(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
+                                        const CefString& url) {
+  if (frame->IsMain()) {
+    std::string url_str = url.ToString();
+    EmitEventOnUi("urlChanged", [url_str = std::move(url_str)]() {
+      FlValue* args = fl_value_new_map();
+      fl_value_set_string_take(args, "url", fl_value_new_string(url_str.c_str()));
+      return args;
+    });
   }
 }
 
 void CefBrowserHandler::OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title) {
-  if (on_event_) {
-    g_autoptr(FlValue) args = fl_value_new_map();
-    fl_value_set_string_take(args, "title", fl_value_new_string(title.ToString().c_str()));
-    on_event_("titleChanged", args);
-  }
+  std::string title_str = title.ToString();
+  EmitEventOnUi("titleChanged", [title_str = std::move(title_str)]() {
+    FlValue* args = fl_value_new_map();
+    fl_value_set_string_take(args, "title", fl_value_new_string(title_str.c_str()));
+    return args;
+  });
 }
 
-void CefBrowserHandler::OnLoadingStateChange(CefRefPtr<CefBrowser> browser, bool isLoading, bool canGoBack, bool canGoForward) {
-  if (on_event_) {
-    g_autoptr(FlValue) args = fl_value_new_map();
+void CefBrowserHandler::OnLoadingStateChange(CefRefPtr<CefBrowser> browser, bool isLoading,
+                                             bool canGoBack, bool canGoForward) {
+  EmitEventOnUi("loadingStateChanged", [isLoading, canGoBack, canGoForward]() {
+    FlValue* args = fl_value_new_map();
     fl_value_set_string_take(args, "isLoading", fl_value_new_bool(isLoading));
     fl_value_set_string_take(args, "canGoBack", fl_value_new_bool(canGoBack));
     fl_value_set_string_take(args, "canGoForward", fl_value_new_bool(canGoForward));
-    on_event_("loadingStateChanged", args);
-  }
+    return args;
+  });
 }
 
-void CefBrowserHandler::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, ErrorCode errorCode,
-                                    const CefString& errorText, const CefString& failedUrl) {
-  if (frame->IsMain() && on_event_ && errorCode != ERR_ABORTED) {
-    g_autoptr(FlValue) args = fl_value_new_map();
-    fl_value_set_string_take(args, "errorCode", fl_value_new_int(errorCode));
-    fl_value_set_string_take(args, "errorText", fl_value_new_string(errorText.ToString().c_str()));
-    fl_value_set_string_take(args, "failedUrl", fl_value_new_string(failedUrl.ToString().c_str()));
-    on_event_("loadError", args);
+void CefBrowserHandler::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
+                                    ErrorCode errorCode, const CefString& errorText,
+                                    const CefString& failedUrl) {
+  if (frame->IsMain() && errorCode != ERR_ABORTED) {
+    int code = static_cast<int>(errorCode);
+    std::string text = errorText.ToString();
+    std::string url = failedUrl.ToString();
+    EmitEventOnUi("loadError", [code, text = std::move(text), url = std::move(url)]() {
+      FlValue* args = fl_value_new_map();
+      fl_value_set_string_take(args, "errorCode", fl_value_new_int(code));
+      fl_value_set_string_take(args, "errorText", fl_value_new_string(text.c_str()));
+      fl_value_set_string_take(args, "failedUrl", fl_value_new_string(url.c_str()));
+      return args;
+    });
   }
 }
 
@@ -207,24 +652,29 @@ bool CefBrowserHandler::OnJSDialog(CefRefPtr<CefBrowser> browser, const CefStrin
                                    JSDialogType dialog_type, const CefString& message_text,
                                    const CefString& default_prompt_text,
                                    CefRefPtr<CefJSDialogCallback> callback, bool& suppress_message) {
-  if (on_event_) {
-    int id = pending_dialogs_.Add(callback);
-    g_autoptr(FlValue) args = fl_value_new_map();
+  if (closing_.load(std::memory_order_acquire) || !bridge_) return false;
+  int id = pending_dialogs_.Add(callback);
+  int type = static_cast<int>(dialog_type);
+  std::string message = message_text.ToString();
+  std::string prompt = default_prompt_text.ToString();
+  EmitEventOnUi("jsDialog", [id, type, message = std::move(message), prompt = std::move(prompt)]() {
+    FlValue* args = fl_value_new_map();
     fl_value_set_string_take(args, "dialogId", fl_value_new_int(id));
-    fl_value_set_string_take(args, "type", fl_value_new_int(dialog_type));
-    fl_value_set_string_take(args, "message", fl_value_new_string(message_text.ToString().c_str()));
-    fl_value_set_string_take(args, "defaultPrompt", fl_value_new_string(default_prompt_text.ToString().c_str()));
-    on_event_("jsDialog", args);
-    return true; // We will handle this dialog
-  }
-  return false;
+    fl_value_set_string_take(args, "type", fl_value_new_int(type));
+    fl_value_set_string_take(args, "message", fl_value_new_string(message.c_str()));
+    fl_value_set_string_take(args, "defaultPrompt", fl_value_new_string(prompt.c_str()));
+    return args;
+  });
+  return true;  // We will handle this dialog.
 }
 
 void CefBrowserHandler::OnResetDialogState(CefRefPtr<CefBrowser> browser) {
   // Remove ownership before invoking CEF: completion may re-enter this handler.
   auto dialogs = pending_dialogs_.Drain();
   auto menus = pending_menus_.Drain();
-  if (on_event_ && (!dialogs.empty() || !menus.empty())) on_event_("transientUiDismissed", nullptr);
+  if (!dialogs.empty() || !menus.empty()) {
+    EmitEventOnUi("transientUiDismissed", nullptr);
+  }
   for (auto& pair : dialogs) {
     pair.second->Continue(false, "");
   }
@@ -233,67 +683,36 @@ void CefBrowserHandler::OnResetDialogState(CefRefPtr<CefBrowser> browser) {
   }
 }
 
-void CefBrowserHandler::CloseJSDialog(int dialog_id, bool success, const std::string& user_input) {
-  auto callback = pending_dialogs_.Take(dialog_id);
-  if (callback) {
-    callback->Continue(success, user_input);
-  }
-}
-
-FlValue* SerializeMenuModel(CefRefPtr<CefMenuModel> model) {
-  FlValue* list = fl_value_new_list();
-  for (int i = 0; i < model->GetCount(); ++i) {
-    FlValue* item = fl_value_new_map();
-    fl_value_set_string_take(item, "commandId", fl_value_new_int(model->GetCommandIdAt(i)));
-    fl_value_set_string_take(item, "label", fl_value_new_string(model->GetLabelAt(i).ToString().c_str()));
-    fl_value_set_string_take(item, "type", fl_value_new_int(model->GetTypeAt(i)));
-    fl_value_set_string_take(item, "isEnabled", fl_value_new_bool(model->IsEnabledAt(i)));
-    fl_value_set_string_take(item, "isChecked", fl_value_new_bool(model->IsCheckedAt(i)));
-    if (model->GetTypeAt(i) == MENUITEMTYPE_SUBMENU) {
-      fl_value_set_string_take(item, "subMenu", SerializeMenuModel(model->GetSubMenuAt(i)));
-    }
-    fl_value_append_take(list, item);
-  }
-  return list;
-}
-
 bool CefBrowserHandler::RunContextMenu(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
-                                       CefRefPtr<CefContextMenuParams> params, CefRefPtr<CefMenuModel> model,
+                                       CefRefPtr<CefContextMenuParams> params,
+                                       CefRefPtr<CefMenuModel> model,
                                        CefRefPtr<CefRunContextMenuCallback> callback) {
-  if (on_event_) {
-    int id = pending_menus_.Add(callback);
-    g_autoptr(FlValue) args = fl_value_new_map();
+  if (closing_.load(std::memory_order_acquire) || !bridge_) return false;
+  int id = pending_menus_.Add(callback);
+  int x = params->GetXCoord();
+  int y = params->GetYCoord();
+  auto items = SnapshotMenuModel(model);
+  EmitEventOnUi("contextMenuRequested", [id, x, y, items = std::move(items)]() {
+    FlValue* args = fl_value_new_map();
     fl_value_set_string_take(args, "menuId", fl_value_new_int(id));
-    fl_value_set_string_take(args, "x", fl_value_new_int(params->GetXCoord()));
-    fl_value_set_string_take(args, "y", fl_value_new_int(params->GetYCoord()));
-    fl_value_set_string_take(args, "items", SerializeMenuModel(model));
-    on_event_("contextMenuRequested", args);
-    return true; // We will handle this menu
-  }
-  return false;
+    fl_value_set_string_take(args, "x", fl_value_new_int(x));
+    fl_value_set_string_take(args, "y", fl_value_new_int(y));
+    fl_value_set_string_take(args, "items", BuildMenuModelValue(items));
+    return args;
+  });
+  return true;  // We will handle this menu.
 }
 
 void CefBrowserHandler::OnTakeFocus(CefRefPtr<CefBrowser> browser, bool next) {
-  if (on_event_) {
-    g_autoptr(FlValue) args = fl_value_new_map();
+  EmitEventOnUi("takeFocus", [next]() {
+    FlValue* args = fl_value_new_map();
     fl_value_set_string_take(args, "next", fl_value_new_bool(next));
-    on_event_("takeFocus", args);
-  }
-}
-
-void CefBrowserHandler::CloseContextMenu(int menu_id, int command_id) {
-  auto callback = pending_menus_.Take(menu_id);
-  if (callback) {
-    if (command_id != -1) {
-      callback->Continue(command_id, EVENTFLAG_NONE);
-    } else {
-      callback->Cancel();
-    }
-  }
+    return args;
+  });
 }
 
 void CefBrowserHandler::OnContextMenuDismissed(CefRefPtr<CefBrowser>, CefRefPtr<CefFrame>) {
   // CEF has already dismissed the menu. Late Dart responses must be no-ops.
   pending_menus_.Clear();
-  if (on_event_) on_event_("transientUiDismissed", nullptr);
+  EmitEventOnUi("transientUiDismissed", nullptr);
 }

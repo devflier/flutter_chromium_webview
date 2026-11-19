@@ -1,6 +1,7 @@
 #include "include/cef_keyboard.h"
 #include <gdk/gdkkeysyms.h>
 #include <algorithm>
+#include <string>
 
 namespace {
 int Modifiers(guint state) {
@@ -56,7 +57,7 @@ int WindowsKey(guint key) {
     default: return 0;
   }
 }
-}
+}  // namespace
 
 CefKeyboard::CefKeyboard(GtkWidget* window) : window_(window), im_(gtk_im_multicontext_new()) {
   if (window_) {
@@ -72,7 +73,7 @@ CefKeyboard::CefKeyboard(GtkWidget* window) : window_(window), im_(gtk_im_multic
 }
 
 CefKeyboard::~CefKeyboard() {
-  SetBrowser(nullptr);
+  SetHandler(nullptr);
   if (window_) {
     g_signal_handlers_disconnect_by_data(window_, this);
     g_object_remove_weak_pointer(G_OBJECT(window_), reinterpret_cast<gpointer*>(&window_));
@@ -80,29 +81,28 @@ CefKeyboard::~CefKeyboard() {
   g_object_unref(im_);
 }
 
-void CefKeyboard::SetBrowser(CefRefPtr<CefBrowser> browser) {
-  if (browser_ == browser) {
-    if (browser_) browser_->GetHost()->SetFocus(true);
+void CefKeyboard::SetHandler(CefRefPtr<CefBrowserHandler> handler) {
+  if (handler_ == handler) {
+    if (handler_) handler_->SetFocus(true);
     return;
   }
-  if (browser_) {
+  if (handler_) {
     gtk_im_context_reset(im_);
     gtk_im_context_focus_out(im_);
-    browser_->GetHost()->ImeCancelComposition();
-    browser_->GetHost()->SetFocus(false);
+    handler_->ImeCancelComposition();
+    handler_->SetFocus(false);
   }
-  browser_ = browser;
-  if (browser_) {
+  handler_ = std::move(handler);
+  if (handler_) {
     if (window_) gtk_im_context_set_client_window(im_, gtk_widget_get_window(window_));
-    browser_->GetHost()->SetFocus(true);
+    handler_->SetFocus(true);
     gtk_im_context_focus_in(im_);
   }
 }
 
 gboolean CefKeyboard::Key(GtkWidget*, GdkEventKey* event, gpointer data) {
   auto* self = static_cast<CefKeyboard*>(data);
-  if (!self->browser_) return FALSE;
-  auto host = self->browser_->GetHost();
+  if (!self->handler_) return FALSE;
   CefKeyEvent key;
   key.type = event->type == GDK_KEY_RELEASE ? KEYEVENT_KEYUP : KEYEVENT_RAWKEYDOWN;
   key.windows_key_code = WindowsKey(event->keyval);
@@ -114,7 +114,7 @@ gboolean CefKeyboard::Key(GtkWidget*, GdkEventKey* event, gpointer data) {
   key.unmodified_character = key.character;
   if (event->keyval >= GDK_KEY_KP_Space && event->keyval <= GDK_KEY_KP_Equal)
     key.modifiers |= EVENTFLAG_IS_KEY_PAD;
-  host->SendKeyEvent(key);
+  self->handler_->SendKeyEvent(key);
   // GTK filters compose/dead keys and dispatches commit/preedit callbacks.
   if (gtk_im_context_filter_keypress(self->im_, event)) return TRUE;
   if (event->type == GDK_KEY_PRESS &&
@@ -124,7 +124,7 @@ gboolean CefKeyboard::Key(GtkWidget*, GdkEventKey* event, gpointer data) {
     else if (key.windows_key_code == 0x08) key.character = '\b';
     if (key.character) {
       key.type = KEYEVENT_CHAR;
-      host->SendKeyEvent(key);
+      self->handler_->SendKeyEvent(key);
     }
   }
   return TRUE;
@@ -132,33 +132,31 @@ gboolean CefKeyboard::Key(GtkWidget*, GdkEventKey* event, gpointer data) {
 
 void CefKeyboard::Commit(GtkIMContext*, const gchar* text, gpointer data) {
   auto* self = static_cast<CefKeyboard*>(data);
-  if (self->browser_)
-    self->browser_->GetHost()->ImeCommitText(text, CefRange(-1, -1), 0);
+  if (self->handler_ && text)
+    self->handler_->ImeCommitText(text);
 }
 
 void CefKeyboard::Preedit(GtkIMContext* im, gpointer data) {
   auto* self = static_cast<CefKeyboard*>(data);
-  if (!self->browser_) return;
+  if (!self->handler_) return;
   gchar* text = nullptr;
   PangoAttrList* attrs = nullptr;
   gint cursor = 0;
   gtk_im_context_get_preedit_string(im, &text, &attrs, &cursor);
-  CefString composition(text);
-  const gchar* cursor_end = g_utf8_offset_to_pointer(text, std::min<glong>(cursor, g_utf8_strlen(text, -1)));
-  CefString prefix(std::string(text, static_cast<size_t>(cursor_end - text)));
-  CefCompositionUnderline underline;
-  underline.range = CefRange(0, composition.length());
-  underline.color = 0xff000000;
-  self->browser_->GetHost()->ImeSetComposition(composition, {underline},
-      CefRange(-1, -1), CefRange(prefix.length(), prefix.length()));
-  g_free(text);
-  pango_attr_list_unref(attrs);
+  if (text) {
+    const gchar* cursor_end =
+        g_utf8_offset_to_pointer(text, std::min<glong>(cursor, g_utf8_strlen(text, -1)));
+    CefString prefix(std::string(text, static_cast<size_t>(cursor_end - text)));
+    self->handler_->ImeSetComposition(text, prefix.length());
+    g_free(text);
+  }
+  if (attrs) pango_attr_list_unref(attrs);
 }
 
 gboolean CefKeyboard::FocusIn(GtkWidget*, GdkEventFocus*, gpointer data) {
   auto* self = static_cast<CefKeyboard*>(data);
-  if (self->browser_) {
-    self->browser_->GetHost()->SetFocus(true);
+  if (self->handler_) {
+    self->handler_->SetFocus(true);
     gtk_im_context_focus_in(self->im_);
   }
   return FALSE;
@@ -166,10 +164,10 @@ gboolean CefKeyboard::FocusIn(GtkWidget*, GdkEventFocus*, gpointer data) {
 
 gboolean CefKeyboard::FocusOut(GtkWidget*, GdkEventFocus*, gpointer data) {
   auto* self = static_cast<CefKeyboard*>(data);
-  if (self->browser_) {
+  if (self->handler_) {
     gtk_im_context_reset(self->im_);
     gtk_im_context_focus_out(self->im_);
-    self->browser_->GetHost()->SetFocus(false);
+    self->handler_->SetFocus(false);
   }
   return FALSE;
 }
