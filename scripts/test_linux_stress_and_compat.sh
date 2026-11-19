@@ -534,6 +534,30 @@ run_case() {
   fi
 }
 
+run_failure_case() {
+  local name="$1"
+  local timeout_s="$2"
+  local expected_err="$3"
+  shift 3
+  local logf="$output_dir/${name}.log"
+  local rc=0
+  timeout "$timeout_s" "$BIN" "$@" >"$logf" 2>&1 || rc=$?
+  sleep 0.4
+  local orphans
+  orphans="$(pgrep -f "flutter_chromium_webview_subprocess|flutter_chromium_webview_example" || true)"
+  local shut=0
+  grep -q "\[CEF\] Shutdown complete" "$logf" && shut=1 || true
+  local matched_err=0
+  grep -Eq "$expected_err" "$logf" && matched_err=1 || true
+  if [[ "$shut" -eq 0 && "$matched_err" -eq 1 && -z "$orphans" ]]; then
+    echo "[PASS] $name (expected_error=1, shut_skipped=1, orphans=0)"
+  else
+    echo "[FAIL] $name (rc=$rc, shut=$shut, matched_err=$matched_err, orphans=${orphans:-none})"
+    tail -n 15 "$logf"
+    fail_count=$((fail_count + 1))
+  fi
+}
+
 echo "=== 1. 100 WebView create/dispose cycles ==="
 run_case "cycles_100" 180 cycles_100
 
@@ -673,6 +697,15 @@ __attribute__((constructor)) static void add_idle(void) {
 C
 gcc -shared -fPIC "$work_dir/idle_source_preload.c" $(pkg-config --cflags --libs glib-2.0 gio-2.0) -o "$work_dir/libidle_preload.so"
 LD_PRELOAD="$work_dir/libidle_preload.so" run_case "shutdown_with_perpetual_glib_source" 35 startup_cycle
+
+echo "=== 8. Deterministic failure injection: browser timeout & barrier timeout ==="
+# Test A: Browser closure times out -> kShutdownFailed, CefShutdown skipped, 0 orphans
+FCW_TEST_FORCE_BROWSER_TIMEOUT=1 FCW_TEST_SHUTDOWN_TIMEOUT_MS=10 run_failure_case \
+  "failure_inject_browser_timeout" 15 "Shutdown FAILED: [0-9]+ browser\(s\) still live" rapid_exit during_create
+
+# Test B: TID_UI barrier times out -> kShutdownFailed, CefShutdown skipped, 0 orphans
+FCW_TEST_FORCE_BARRIER_TIMEOUT=1 run_failure_case \
+  "failure_inject_barrier_timeout" 15 "Shutdown FAILED: TID_UI barrier timed out" startup_cycle
 
 echo "=== STRESS_AND_COMPAT_SUMMARY fail_count=$fail_count ==="
 exit $(( fail_count > 0 ))

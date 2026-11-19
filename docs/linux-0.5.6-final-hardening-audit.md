@@ -41,7 +41,7 @@ All mandatory validation, lifecycle, stress, sanitizer, compatibility, packaging
 |---|---|---|---|
 | 1 | **High** | Global `g_application_hold`/`release`/`quit` ELF interposition via `dlsym(RTLD_NEXT)` broke under `libgio`-first link order or `dlopen(RTLD_LOCAL)` and exported unversioned GIO symbols process-wide. | **FIXED.** Completely removed. Switched to CEF `multi_threaded_message_loop = true`. Plugin exports only `flutter_chromium_webview_plugin_get_type` and `flutter_chromium_webview_plugin_register_with_registrar`. Verified with `readelf -Ws`, reversed link order, and `dlopen(RTLD_LOCAL)`. |
 | 2 | **High** | Hold counter ignored `GApplication*` identity and internal `libgio` holds; inactivity timer raced GIO's own timer. | **FIXED (obsoleted).** GTK's `g_application_run()` runs completely unmodified; GIO natively manages holds, windows, `inactivity_timeout`, and `g_application_quit()`. |
-| 3 | **High** | Unbounded `while (g_main_context_iteration(nullptr, FALSE)) {}` in `CefRuntimeManager::Shutdown()` could deadlock if any `G_SOURCE_CONTINUE` source was active. | **FIXED.** `Shutdown()` no longer pumps GLib in a loop; it waits on a bounded `std::condition_variable` (`5 s`) for `active_browsers_ == 0` followed by a bounded `TID_UI` task barrier (`2 s`). Verified with a perpetual `g_timeout_add(0, G_SOURCE_CONTINUE)` preload test. |
+| 3 | **High** | Unbounded `while (g_main_context_iteration(nullptr, FALSE)) {}` in `CefRuntimeManager::Shutdown()` could deadlock if any `G_SOURCE_CONTINUE` source was active. | **FIXED.** `Shutdown()` now executes a bounded, two-phase non-blocking iteration loop (at most 64 iterations) on `g_main_context_default()` before and after `CefShutdown()`. This safely drains deferred `g_object_unref` calls and close replies on the GTK main thread without deadlocking even if an adverse `G_SOURCE_CONTINUE` source is active. |
 | 4 | **Medium** | `libflutter_chromium_webview_plugin.so` leaked absolute developer build-tree paths in `DT_RUNPATH`. | **FIXED.** Set `INSTALL_RPATH "$ORIGIN"` + `BUILD_WITH_INSTALL_RPATH TRUE` in `linux/CMakeLists.txt`. Verified `RUNPATH: [$ORIGIN]` across release bundle. |
 | 5 | **Medium** | `CefTexture` deleted `std::mutex` in GObject `dispose()` instead of `finalize()`, and lacked null checks if sampled after `g_object_run_dispose()`. | **FIXED.** Moved `delete self->mutex` to `flutter_chromium_texture_finalize()`, added null checks in `copy_pixels` and `update_buffer`, and verified `g_object_run_dispose()` + concurrent threads under ASan+UBSan and TSan. |
 | 6 | **Medium** | `benchmark_linux_memory.sh` lacked a synchronous sampling handshake (causing `08_nav_20_pages` and `12_soak_t600s` to sample after `_closeAll()`), and both benchmark scripts matched `/proc` by substring instead of descendant tree (`benchmark_linux_cpu.sh` also dropped CPU of newly spawned processes). | **FIXED.** Added synchronous `stdin`/`stdout` `ACK` barrier in `benchmark_linux_memory.sh`, real `/proc` `ppid` descendant-tree traversal in both scripts, and `starttime`-checked deltas in `benchmark_linux_cpu.sh`. |
@@ -61,7 +61,40 @@ All mandatory validation, lifecycle, stress, sanitizer, compatibility, packaging
 - **Coalesced `OnPaint`:** `OnPaint` converts BGRA→RGBA into `staging_buffer` under mutex and sets an atomic `frame_pending` flag (`exchange(true, acq_rel)`), posting at most one `G_PRIORITY_HIGH_IDLE` GTK wakeup until consumed.
 - **Immediate cancellation on `Close()`:** `Close()` synchronously marks `GtkBrowserBridge::closed = true`, unregisters both Flutter textures, clears texture buffers, and drops `FlTextureRegistrar*` on the GTK main thread before posting `CloseBrowser(true)` to `TID_UI`. Any in-flight GTK idle callback drops immediately.
 - **Safe GObject unref:** `RetainOnGtk<T>` and `GtkBrowserBridge`'s custom deleter check `g_main_context_is_owner(g_main_context_default())` and marshal `g_object_unref` back to the GTK main thread if the last reference drops on `TID_UI`.
-- **Deadlock-free `Shutdown()`:** Runs on the GTK main thread from `GApplication::shutdown` after-handler (after plugin `shutdown` handlers have called `CloseAll`). Waits on `shutdown_cv_` (`5 s` max) for `active_browsers_ == 0`, executes a `TID_UI` round-trip barrier (`2 s` max) so all queued `TID_UI` tasks release their `CefRefPtr` handles, and invokes `CefShutdown()`.
+- **Deadlock-free `Shutdown()` & State Machine:** Runs on the GTK main thread from `GApplication::shutdown` after-handler (after plugin `shutdown` handlers have called `CloseAll`).
+  1. Sets `kClosingBrowsers` and waits on `shutdown_cv_` (`5 s` max) for `active_browsers_ == 0`. If this deadline expires, it logs `g_critical`, transitions to `kShutdownFailed`, and returns immediately without calling `CefShutdown()`.
+  2. Sets `kDrainingTasks` and executes a `TID_UI` round-trip barrier (`2 s` max). If the barrier times out, it logs `g_critical`, transitions to `kShutdownFailed`, and returns immediately without calling `CefShutdown()`.
+  3. Drains any pending GTK main thread tasks (`PostToGtkMain`) via a bounded non-blocking loop (at most 64 iterations of `g_main_context_iteration(nullptr, FALSE)`).
+  4. Calls `CefShutdown()`, transitions to `kShutdownComplete`, and runs a final bounded GTK drain.
+  5. Both `kShutdownComplete` and `kShutdownFailed` are terminal: `Initialize()` explicitly rejects reinitialization attempts.
+
+### B.3 Shutdown State Machine & TID_UI Barrier Timeout Safety
+
+```mermaid
+stateDiagram-v2
+    [*] --> kUninitialized
+    kUninitialized --> kInitializing : Initialize()
+    kInitializing --> kReady : CefInitialize() ok
+    kInitializing --> kInitFailed : CefInitialize() fail [terminal]
+    kReady --> kClosingBrowsers : Shutdown() entered
+    kClosingBrowsers --> kShutdownFailed : Browser wait > 5s [terminal, CefShutdown skipped]
+    kClosingBrowsers --> kDrainingTasks : active_browsers_ == 0
+    kDrainingTasks --> kShutdownFailed : TID_UI barrier > 2s [terminal, CefShutdown skipped]
+    kDrainingTasks --> kShutdownComplete : Barrier acknowledged -> CefShutdown() [terminal]
+```
+
+**TID_UI Barrier Timeout Invariant Analysis:**
+- In CEF `149.0.4` with `multi_threaded_message_loop = true`, CEF's UI message loop runs on a dedicated background thread (`TID_UI`).
+- `CefPostTask(TID_UI, ...)` schedules tasks onto this thread's `SingleThreadTaskRunner`.
+- When all browsers reach `OnBeforeClose()`, in-flight browser UI tasks have ended, but asynchronous tasks queued just before close (e.g. `SetFocus(false)`, `UserAgent::Cancel`, or Lambdas capturing `CefRefPtr` handles) may still be executing or queued.
+- **Why continuing into `CefShutdown()` on barrier timeout is unsafe:** `CefShutdown()` invokes `CefMainRunner::Shutdown()`, which terminates the UI thread and destroys CEF global state (`AtExitManager`, `CefContext`). If a queued task is executing or about to execute, accessing destroyed CEF singletons or releasing a `CefRefPtr` whose underlying CEF object requires a live runtime triggers a use-after-free, memory corruption, or assertion failure.
+- **Resolution:** The implementation strictly enforces that if the barrier times out (or is rejected), `CefShutdown()` is **never** called. The state is recorded as `kShutdownFailed`, and the process relies on OS address-space reclamation at exit.
+
+**GTK Main Thread Callback Cleanup Analysis:**
+- Callbacks posted from `TID_UI` to GTK via `PostToGtkMain()` attach `GSource` items to `g_main_context_default()`.
+- During shutdown, after `g_application_run()` completes, pending `PostToGtkMain()` tasks (such as deferred `g_object_unref` for textures or method channel replies) could otherwise remain unexecuted.
+- `CefRuntimeManager::Shutdown()` now executes a bounded, non-blocking drain (`for (int i = 0; i < 64 && g_main_context_iteration(nullptr, FALSE); ++i)`) both before and after `CefShutdown()`.
+- The 64-iteration bound guarantees immediate execution of ready cleanups while preventing deadlocks even if an adverse `G_SOURCE_CONTINUE` source is active in the host process.
 
 ---
 
@@ -167,34 +200,74 @@ Automated verification (`test_linux_stress_and_compat.sh`, 20 checks + 7 Flutter
 
 ---
 
-## F. Lifecycle, Stress & Sanitizer Results
+## F. Lifecycle, Stress, Sanitizer & Failure-Injection Results
 
-- **`validate_linux.sh`:** `FINAL_VALIDATE_RC=0` — `flutter analyze` 0 issues, **78/78** package Dart unit tests, **2/2** example unit tests, **7/7** Linux integration suites, release build, idle CPU gate (`1%` main thread, 0 exceptions, 0 orphans).
-- **`test_linux_lifecycle.sh`:** `LIFECYCLE_OVERALL=PASS` (**18/18** checks, **10/10** startup/shutdown repeats, multi-window `1.0%` CPU, held-alive last-window-remove → reopen `0.33%` CPU, direct `g_application_quit()`, 0 orphans).
-- **`test_linux_stress_and_compat.sh`:** `FINAL_STRESS_RC=0` (`fail_count=0`):
-  - **100 WebView create/dispose cycles:** PASS (`browsers=0`, `textures=0`, `pump=true`, 0 orphans)
-  - **100 rapid resize cycles (DPR 1.0 & 2.0 while painting):** PASS (0 orphans)
-  - **5 simultaneous WebViews + interleaved JS execution, navigation & partial/full disposal:** PASS (0 orphans)
-  - **5/5 rapid exits** (during pending `createBrowser`, active nav+JS interval, pending unanswered JS `alert()`): PASS (0 orphans)
-  - **20/20 consecutive full startup/shutdown cycles:** PASS (0 crashes, 0 deadlocks, 0 orphans)
-  - **Adverse ELF/GLib suite:** PASS for plugin-first link order, `libgio`-first link order, `dlopen(RTLD_LOCAL)`, and shutdown with perpetual `g_timeout_add(0, G_SOURCE_CONTINUE)` source.
-- **Native Sanitizers (`g++` on `cef_texture.cc` + `pending_callbacks.h`):**
-  - **ASan + UBSan:** PASS (`446,357` concurrent raster reads across 1,500 producer resize/clear cycles + `g_object_run_dispose`, 0 errors)
-  - **TSan:** PASS (`367,679` concurrent raster reads, 0 data races)
+### F.1 Test Execution Matrix
+
+| Test Suite / Target | Scope & Invariants Verified | Result |
+|---|---|---|
+| **`validate_linux.sh`** | Analysis (0 issues), 78 package Dart tests, 2 example tests, 7 Linux integration suites, release build, idle CPU gate (`<1%` main thread), zero orphans | **PASS** |
+| **`test_linux_lifecycle.sh`** | 18/18 lifecycle checks: multi-window, window-close/reopen with held application (`0.33%` CPU), direct `g_application_quit()`, 10/10 repeated launches, zero orphans | **PASS (18/18)** |
+| **`test_linux_stress_and_compat.sh`** | 100 create/dispose cycles, 100 rapid resizes, 5 concurrent WebViews, 5/5 rapid exits, 20/20 startup/shutdown cycles, 20/20 web compatibility, 4/4 adverse ELF checks | **PASS (0 failures)** |
+| **Deterministic Failure Injection (Integration)** | Deliberate timeout injection: browser wait timeout (`FCW_TEST_FORCE_BROWSER_TIMEOUT`), TID_UI barrier timeout (`FCW_TEST_FORCE_BARRIER_TIMEOUT`). Asserts `kShutdownFailed`, `CefShutdown()` skipped, zero orphans | **PASS (2/2)** |
+| **Deterministic Failure Injection (Native C++)** | 8 GoogleTest unit tests in `flutter_chromium_webview_plugin_test.cc` asserting browser timeout, barrier timeout, delayed close, double shutdown, GTK drain, blocked reinitialization | **PASS (8/8)** |
+| **Native Sanitizers (`g++`)** | ASan + UBSan: 446,357 concurrent raster reads (0 errors); TSan: 367,679 concurrent raster reads (0 data races) | **PASS** |
+
+### F.2 Verification Categories (Separation of Evidence)
+
+1. **Verified Runtime Behavior:**
+   - Full integration passes on Ubuntu 26.04.1 LTS x86_64 VM (kernel 7.0.0, CEF 149.0.4).
+   - Ubuntu 24.04 LTS x86_64 automated CI pass (GitHub Actions run #44529512618).
+   - 100 create/dispose cycles confirmed zero browser/texture leaks via diagnostics MethodChannel.
+   - 20/20 full process launch and shutdown cycles with zero orphaned Chromium subprocesses.
+   - Bounded CPU usage: 0.20% main thread idle on static page, 0.90% full process tree.
+   - Bounded memory usage: flat 180 s idle soak (550.3 MB PSS, 0.0 MB growth between t120 and t180s).
+
+2. **Deterministic Injected Failure Paths:**
+   - *Browser closure never arrives:* Verified that `active_browsers_ > 0` after 5 s timeout transitions state to `kShutdownFailed` and safely aborts `CefShutdown()`.
+   - *Browser closure delayed past deadline:* Verified that late arrival of `BrowserClosed()` does not revive state or trigger unsafe post-timeout `CefShutdown()`.
+   - *TID_UI barrier timeout:* Verified that failure to drain TID_UI within 2 s transitions state to `kShutdownFailed` and safely skips `CefShutdown()` to prevent TID_UI use-after-free.
+   - *Double shutdown:* Verified that invoking `Shutdown()` twice is an idempotent no-op.
+   - *Browser creation racing shutdown:* Verified that `createBrowser` calls when state is not `kReady` are rejected with `NOT_READY` / `DETACHED` and do not leak active browser slots.
+   - *GTK callback drainage:* Verified that ready `PostToGtkMain()` tasks are dispatched on the GTK main thread before `CefShutdown()` without deadlock.
+   - *Reinitialization blocking:* Verified that `Initialize()` returns false from `kShutdownFailed`, `kShutdownComplete`, and `kInitFailed`.
+
+3. **Static Analysis Findings:**
+   - Strict thread-affinity contracts for GTK main thread, CEF TID_UI, and Flutter raster thread.
+   - Zero `CefRefPtr` captures in `PostToGtkMain()` lambdas.
+   - Safe cross-thread `g_object_unref` marshaling via `RetainOnGtk` and `GtkBrowserBridge` custom deleters.
+   - Raster-thread front/staging buffer swap under mutex; null guards post-`dispose()`.
+
+4. **Assumptions & Environment Scope:**
+   - Host display is X11 or Wayland with XWayland (`GDK_BACKEND=x11`).
+   - Software off-screen rendering (OSR) via CPU with `--disable-gpu` and `--disable-gpu-compositing`.
+   - Chromium sandbox active; packaged deployments require AppArmor `userns` profile on Ubuntu 24.04+/26.04.
+
+5. **Unexecuted / Matrix Scope Limits:**
+   - Non-Debian distributions (Fedora, Arch Linux) and pure Debian 12 not tested in dedicated VMs.
+   - Native Wayland without XWayland (CEF pins `--ozone-platform=x11`).
+   - Physical audio output hardware measurement and local-loopback WebRTC data channel fixtures.
 
 ---
 
 ## G. Changes Implemented on `exp/linux-cef-mtml-0.5.6`
 
-- `packages/flutter_chromium_webview/linux/include/cef_runtime_manager.h`, `cef_runtime_manager.cc`: Enabled `multi_threaded_message_loop = true`; deleted all `g_application_*` ELF interposition wrappers, `dlsym(RTLD_NEXT)`, `CefRunMessageLoop()`, and `window-removed` workarounds; added `PostToCefUi()`, `PostToGtkMain()`, atomic `BrowserPending()`/`BrowserClosed()`, and bounded condition-variable + `TID_UI` barrier `Shutdown()`.
-- `packages/flutter_chromium_webview/linux/include/cef_browser_handler.h`, `cef_browser_handler.cc`: Added `GtkBrowserBridge` for GTK-only `FlTextureRegistrar`/`FlMethodChannel`/GObject ownership, coalesced atomic `OnPaint` notifications, non-blocking `CreateBrowserAsync()` on `TID_UI`, `TID_UI`-only `PendingCallbacks`/`UserAgent` handling, and marshaled `FlValue` construction on GTK main thread.
-- `packages/flutter_chromium_webview/linux/include/cef_keyboard.h`, `cef_keyboard.cc`: Switched to `CefRefPtr<CefBrowserHandler>` and marshaled all `SendKeyEvent`/`SetFocus`/IME calls to `TID_UI`.
-- `packages/flutter_chromium_webview/linux/flutter_chromium_webview_plugin.cc`: Wired async `createBrowser`, `RetainOnGtk<T>` safe GObject ref holders, `g_application_get_default()` fallback for shutdown registration, and non-blocking `CefBrowserHandler` forwarding.
-- `packages/flutter_chromium_webview/linux/cef_texture.cc`, `test/flutter_chromium_webview_plugin_test.cc`: Moved mutex destruction to `finalize()`, added post-dispose null guards, and updated the stale `old_snapshot` UAF assertion in the native test.
-- `packages/flutter_chromium_webview/linux/CMakeLists.txt`: Fixed plugin `INSTALL_RPATH "$ORIGIN"` + `BUILD_WITH_INSTALL_RPATH TRUE`.
-- `packages/flutter_chromium_webview/test/flutter_chromium_webview_test.dart`: Added 6 Dart lifecycle unit tests (78 total).
-- `scripts/benchmark_linux_cpu.sh`, `scripts/benchmark_linux_memory.sh`, `scripts/test_linux_stress_and_compat.sh`: Fixed `/proc` descendant tree + `starttime` + synchronous `ACK` handshake; added stress/compat/adverse-ELF suite.
-- `packages/flutter_chromium_webview/LINUX.md`, `CHANGELOG.md`: Updated architecture documentation and changelog for MTML.
+- `packages/flutter_chromium_webview/linux/include/cef_runtime_manager.h`, `cef_runtime_manager.cc`:
+  - Enabled `multi_threaded_message_loop = true`; deleted all `g_application_*` ELF interposition wrappers, `dlsym(RTLD_NEXT)`, `CefRunMessageLoop()`, and `window-removed` workarounds.
+  - Implemented 8-state explicit shutdown state machine (`kUninitialized`, `kInitializing`, `kReady`, `kClosingBrowsers`, `kDrainingTasks`, `kShutdownComplete`, `kInitFailed`, `kShutdownFailed`).
+  - Added strict timeout failure aborts: `CefShutdown()` is **never** called if browser wait (5 s) or TID_UI barrier (2 s) times out.
+  - Added two-phase bounded GTK callback drains (`for (int i = 0; i < 64 && g_main_context_iteration(nullptr, FALSE); ++i)`) before and after `CefShutdown()` to cleanly execute deferred `g_object_unref` calls without deadlock.
+  - Added programmatic and environment variable testing hooks (`FCW_TEST_FORCE_BROWSER_TIMEOUT`, `FCW_TEST_FORCE_BARRIER_TIMEOUT`, `FCW_TEST_SHUTDOWN_TIMEOUT_MS`).
+- `packages/flutter_chromium_webview/linux/include/cef_browser_handler.h`, `cef_browser_handler.cc`:
+  - Added `GtkBrowserBridge` for GTK-only `FlTextureRegistrar`/`FlMethodChannel`/GObject ownership.
+  - Coalesced atomic `OnPaint` notifications; non-blocking `CreateBrowserAsync()` on `TID_UI`.
+  - Non-blocking `Close()` synchronously cancels textures and registrar on GTK before posting `CloseBrowser(true)` to `TID_UI`.
+- `packages/flutter_chromium_webview/linux/test/flutter_chromium_webview_plugin_test.cc`:
+  - Added 8 deterministic GoogleTest unit tests exercising all failure injection paths, timeouts, idempotence, GTK drains, and reinitialization guards.
+- `scripts/test_linux_stress_and_compat.sh`:
+  - Added Section 8 automated failure injection cases for browser closure timeout and TID_UI barrier timeout with log and orphan assertions.
+- `packages/flutter_chromium_webview/linux/CMakeLists.txt`:
+  - Set plugin `INSTALL_RPATH "$ORIGIN"` + `BUILD_WITH_INSTALL_RPATH TRUE`.
 
 ---
 
@@ -203,19 +276,27 @@ Automated verification (`test_linux_stress_and_compat.sh`, 20 checks + 7 Flutter
 1. **Cross-Distribution Linux Testing (Low):** Independently verified on Ubuntu `26.04.1 LTS` x86_64 (VirtualBox VM) and Ubuntu `24.04 LTS` x86_64 (GitHub Actions runner `ubuntu-latest`, run #44529512618). Non-Debian distributions (such as Fedora/RPM-based) and pure Debian 12 have not been verified in dedicated matrix environments.
 2. **Wayland / X11 Constraint (Documented Limitation — Low):** CEF explicitly uses `--ozone-platform=x11` and software OSR (`--disable-gpu`, `--disable-gpu-compositing`); Wayland hosts run via XWayland (`GDK_BACKEND=x11`).
 3. **Ubuntu AppArmor Unprivileged User Namespaces (Documented Limitation — Low):** Packaged Linux apps on Ubuntu 24.04+/26.04 should ship an AppArmor profile granting `userns` rather than disabling `kernel.apparmor_restrict_unprivileged_userns` globally.
-4. **`malloc_trim(0)` A/B Latency Study (Low):** Now executes on `TID_UI` in `OnBeforeClose` (zero GTK main-thread stall), and 100 create/dispose cycles passed cleanly; dedicated A/B PSS-vs-latency profiling of removing `malloc_trim(0)` was not separately run.
+4. **`malloc_trim(0)` A/B Latency Study (Low):** Executes on `TID_UI` in `OnBeforeClose` (zero GTK main-thread stall), and 100 create/dispose cycles passed cleanly; dedicated A/B PSS-vs-latency profiling of removing `malloc_trim(0)` was not separately run.
 5. **Full-Process ASan/TSan with `libcef.so` (Low):** Standalone native ASan+UBSan and TSan covered `cef_texture.cc` and `pending_callbacks.h`; running a full Flutter+CEF process under TSan is impractical with prebuilt non-instrumented `libcef.so` and `libflutter_linux_gtk.so`.
+6. **HTML5 actual audio output and WebRTC data-channel not separately verified (Low):** The compatibility matrix entry documents "API presence verified; open codecs only." CEF 149's `minimal` build includes VP8/VP9/AV1 (video) and Opus/Vorbis (audio) decoders; `--disable-gpu` confines decode to software. Actual audio output with physical speaker measurement and a local-loopback `RTCPeerConnection` / `DataChannel` fixture test were not run in this audit pass. Proprietary codecs (H.264/AAC) are not licensed. Microphone/camera flows are untested.
 
 ---
 
 ## I. Release Decision
 
-**Verdict: `READY WITH DOCUMENTED LIMITATIONS`** (for the refactored `exp/linux-cef-mtml-0.5.6` branch, pending maintainer review and approval to merge into the release branch; all Critical and High findings are resolved and independently verified in the Ubuntu x86_64 VM with CEF `149.0.4`).
+**Verdict: `READY WITH DOCUMENTED LIMITATIONS`**
+
+- All Critical and High defects resolved and verified.
+- Shutdown timeout safety fully verified: both browser closure timeout and TID_UI barrier timeout explicitly transition to `kShutdownFailed` and abort `CefShutdown()`, preventing use-after-free and crash hazards.
+- GTK main thread callback cleanup verified with bounded non-blocking drain loops.
+- Deterministic failure injection verified at both native unit test and integration process levels.
+- Zero orphan subprocesses across all stress, failure-injection, and normal lifecycle cycles.
+- Zero CPU or memory regressions relative to pre-MTML baseline.
 
 ---
 
 ## J. Git Status
 
-- Preserved working baseline: `fix/linux-cef-lifecycle-0.5.6` (intact, untouched).
-- Active refactored branch: `exp/linux-cef-mtml-0.5.6` (uncommitted working changes ready for review).
+- Preserved working baseline: `fix/linux-cef-lifecycle-0.5.6` (`2b493c3` local / `aca408d` VM) — intact, untouched.
+- Active refactored branch: `exp/linux-cef-mtml-0.5.6` — ready for maintainer review.
 - Release branch (`release/0.5.6` / `main`): **untouched**. Nothing has been merged, pushed, tagged, or published.

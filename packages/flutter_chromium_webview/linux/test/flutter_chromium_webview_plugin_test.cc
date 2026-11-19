@@ -1,6 +1,8 @@
 #include <flutter_linux/flutter_linux.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <chrono>
+#include <thread>
 
 #include "include/flutter_chromium_webview/flutter_chromium_webview_plugin.h"
 #include "flutter_chromium_webview_plugin_private.h"
@@ -125,10 +127,177 @@ TEST(CefTexture, ResizingAndConversion) {
 
 TEST(CefRuntimeManager, LifecycleTransitions) {
   auto* runtime = CefRuntimeManager::GetInstance();
-  // Ensure the state starts uninitialized in tests.
+  runtime->ResetForTesting();
   EXPECT_EQ(runtime->GetState(), CefRuntimeState::kUninitialized);
-  // We avoid calling Initialize() since it would spawn real CEF processes,
-  // but we can verify the singleton works.
+  EXPECT_FALSE(runtime->pump_running());
+  EXPECT_FALSE(runtime->shutdown_clean());
+  EXPECT_FALSE(runtime->is_failed());
+
+  // Simulate successful initialization.
+  runtime->SetStateForTesting(CefRuntimeState::kReady);
+  EXPECT_EQ(runtime->GetState(), CefRuntimeState::kReady);
+  EXPECT_TRUE(runtime->pump_running());
+
+  // Clean shutdown without active browsers.
+  runtime->SetSkipCefCallsForTesting(true);
+  runtime->Shutdown();
+  EXPECT_EQ(runtime->GetState(), CefRuntimeState::kShutdownComplete);
+  EXPECT_FALSE(runtime->pump_running());
+  EXPECT_TRUE(runtime->shutdown_clean());
+  EXPECT_FALSE(runtime->is_failed());
+  runtime->ResetForTesting();
+}
+
+TEST(CefRuntimeManager, FailureInjection_BrowserCloseNotificationNeverArrives) {
+  auto* runtime = CefRuntimeManager::GetInstance();
+  runtime->ResetForTesting();
+  runtime->SetStateForTesting(CefRuntimeState::kReady);
+  runtime->SetSkipCefCallsForTesting(true);
+  runtime->SetBrowserTimeoutForTesting(std::chrono::milliseconds(25));
+
+  // Simulate an in-flight browser whose OnBeforeClose never arrives.
+  runtime->BrowserPending();
+  EXPECT_EQ(runtime->browser_count(), 1);
+
+  runtime->Shutdown();
+
+  // Invariant: Must transition to kShutdownFailed and NEVER claim clean shutdown.
+  EXPECT_EQ(runtime->GetState(), CefRuntimeState::kShutdownFailed);
+  EXPECT_TRUE(runtime->is_failed());
+  EXPECT_FALSE(runtime->shutdown_clean());
+  EXPECT_FALSE(runtime->pump_running());
+  EXPECT_EQ(runtime->browser_count(), 1); // Preserves exact count for diagnostics.
+  runtime->ResetForTesting();
+}
+
+TEST(CefRuntimeManager, FailureInjection_BrowserClosureDelayedPastTimeout) {
+  auto* runtime = CefRuntimeManager::GetInstance();
+  runtime->ResetForTesting();
+  runtime->SetStateForTesting(CefRuntimeState::kReady);
+  runtime->SetSkipCefCallsForTesting(true);
+  runtime->SetBrowserTimeoutForTesting(std::chrono::milliseconds(25));
+
+  runtime->BrowserPending();
+
+  // Worker thread simulates late close arriving after the deadline.
+  std::thread late_closer([runtime]() {
+    std::this_thread::sleep_for(std::chrono::milliseconds(75));
+    runtime->BrowserClosed();
+  });
+
+  runtime->Shutdown();
+
+  EXPECT_EQ(runtime->GetState(), CefRuntimeState::kShutdownFailed);
+  EXPECT_TRUE(runtime->is_failed());
+
+  late_closer.join();
+
+  // Late notification must not revive state or trigger CefShutdown().
+  EXPECT_EQ(runtime->GetState(), CefRuntimeState::kShutdownFailed);
+  runtime->ResetForTesting();
+}
+
+TEST(CefRuntimeManager, FailureInjection_CefUiBarrierTimeoutFailsWithoutCefShutdown) {
+  auto* runtime = CefRuntimeManager::GetInstance();
+  runtime->ResetForTesting();
+  runtime->SetStateForTesting(CefRuntimeState::kReady);
+  runtime->SetSkipCefCallsForTesting(true);
+  runtime->SetBarrierTimeoutForTesting(std::chrono::milliseconds(25));
+  runtime->SetInjectBarrierBlockForTesting(true);
+
+  // active_browsers_ is 0, but barrier will time out.
+  EXPECT_EQ(runtime->browser_count(), 0);
+
+  runtime->Shutdown();
+
+  // Invariant: Proceeding into CefShutdown on barrier timeout is unsafe.
+  // Must fail explicitly.
+  EXPECT_EQ(runtime->GetState(), CefRuntimeState::kShutdownFailed);
+  EXPECT_TRUE(runtime->is_failed());
+  EXPECT_FALSE(runtime->shutdown_clean());
+  runtime->ResetForTesting();
+}
+
+TEST(CefRuntimeManager, FailureInjection_ShutdownRequestedTwiceIsIdempotent) {
+  auto* runtime = CefRuntimeManager::GetInstance();
+  runtime->ResetForTesting();
+  runtime->SetStateForTesting(CefRuntimeState::kReady);
+  runtime->SetSkipCefCallsForTesting(true);
+
+  runtime->Shutdown();
+  EXPECT_EQ(runtime->GetState(), CefRuntimeState::kShutdownComplete);
+
+  // Second shutdown call must be a safe no-op.
+  runtime->Shutdown();
+  EXPECT_EQ(runtime->GetState(), CefRuntimeState::kShutdownComplete);
+  EXPECT_TRUE(runtime->shutdown_clean());
+  runtime->ResetForTesting();
+}
+
+TEST(CefRuntimeManager, FailureInjection_CloseCallbackArrivesJustBeforeTimeout) {
+  auto* runtime = CefRuntimeManager::GetInstance();
+  runtime->ResetForTesting();
+  runtime->SetStateForTesting(CefRuntimeState::kReady);
+  runtime->SetSkipCefCallsForTesting(true);
+  runtime->SetBrowserTimeoutForTesting(std::chrono::milliseconds(150));
+
+  runtime->BrowserPending();
+
+  // Notification arrives well before 150 ms deadline.
+  std::thread prompt_closer([runtime]() {
+    std::this_thread::sleep_for(std::chrono::milliseconds(25));
+    runtime->BrowserClosed();
+  });
+
+  runtime->Shutdown();
+  prompt_closer.join();
+
+  EXPECT_EQ(runtime->GetState(), CefRuntimeState::kShutdownComplete);
+  EXPECT_TRUE(runtime->shutdown_clean());
+  runtime->ResetForTesting();
+}
+
+TEST(CefRuntimeManager, FailureInjection_DrainsPendingGtkCallbacksBeforeShutdown) {
+  auto* runtime = CefRuntimeManager::GetInstance();
+  runtime->ResetForTesting();
+  runtime->SetStateForTesting(CefRuntimeState::kReady);
+  runtime->SetSkipCefCallsForTesting(true);
+
+  bool gtk_callback_executed = false;
+  CefRuntimeManager::PostToGtkMain([&gtk_callback_executed]() {
+    gtk_callback_executed = true;
+  });
+
+  EXPECT_FALSE(gtk_callback_executed);
+
+  // Shutdown must drain ready GMainContext sources via bounded iteration.
+  runtime->Shutdown();
+
+  EXPECT_TRUE(gtk_callback_executed);
+  EXPECT_EQ(runtime->GetState(), CefRuntimeState::kShutdownComplete);
+  runtime->ResetForTesting();
+}
+
+TEST(CefRuntimeManager, FailureInjection_ReinitializationPreventedInTerminalStates) {
+  auto* runtime = CefRuntimeManager::GetInstance();
+  runtime->ResetForTesting();
+
+  // 1. After kShutdownFailed
+  runtime->SetStateForTesting(CefRuntimeState::kShutdownFailed);
+  EXPECT_FALSE(runtime->Initialize("/tmp/cache", 0, nullptr));
+  EXPECT_EQ(runtime->GetState(), CefRuntimeState::kShutdownFailed);
+
+  // 2. After kShutdownComplete
+  runtime->SetStateForTesting(CefRuntimeState::kShutdownComplete);
+  EXPECT_FALSE(runtime->Initialize("/tmp/cache", 0, nullptr));
+  EXPECT_EQ(runtime->GetState(), CefRuntimeState::kShutdownComplete);
+
+  // 3. After kInitFailed
+  runtime->SetStateForTesting(CefRuntimeState::kInitFailed);
+  EXPECT_FALSE(runtime->Initialize("/tmp/cache", 0, nullptr));
+  EXPECT_EQ(runtime->GetState(), CefRuntimeState::kInitFailed);
+
+  runtime->ResetForTesting();
 }
 
 }  // namespace test
