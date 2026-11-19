@@ -328,236 +328,287 @@ void main() {
     expect(finalFocusCalls, greaterThanOrEqualTo(1));
   });
 
-  test('DETACHED stops subsequent calls cleanly without swallowing other errors', () async {
-    final calls = <String>[];
-    var detached = false;
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(
-          const MethodChannel('flutter_chromium_webview'),
-          (MethodCall methodCall) async {
-            calls.add(methodCall.method);
-            if (methodCall.method == 'createBrowser') {
-              return {'browserId': 77, 'textureId': 770, 'popupTextureId': -1};
-            }
-            if (methodCall.method == 'loadRequest') {
-              throw PlatformException(
-                code: 'INVALID_URL',
-                message: 'URL must not be empty',
-              );
-            }
-            if (detached) {
-              throw PlatformException(
-                code: 'DETACHED',
-                message: 'Flutter view has been detached',
-              );
-            }
-            return null;
-          },
-        );
-
-    final controller = ChromiumWebViewController();
-    await controller.createBrowser();
-
-    // Unrelated PlatformExceptions must still propagate.
-    await expectLater(
-      controller.loadRequest('   '),
-      throwsA(
-        isA<PlatformException>().having((e) => e.code, 'code', 'INVALID_URL'),
-      ),
-    );
-
-    // Once native reports DETACHED, the failing call completes cleanly and
-    // subsequent platform calls (including dispose) are skipped.
-    detached = true;
-    calls.clear();
-    await controller.executeJavaScript('console.log(1);');
-    expect(calls, ['executeJavaScript']);
-
-    await controller.reload();
-    await controller.setFocus(false);
-    await controller.dispose();
-    expect(calls, ['executeJavaScript']);
-  });
-
-  test('Disposal during in-flight JavaScript execution completes cleanly', () async {
-    final jsCompleter = Completer<void>();
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(
-          const MethodChannel('flutter_chromium_webview'),
-          (MethodCall call) async {
-            log.add(call);
-            if (call.method == 'createBrowser') {
-              return {'browserId': 1, 'textureId': 101, 'popupTextureId': 201};
-            }
-            if (call.method == 'executeJavaScript') {
-              await jsCompleter.future;
+  test(
+    'DETACHED stops subsequent calls cleanly without swallowing other errors',
+    () async {
+      final calls = <String>[];
+      var detached = false;
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+            const MethodChannel('flutter_chromium_webview'),
+            (MethodCall methodCall) async {
+              calls.add(methodCall.method);
+              if (methodCall.method == 'createBrowser') {
+                return {
+                  'browserId': 77,
+                  'textureId': 770,
+                  'popupTextureId': -1,
+                };
+              }
+              if (methodCall.method == 'loadRequest') {
+                throw PlatformException(
+                  code: 'INVALID_URL',
+                  message: 'URL must not be empty',
+                );
+              }
+              if (detached) {
+                throw PlatformException(
+                  code: 'DETACHED',
+                  message: 'Flutter view has been detached',
+                );
+              }
               return null;
-            }
-            return null;
-          },
-        );
+            },
+          );
 
-    final controller = ChromiumWebViewController();
-    await controller.createBrowser();
+      final controller = ChromiumWebViewController();
+      await controller.createBrowser();
 
-    final jsFuture = controller.executeJavaScript('1 + 1');
-    await Future<void>.delayed(Duration.zero);
-    final disposeFuture = controller.dispose();
-    jsCompleter.complete();
-    await Future.wait([jsFuture, disposeFuture]);
+      // Unrelated PlatformExceptions must still propagate.
+      await expectLater(
+        controller.loadRequest('   '),
+        throwsA(
+          isA<PlatformException>().having((e) => e.code, 'code', 'INVALID_URL'),
+        ),
+      );
 
-    expect(log.where((c) => c.method == 'disposeBrowser'), hasLength(1));
-    await controller.executeJavaScript('2 + 2');
-    expect(log.where((c) => c.method == 'executeJavaScript'), hasLength(1));
-  });
+      // Once native reports DETACHED, the failing call completes cleanly and
+      // subsequent platform calls (including dispose) are skipped.
+      detached = true;
+      calls.clear();
+      await controller.executeJavaScript('console.log(1);');
+      expect(calls, ['executeJavaScript']);
 
-  test('Double disposal (concurrent and sequential) only disposes native browser once', () async {
-    final disposeCompleter = Completer<void>();
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(
-          const MethodChannel('flutter_chromium_webview'),
-          (MethodCall call) async {
-            log.add(call);
-            if (call.method == 'createBrowser') {
-              return {'browserId': 1, 'textureId': 101, 'popupTextureId': 201};
-            }
-            if (call.method == 'disposeBrowser') {
-              await disposeCompleter.future;
+      await controller.reload();
+      await controller.setFocus(false);
+      await controller.dispose();
+      expect(calls, ['executeJavaScript']);
+    },
+  );
+
+  test(
+    'Disposal during in-flight JavaScript execution completes cleanly',
+    () async {
+      final jsCompleter = Completer<void>();
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+            const MethodChannel('flutter_chromium_webview'),
+            (MethodCall call) async {
+              log.add(call);
+              if (call.method == 'createBrowser') {
+                return {
+                  'browserId': 1,
+                  'textureId': 101,
+                  'popupTextureId': 201,
+                };
+              }
+              if (call.method == 'executeJavaScript') {
+                await jsCompleter.future;
+                return null;
+              }
               return null;
-            }
-            return null;
-          },
-        );
+            },
+          );
 
-    final controller = ChromiumWebViewController();
-    await controller.createBrowser();
+      final controller = ChromiumWebViewController();
+      await controller.createBrowser();
 
-    final d1 = controller.dispose();
-    final d2 = controller.dispose();
-    disposeCompleter.complete();
-    await Future.wait([d1, d2]);
-    await controller.dispose();
+      final jsFuture = controller.executeJavaScript('1 + 1');
+      await Future<void>.delayed(Duration.zero);
+      final disposeFuture = controller.dispose();
+      jsCompleter.complete();
+      await Future.wait([jsFuture, disposeFuture]);
 
-    expect(log.where((c) => c.method == 'disposeBrowser'), hasLength(1));
-  });
+      expect(log.where((c) => c.method == 'disposeBrowser'), hasLength(1));
+      await controller.executeJavaScript('2 + 2');
+      expect(log.where((c) => c.method == 'executeJavaScript'), hasLength(1));
+    },
+  );
 
-  test('Platform detachment during navigation completes cleanly and stops subsequent calls', () async {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(
-          const MethodChannel('flutter_chromium_webview'),
-          (MethodCall call) async {
-            log.add(call);
-            if (call.method == 'createBrowser') {
-              return {'browserId': 1, 'textureId': 101, 'popupTextureId': 201};
-            }
-            if (call.method == 'loadRequest') {
-              throw PlatformException(
-                code: 'DETACHED',
-                message: 'Flutter view has been detached',
-              );
-            }
-            return null;
-          },
-        );
+  test(
+    'Double disposal (concurrent and sequential) only disposes native browser once',
+    () async {
+      final disposeCompleter = Completer<void>();
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+            const MethodChannel('flutter_chromium_webview'),
+            (MethodCall call) async {
+              log.add(call);
+              if (call.method == 'createBrowser') {
+                return {
+                  'browserId': 1,
+                  'textureId': 101,
+                  'popupTextureId': 201,
+                };
+              }
+              if (call.method == 'disposeBrowser') {
+                await disposeCompleter.future;
+                return null;
+              }
+              return null;
+            },
+          );
 
-    final controller = ChromiumWebViewController();
-    await controller.createBrowser();
-    await controller.loadRequest('https://example.com');
-    await controller.goBack();
-    await controller.dispose();
+      final controller = ChromiumWebViewController();
+      await controller.createBrowser();
 
-    expect(log.map((c) => c.method).toList(), ['createBrowser', 'loadRequest']);
-  });
+      final d1 = controller.dispose();
+      final d2 = controller.dispose();
+      disposeCompleter.complete();
+      await Future.wait([d1, d2]);
+      await controller.dispose();
 
-  test('Closing during browser initialization disposes native browser once created', () async {
-    final created = Completer<Map<String, int>>();
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(
-          const MethodChannel('flutter_chromium_webview'),
-          (MethodCall call) async {
-            log.add(call);
-            if (call.method == 'createBrowser') return created.future;
-            return null;
-          },
-        );
+      expect(log.where((c) => c.method == 'disposeBrowser'), hasLength(1));
+    },
+  );
 
-    final controller = ChromiumWebViewController();
-    final initFuture = controller.createBrowser();
-    final disposeFuture = controller.dispose();
+  test(
+    'Platform detachment during navigation completes cleanly and stops subsequent calls',
+    () async {
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+            const MethodChannel('flutter_chromium_webview'),
+            (MethodCall call) async {
+              log.add(call);
+              if (call.method == 'createBrowser') {
+                return {
+                  'browserId': 1,
+                  'textureId': 101,
+                  'popupTextureId': 201,
+                };
+              }
+              if (call.method == 'loadRequest') {
+                throw PlatformException(
+                  code: 'DETACHED',
+                  message: 'Flutter view has been detached',
+                );
+              }
+              return null;
+            },
+          );
 
-    created.complete({'browserId': 42, 'textureId': 142, 'popupTextureId': 242});
-    await Future.wait([initFuture, disposeFuture]);
+      final controller = ChromiumWebViewController();
+      await controller.createBrowser();
+      await controller.loadRequest('https://example.com');
+      await controller.goBack();
+      await controller.dispose();
 
-    final disposeCalls = log.where((c) => c.method == 'disposeBrowser').toList();
-    expect(disposeCalls, hasLength(1));
-    expect((disposeCalls.single.arguments as Map)['browserId'], 42);
-  });
+      expect(log.map((c) => c.method).toList(), [
+        'createBrowser',
+        'loadRequest',
+      ]);
+    },
+  );
 
-  test('Multiple controllers dispose independently without cross-interference', () async {
-    final c1 = ChromiumWebViewController();
-    final c2 = ChromiumWebViewController();
-    final c3 = ChromiumWebViewController();
-    await Future.wait([c1.createBrowser(), c2.createBrowser(), c3.createBrowser()]);
+  test(
+    'Closing during browser initialization disposes native browser once created',
+    () async {
+      final created = Completer<Map<String, int>>();
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+            const MethodChannel('flutter_chromium_webview'),
+            (MethodCall call) async {
+              log.add(call);
+              if (call.method == 'createBrowser') return created.future;
+              return null;
+            },
+          );
 
-    await Future.wait([c1.dispose(), c3.dispose()]);
-    await c2.loadRequest('https://still-alive.example');
+      final controller = ChromiumWebViewController();
+      final initFuture = controller.createBrowser();
+      final disposeFuture = controller.dispose();
 
-    final disposedIds = log
-        .where((c) => c.method == 'disposeBrowser')
-        .map((c) => (c.arguments as Map)['browserId'])
-        .toSet();
-    expect(disposedIds, {1, 3});
-    expect(
-      log.where((c) => c.method == 'loadRequest').map((c) => (c.arguments as Map)['browserId']),
-      [2],
-    );
-    await c2.dispose();
-  });
+      created.complete({
+        'browserId': 42,
+        'textureId': 142,
+        'popupTextureId': 242,
+      });
+      await Future.wait([initFuture, disposeFuture]);
 
-  testWidgets('Native callbacks arriving after controller destruction are ignored', (tester) async {
-    final controller = ChromiumWebViewController();
-    await controller.createBrowser();
+      final disposeCalls = log
+          .where((c) => c.method == 'disposeBrowser')
+          .toList();
+      expect(disposeCalls, hasLength(1));
+      expect((disposeCalls.single.arguments as Map)['browserId'], 42);
+    },
+  );
 
-    var callbackCount = 0;
-    controller.onUrlChanged = (_) => callbackCount++;
-    controller.onTitleChanged = (_) => callbackCount++;
-    controller.onLoadingStateChanged = (_, _, _) => callbackCount++;
-    controller.onLoadError = (_, _, _) => callbackCount++;
-    controller.onNewWindowRequested = (_) => callbackCount++;
-    controller.onJSDialog = (_) async {
-      callbackCount++;
-      return const JSDialogResponse(success: true);
-    };
+  test(
+    'Multiple controllers dispose independently without cross-interference',
+    () async {
+      final c1 = ChromiumWebViewController();
+      final c2 = ChromiumWebViewController();
+      final c3 = ChromiumWebViewController();
+      await Future.wait([
+        c1.createBrowser(),
+        c2.createBrowser(),
+        c3.createBrowser(),
+      ]);
 
-    await controller.dispose();
+      await Future.wait([c1.dispose(), c3.dispose()]);
+      await c2.loadRequest('https://still-alive.example');
 
-    await sendNativeEvent(1, 'urlChanged', {'url': 'https://stale.example'});
-    await sendNativeEvent(1, 'titleChanged', {'title': 'Stale'});
-    await sendNativeEvent(1, 'loadingStateChanged', {
-      'isLoading': false,
-      'canGoBack': true,
-      'canGoForward': false,
-    });
-    await sendNativeEvent(1, 'loadError', {
-      'errorCode': -2,
-      'errorText': 'FAILED',
-      'failedUrl': 'https://stale.example',
-    });
-    await sendNativeEvent(1, 'newWindowRequested', {
-      'url': 'https://popup.example',
-      'targetFrameName': '_blank',
-      'targetDisposition': 1,
-      'userGesture': true,
-    });
-    await sendNativeEvent(1, 'jsDialog', {
-      'dialogId': 7,
-      'type': 0,
-      'message': 'late',
-      'defaultPrompt': '',
-    });
-    await tester.pump();
+      final disposedIds = log
+          .where((c) => c.method == 'disposeBrowser')
+          .map((c) => (c.arguments as Map)['browserId'])
+          .toSet();
+      expect(disposedIds, {1, 3});
+      expect(
+        log
+            .where((c) => c.method == 'loadRequest')
+            .map((c) => (c.arguments as Map)['browserId']),
+        [2],
+      );
+      await c2.dispose();
+    },
+  );
 
-    expect(callbackCount, 0);
-  });
+  testWidgets(
+    'Native callbacks arriving after controller destruction are ignored',
+    (tester) async {
+      final controller = ChromiumWebViewController();
+      await controller.createBrowser();
+
+      var callbackCount = 0;
+      controller.onUrlChanged = (_) => callbackCount++;
+      controller.onTitleChanged = (_) => callbackCount++;
+      controller.onLoadingStateChanged = (_, _, _) => callbackCount++;
+      controller.onLoadError = (_, _, _) => callbackCount++;
+      controller.onNewWindowRequested = (_) => callbackCount++;
+      controller.onJSDialog = (_) async {
+        callbackCount++;
+        return const JSDialogResponse(success: true);
+      };
+
+      await controller.dispose();
+
+      await sendNativeEvent(1, 'urlChanged', {'url': 'https://stale.example'});
+      await sendNativeEvent(1, 'titleChanged', {'title': 'Stale'});
+      await sendNativeEvent(1, 'loadingStateChanged', {
+        'isLoading': false,
+        'canGoBack': true,
+        'canGoForward': false,
+      });
+      await sendNativeEvent(1, 'loadError', {
+        'errorCode': -2,
+        'errorText': 'FAILED',
+        'failedUrl': 'https://stale.example',
+      });
+      await sendNativeEvent(1, 'newWindowRequested', {
+        'url': 'https://popup.example',
+        'targetFrameName': '_blank',
+        'targetDisposition': 1,
+        'userGesture': true,
+      });
+      await sendNativeEvent(1, 'jsDialog', {
+        'dialogId': 7,
+        'type': 0,
+        'message': 'late',
+        'defaultPrompt': '',
+      });
+      await tester.pump();
+
+      expect(callbackCount, 0);
+    },
+  );
 }
-

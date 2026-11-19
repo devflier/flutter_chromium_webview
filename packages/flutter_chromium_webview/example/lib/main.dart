@@ -154,11 +154,13 @@ class _BrowserScreenState extends State<BrowserScreen> {
         return;
       }
       unawaited(
-        _controller.executeJavaScript(
-          "window.chromiumPostMessage('TestChannel', 'Hello from JS bridge loop!');",
-        ).catchError((Object error) {
-          debugPrint('Periodic JS bridge skipped: $error');
-        }),
+        _controller
+            .executeJavaScript(
+              "window.chromiumPostMessage('TestChannel', 'Hello from JS bridge loop!');",
+            )
+            .catchError((Object error) {
+              debugPrint('Periodic JS bridge skipped: $error');
+            }),
       );
     });
 
