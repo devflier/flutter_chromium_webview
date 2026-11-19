@@ -162,7 +162,8 @@ Automated verification (`test_linux_stress_and_compat.sh`, 20 checks + 7 Flutter
 | Ubuntu 26.04.1 LTS x86_64 (XWayland / `GDK_BACKEND=x11`) | **PASS** | Full validation, lifecycle, stress, sanitizers, benchmarks |
 | Standalone release bundle outside checkout | **PASS** | `1.5 GB` uncompressed; `$ORIGIN` RUNPATH on all ELFs; `ldd` clean; executable perms verified (`0755`) |
 | Native Wayland (`GDK_BACKEND=wayland`, VirtualBox VMSVGA) | **NOT RUN / BLOCKED** | CEF explicitly pins `--ozone-platform=x11`; `LINUX.md` documents `GDK_BACKEND=x11` |
-| Ubuntu 24.04 LTS / Debian 12 / Fedora x86_64 | **NOT RUN** | Not provisioned in current VM environment |
+| Ubuntu 24.04 LTS (GitHub Actions `ubuntu-latest`) | **PASS** | Automated CI workflow run #44529512618 (`validate_linux.sh` passed in 8m32s) |
+| Debian 12 / Fedora x86_64 | **NOT RUN** | Not provisioned in test environments |
 
 ---
 
@@ -199,7 +200,7 @@ Automated verification (`test_linux_stress_and_compat.sh`, 20 checks + 7 Flutter
 
 ## H. Remaining Issues & Documented Limitations
 
-1. **Cross-Distribution Linux Testing (`NOT RUN` — Medium):** Verified on Ubuntu `26.04.1 LTS` x86_64 only. Ubuntu `24.04 LTS`, Debian 12, and Fedora x86_64 were not executed in this environment and should be verified in CI before broad distro claims.
+1. **Cross-Distribution Linux Testing (Low):** Independently verified on Ubuntu `26.04.1 LTS` x86_64 (VirtualBox VM) and Ubuntu `24.04 LTS` x86_64 (GitHub Actions runner `ubuntu-latest`, run #44529512618). Non-Debian distributions (such as Fedora/RPM-based) and pure Debian 12 have not been verified in dedicated matrix environments.
 2. **Wayland / X11 Constraint (Documented Limitation — Low):** CEF explicitly uses `--ozone-platform=x11` and software OSR (`--disable-gpu`, `--disable-gpu-compositing`); Wayland hosts run via XWayland (`GDK_BACKEND=x11`).
 3. **Ubuntu AppArmor Unprivileged User Namespaces (Documented Limitation — Low):** Packaged Linux apps on Ubuntu 24.04+/26.04 should ship an AppArmor profile granting `userns` rather than disabling `kernel.apparmor_restrict_unprivileged_userns` globally.
 4. **`malloc_trim(0)` A/B Latency Study (Low):** Now executes on `TID_UI` in `OnBeforeClose` (zero GTK main-thread stall), and 100 create/dispose cycles passed cleanly; dedicated A/B PSS-vs-latency profiling of removing `malloc_trim(0)` was not separately run.
