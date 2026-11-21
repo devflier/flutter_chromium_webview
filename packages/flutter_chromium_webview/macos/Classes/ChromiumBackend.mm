@@ -162,7 +162,9 @@ static void StartSurfacePortListener() {
                     NSLog(@"[ChromiumBackend] Failed to lookup IOSurface from mach port");
                     continue;
                 }
+#if DEBUG
                 NSLog(@"[ChromiumBackend] Successfully looked up IOSurface %p for slot %u, browserId %llu", surface, slot, browserId);
+#endif
                 
                 dispatch_async(dispatch_get_main_queue(), ^{
                     for (auto* core : cores) {
@@ -194,7 +196,7 @@ void Runtime::Initialize(NSString* cache, NSString* keychainBehavior, std::funct
   attempted_ = true;
   
   Runtime* _this = this;
-  [[ChromiumHostManager sharedManager] launchHostWithKeychainBehavior:keychainBehavior completion:^(BOOL success, NSError *error) {
+  [[ChromiumHostManager sharedManager] launchHostWithCachePath:cache keychainBehavior:keychainBehavior completion:^(BOOL success, NSError *error) {
       if (success) {
           _this->ready_ = true;
           if (completion) completion(true, nil);
@@ -527,6 +529,11 @@ void Core::Handle(FlutterMethodCall* call, FlutterResult result) {
     
     msg.type = "setFocus";
     msg.payload = @{@"browserId": @(id), @"focused": @(Number(args, @"focused") != 0)};
+    [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:nil];
+  } else if ([method isEqualToString:@"setRenderingActive"]) {
+    const bool active = Number(args, @"active", 1) != 0;
+    msg.type = "setRenderingActive";
+    msg.payload = @{@"browserId": @(id), @"active": @(active)};
     [[ChromiumHostManager sharedManager].ipcClient sendMessage:msg responseCallback:nil];
   } else if ([method isEqualToString:@"closeJSDialog"] || [method isEqualToString:@"closeContextMenu"]) {
     msg.type = [method UTF8String];

@@ -80,7 +80,7 @@ class Policy {
 
 class PostMessage : public CefV8Handler {
  public:
-  explicit PostMessage(std::string origin) : origin_(std::move(origin)) {}
+  explicit PostMessage(std::string origin = "") : origin_(std::move(origin)) {}
   bool Execute(const CefString&, CefRefPtr<CefV8Value>,
       const CefV8ValueList& args, CefRefPtr<CefV8Value>& result,
       CefString& exception) override {
@@ -96,12 +96,24 @@ class PostMessage : public CefV8Handler {
     }
     auto frame = CefV8Context::GetCurrentContext()->GetFrame();
     if (!frame || !frame->IsMain()) { result = CefV8Value::CreateBool(false); return true; }
+
+    std::string origin = origin_;
+    if (origin.empty()) {
+      auto ctx = CefV8Context::GetCurrentContext();
+      auto security_origin = ctx ? ctx->GetGlobal()->GetValue("origin") : nullptr;
+      if (security_origin && security_origin->IsString()) {
+        origin = security_origin->GetStringValue().ToString();
+      } else {
+        origin = Origin(frame->GetURL().ToString());
+      }
+    }
+
     auto message = CefProcessMessage::Create(kMessage);
     auto values = message->GetArgumentList();
     values->SetString(0, channel);
     values->SetString(1, text);
     values->SetString(2, frame->GetURL());
-    values->SetString(3, origin_);
+    values->SetString(3, origin);
     frame->SendProcessMessage(PID_BROWSER, message);
     // Acceptance is asynchronous. This return value only confirms dispatch.
     result = CefV8Value::CreateBool(true);
@@ -123,8 +135,12 @@ class RendererApp : public CefApp, public CefRenderProcessHandler {
     // Window.origin reflects a sandboxed document's actual security origin;
     // location/frame URLs alone can still look like trusted HTTP URLs.
     auto security_origin = context->GetGlobal()->GetValue("origin");
-    if (origin.empty() || !security_origin || !security_origin->IsString() ||
-        security_origin->GetStringValue().ToString() != origin) return;
+    if (security_origin && security_origin->IsString() && !origin.empty() &&
+        security_origin->GetStringValue().ToString() != origin) {
+      // CSP-sandboxed document with opaque origin ("null") or mismatched origin:
+      // do not expose the native host bridge.
+      return;
+    }
     
     context->GetGlobal()->SetValue("chromiumPostMessage",
       CefV8Value::CreateFunction("chromiumPostMessage", new PostMessage(origin)),

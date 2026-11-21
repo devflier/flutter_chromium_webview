@@ -1,6 +1,7 @@
 #import "ChromiumHostApp.h"
 #import "IpcConnection.h"
 #import "HostBrowserClient.h"
+#include "../../native/chromium_flags.h"
 
 @interface ChromiumHostAppDelegate : NSObject <IpcServerDelegate, IpcConnectionDelegate>
 @property (nonatomic, strong) IpcServer* server;
@@ -45,7 +46,9 @@
 }
 
 - (void)connection:(IpcConnection*)connection didReceiveMessage:(const IPC::Message&)message {
+#if DEBUG
     NSLog(@"[CEFHost] Received message of type: %s", message.type.c_str());
+#endif
     if (!self.isHandshakeDone) {
         if (message.type == "hello") {
             NSString* token = message.payload[@"token"];
@@ -271,6 +274,12 @@
                 session->browser->GetHost()->SetFocus(focused);
             }
         });
+    } else if (message.type == "setRenderingActive") {
+        int64_t browserId = [message.payload[@"browserId"] longLongValue];
+        bool active = message.payload[@"active"] ? [message.payload[@"active"] boolValue] : true;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.browserClient->SetRenderingActive(browserId, active);
+        });
     } else if (message.type == "sendKeyEvent" || message.type == "keyDown" ||
                message.type == "keyUp" || message.type == "textInput") {
         int64_t browserId = [message.payload[@"browserId"] longLongValue];
@@ -402,8 +411,11 @@ void ChromiumHostApp::OnBeforeCommandLineProcessing(const CefString& process_typ
     // If "--use-system-keychain" or CEF_KEYCHAIN_BEHAVIOR=system is explicitly configured,
     // allow Chromium to use the macOS system keychain.
     const char* envKeychain = getenv("CEF_KEYCHAIN_BEHAVIOR");
+    const char* testMockKeychain = getenv("CEF_INPUT_TEST_USE_MOCK_KEYCHAIN");
     bool forceSystem = (envKeychain && strcmp(envKeychain, "system") == 0) || command_line->HasSwitch("use-system-keychain");
-    bool forceMock = (envKeychain && strcmp(envKeychain, "mock") == 0) || command_line->HasSwitch("use-mock-keychain");
+    bool forceMock = (envKeychain && strcmp(envKeychain, "mock") == 0) ||
+                     (testMockKeychain && strcmp(testMockKeychain, "1") == 0) ||
+                     command_line->HasSwitch("use-mock-keychain");
 
     if (forceSystem && !forceMock) {
         command_line->AppendSwitchWithValue("password-store", "keychain");
@@ -414,14 +426,9 @@ void ChromiumHostApp::OnBeforeCommandLineProcessing(const CefString& process_typ
 
     // Hosts that publish their own native media controls can opt out of
     // Chromium's separate OS session, including cross-origin iframe sessions.
-    std::string disabled_features = command_line->GetSwitchValue("disable-features").ToString();
-    if (!disabled_features.empty()) disabled_features += ",";
-    disabled_features += "Accessibility";
-    const char* systemMediaControls = getenv("CEF_SYSTEM_MEDIA_CONTROLS");
-    if (systemMediaControls && strcmp(systemMediaControls, "0") == 0) {
-        disabled_features += ",HardwareMediaKeyHandling,MediaSessionService";
-    }
-    command_line->AppendSwitchWithValue("disable-features", disabled_features);
+    chromium_flags::AppendDisabledFeatures(command_line, "Accessibility");
+    chromium_flags::ApplyLowMemoryProfile(process_type, command_line);
+    chromium_flags::ApplySystemMediaControlsPolicy(command_line);
     command_line->AppendSwitch("disable-renderer-accessibility");
     command_line->AppendSwitch("ignore-gpu-blocklist");
     command_line->AppendSwitch("enable-gpu");

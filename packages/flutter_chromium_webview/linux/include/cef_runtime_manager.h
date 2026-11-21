@@ -10,13 +10,56 @@
 #include <glib.h>
 #include "include/cef_app.h"
 
+// State of the process-global CEF runtime.
+//
+// Legal transitions (all state writes happen on the GTK/Flutter main thread):
+//
+//   kUninitialized -> kInitializing  (Initialize() entered)
+//   kInitializing  -> kReady         (CefInitialize() succeeded)
+//   kInitializing  -> kInitFailed    (CefInitialize() returned false; terminal)
+//
+//   kReady -> kClosingBrowsers       (Shutdown() entered; waiting for browsers)
+//   kClosingBrowsers -> kShutdownFailed  (5 s wait expired; browsers still live;
+//                                        CefShutdown() NOT called; terminal)
+//   kClosingBrowsers -> kDrainingTasks   (active_browsers_ reached 0;
+//                                        TID_UI barrier task posted)
+//   kDrainingTasks -> kShutdownFailed    (2 s barrier wait expired;
+//                                        CefShutdown() NOT called; terminal)
+//   kDrainingTasks -> kShutdownComplete  (barrier completed; CefShutdown()
+//                                        called and returned; terminal)
+//
+// kShutdownComplete is the ONLY terminal state in which CefShutdown() ran.
+// kShutdownFailed means cleanup was aborted; no further CEF API calls are safe.
+// kInitFailed is set by a failed CefInitialize(); CEF was never live.
 enum class CefRuntimeState {
   kUninitialized,
   kInitializing,
   kReady,
-  kShuttingDown,
-  kShutdown
+  kClosingBrowsers,  // waiting for active_browsers_ == 0
+  kDrainingTasks,    // TID_UI round-trip barrier in flight
+  kShutdownComplete, // CefShutdown() completed normally
+  kInitFailed,       // CefInitialize() returned false
+  kShutdownFailed,   // browser-close or barrier timed out; CefShutdown() skipped
 };
+
+// Inputs used to evaluate whether Chromium's inner user-namespace sandbox may
+// be disabled inside an outer Linux container (Snap or Flatpak).
+//
+// Security invariant: disabling the inner sandbox requires BOTH an explicit
+// host opt-in (FLUTTER_CHROMIUM_WEBVIEW_ALLOW_CONTAINER_NO_SANDBOX=1) AND a
+// verified Snap or Flatpak container environment. Normal Linux installations
+// (.deb, AppImage, local builds) always retain Chromium's native sandbox.
+struct ContainerSandboxInputs {
+  bool allow_container_no_sandbox = false;
+  bool snap_env_set = false;
+  bool snap_name_set = false;
+  bool snap_dir_exists = false;
+  bool flatpak_id_set = false;
+  bool flatpak_info_exists = false;
+};
+
+bool ShouldDisableInnerSandboxForContainer(const ContainerSandboxInputs& inputs);
+bool ShouldDisableInnerSandboxForCurrentProcess();
 
 // Manages the process-global CEF runtime on Linux using CEF's dedicated
 // multi-threaded message loop (multi_threaded_message_loop = true).
@@ -34,20 +77,34 @@ class CefRuntimeManager {
   // Initializes CEF globally. Should only be called once on the GTK main thread.
   bool Initialize(const std::string& cache_path, int argc, char** argv);
 
-  // Waits for all active/pending browsers to close on TID_UI, drains pending
-  // TID_UI tasks via a barrier, and runs CefShutdown() on the GTK main thread.
+  // Attempts a safe, bounded CEF shutdown on the GTK main thread:
+  //   1. Waits up to 5 s for active_browsers_ == 0.
+  //   2. Waits up to 2 s for a TID_UI round-trip barrier.
+  //   3. Calls CefShutdown() only if both waits succeeded.
+  // Sets kShutdownFailed without calling CefShutdown() on any timeout.
   void Shutdown();
 
   CefRuntimeState GetState() const { return state_.load(std::memory_order_acquire); }
+
+  // Returns true only when CEF's UI message loop is live and accepting tasks.
+  bool pump_running() const { return state_.load(std::memory_order_acquire) == CefRuntimeState::kReady; }
+
+  // Returns true only after a clean, complete CefShutdown().
+  bool shutdown_clean() const {
+    return state_.load(std::memory_order_acquire) == CefRuntimeState::kShutdownComplete;
+  }
+
+  // Returns true in any terminal failure state (init or shutdown failure).
+  bool is_failed() const {
+    const auto s = state_.load(std::memory_order_acquire);
+    return s == CefRuntimeState::kInitFailed || s == CefRuntimeState::kShutdownFailed;
+  }
 
   // Tracks both in-flight creation requests and open browser instances so
   // Shutdown() never races with CreateBrowser or OnBeforeClose.
   void BrowserPending();
   void BrowserClosed();
   int browser_count() const { return active_browsers_.load(std::memory_order_acquire); }
-
-  // True while CEF's dedicated UI message loop is initialized and active.
-  bool pump_running() const { return state_.load(std::memory_order_acquire) == CefRuntimeState::kReady; }
 
   // Executes |task| on CEF's UI thread (inline if already on TID_UI, otherwise
   // posted via CefPostTask). Returns false if TID_UI is unavailable.
@@ -56,6 +113,31 @@ class CefRuntimeManager {
   // Schedules |task| onto the default GLib GMainContext (GTK/Flutter main
   // thread). Safe to call from any thread. Never capture CefRefPtr in |task|.
   static void PostToGtkMain(std::function<void()> task, gint priority = G_PRIORITY_DEFAULT);
+
+  // Testing hooks for deterministic verification of failure-injection paths.
+  void SetStateForTesting(CefRuntimeState state) {
+    state_.store(state, std::memory_order_release);
+  }
+  void SetBrowserTimeoutForTesting(std::chrono::milliseconds timeout) {
+    browser_timeout_for_testing_ = timeout;
+  }
+  void SetBarrierTimeoutForTesting(std::chrono::milliseconds timeout) {
+    barrier_timeout_for_testing_ = timeout;
+  }
+  void SetInjectBarrierBlockForTesting(bool block) {
+    inject_barrier_block_for_testing_ = block;
+  }
+  void SetSkipCefCallsForTesting(bool skip) {
+    skip_cef_calls_for_testing_ = skip;
+  }
+  void ResetForTesting() {
+    state_.store(CefRuntimeState::kUninitialized, std::memory_order_release);
+    active_browsers_.store(0, std::memory_order_release);
+    browser_timeout_for_testing_ = std::chrono::milliseconds(5000);
+    barrier_timeout_for_testing_ = std::chrono::milliseconds(2000);
+    inject_barrier_block_for_testing_ = false;
+    skip_cef_calls_for_testing_ = false;
+  }
 
  private:
   CefRuntimeManager();
@@ -69,6 +151,11 @@ class CefRuntimeManager {
   std::atomic<int> active_browsers_{0};
   std::mutex shutdown_mutex_;
   std::condition_variable shutdown_cv_;
+
+  std::chrono::milliseconds browser_timeout_for_testing_{5000};
+  std::chrono::milliseconds barrier_timeout_for_testing_{2000};
+  bool inject_barrier_block_for_testing_{false};
+  bool skip_cef_calls_for_testing_{false};
 };
 
 #endif  // FLUTTER_CHROMIUM_WEBVIEW_CEF_RUNTIME_MANAGER_H_

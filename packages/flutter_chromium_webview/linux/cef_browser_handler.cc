@@ -72,9 +72,30 @@ std::shared_ptr<GtkBrowserBridge> GtkBrowserBridge::Create(
     delete bridge;
     if (!reg && !tex && !pop) return;
     auto release = [reg, tex, pop]() {
-      if (pop) g_object_unref(pop);
-      if (tex) g_object_unref(tex);
       if (reg) g_object_unref(reg);
+      if (!tex && !pop) return;
+      // Flutter's fl_texture_registrar_unregister_texture() removes the texture
+      // synchronously on the GTK thread without waiting for an in-flight
+      // copy_pixels() / glTexImage2D upload on the raster thread to finish.
+      // Defer the final unref (which frees front_buffer) briefly so any active
+      // raster upload completes safely; during process shutdown this timeout
+      // will not fire inside CefRuntimeManager::Shutdown()'s non-blocking
+      // drain, avoiding a race with libgallium/Impeller teardown.
+      struct DeferredTextures {
+        FlutterChromiumTexture* tex;
+        FlutterChromiumTexture* pop;
+      };
+      auto* pending = new DeferredTextures{tex, pop};
+      g_timeout_add_full(
+          G_PRIORITY_LOW, 150,
+          [](gpointer data) -> gboolean {
+            auto* d = static_cast<DeferredTextures*>(data);
+            if (d->pop) g_object_unref(d->pop);
+            if (d->tex) g_object_unref(d->tex);
+            return G_SOURCE_REMOVE;
+          },
+          pending,
+          [](gpointer data) { delete static_cast<DeferredTextures*>(data); });
     };
     if (g_main_context_is_owner(g_main_context_default())) {
       release();
@@ -162,6 +183,40 @@ void CefBrowserHandler::FlushCloseCallbacksOnUi() {
   });
 }
 
+CefRefPtr<CefResourceRequestHandler> CefBrowserHandler::GetResourceRequestHandler(
+    CefRefPtr<CefBrowser> browser,
+    CefRefPtr<CefFrame> frame,
+    CefRefPtr<CefRequest> request,
+    bool is_navigation,
+    bool is_download,
+    const CefString& request_initiator,
+    bool& disable_default_handling) {
+  return html_documents->GetResourceRequestHandler(
+      browser, frame, request, is_navigation, is_download, request_initiator,
+      disable_default_handling);
+}
+
+void CefBrowserHandler::OnRenderProcessTerminated(
+    CefRefPtr<CefBrowser> browser,
+    TerminationStatus status,
+    int error_code,
+    const CefString& error_string) {
+  if (closing_.load(std::memory_order_acquire) || crash_notified_on_ui_) return;
+  crash_notified_on_ui_ = true;
+  user_agent->Cancel();
+  html_documents->Clear();
+  OnResetDialogState(browser);
+  int status_int = static_cast<int>(status);
+  std::string err_str = error_string.ToString();
+  EmitEventOnUi("browserCrash", [status_int, error_code, err_str = std::move(err_str)]() {
+    FlValue* args = fl_value_new_map();
+    fl_value_set_string_take(args, "status", fl_value_new_int(status_int));
+    fl_value_set_string_take(args, "errorCode", fl_value_new_int(error_code));
+    fl_value_set_string_take(args, "errorString", fl_value_new_string(err_str.c_str()));
+    return args;
+  });
+}
+
 bool CefBrowserHandler::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser,
     CefRefPtr<CefFrame> frame, CefProcessId source, CefRefPtr<CefProcessMessage> message) {
   if (message->GetName() != chromium_bridge::kMessage) return false;
@@ -202,6 +257,16 @@ void CefBrowserHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
       }
     });
   }
+  if (browser) {
+    if (auto host = browser->GetHost()) {
+      if (auto ctx = host->GetRequestContext()) {
+        if (auto cm = ctx->GetCookieManager(nullptr)) {
+          cm->FlushStore(nullptr);
+        }
+      }
+    }
+  }
+  pending_context_ = nullptr;
   browser_ = nullptr;
   ReleaseRuntimeSlotOnUi();
   // Return freed frame-buffer and browser-host pages to the OS promptly on
@@ -216,7 +281,7 @@ bool CefBrowserHandler::OnBeforePopup(
     int popup_id,
     const CefString& target_url,
     const CefString& target_frame_name,
-    WindowOpenDisposition target_disposition,
+    CefLifeSpanHandler::WindowOpenDisposition target_disposition,
     bool user_gesture,
     const CefPopupFeatures& popupFeatures,
     CefWindowInfo& windowInfo,
@@ -256,48 +321,72 @@ void CefBrowserHandler::CreateBrowserAsync(std::string initial_url,
   bool posted = CefRuntimeManager::PostToCefUi(
       [self, initial_url = std::move(initial_url), requires_gesture,
        profile_name = std::move(profile_name), notify]() mutable {
-        self->creation_pending_on_ui_ = false;
+        auto finish_create = [self, initial_url, requires_gesture, notify](
+                                 CefRefPtr<CefRequestContext> context) mutable {
+          self->creation_pending_on_ui_ = false;
+          self->pending_context_ = nullptr;
+          if (self->closing_.load(std::memory_order_acquire)) {
+            self->ReleaseRuntimeSlotOnUi();
+            self->FlushCloseCallbacksOnUi();
+            notify(false, "DETACHED", "Browser was closed before creation completed");
+            return;
+          }
+          std::string settings_error;
+          if (!requires_gesture && !chromium_settings::AllowAutoplay(context, settings_error)) {
+            self->closing_.store(true, std::memory_order_release);
+            self->ReleaseRuntimeSlotOnUi();
+            self->FlushCloseCallbacksOnUi();
+            notify(false, "SETTINGS_FAILED", settings_error);
+            return;
+          }
+          CefWindowInfo info;
+          info.SetAsWindowless(0);
+          CefBrowserSettings settings;
+          settings.windowless_frame_rate = 60;
+          settings.background_color = 0;
+          auto browser = CefBrowserHost::CreateBrowserSync(
+              info, self, initial_url, settings, nullptr, context);
+          if (!browser) {
+            self->closing_.store(true, std::memory_order_release);
+            self->ReleaseRuntimeSlotOnUi();
+            self->FlushCloseCallbacksOnUi();
+            notify(false, "CREATE_FAILED", "CEF could not create the browser");
+            return;
+          }
+          self->browser_ = browser;
+          if (self->closing_.load(std::memory_order_acquire)) {
+            self->CloseOnUi({});
+            notify(false, "DETACHED", "Browser was closed during creation");
+            return;
+          }
+          notify(true, "", "");
+        };
+
         if (self->closing_.load(std::memory_order_acquire)) {
+          self->creation_pending_on_ui_ = false;
           self->ReleaseRuntimeSlotOnUi();
           self->FlushCloseCallbacksOnUi();
           notify(false, "DETACHED", "Browser was closed before creation completed");
           return;
         }
-        auto context = chromium_settings::CustomContext(requires_gesture, profile_name);
-        if (!requires_gesture && !context) {
+        CefRefPtr<CefRequestContextHandler> ctx_handler =
+            new chromium_settings::ContextReadyHandler(std::move(finish_create));
+        auto context = chromium_settings::CustomContext(
+            requires_gesture, profile_name, ctx_handler);
+        if (!context) {
+          self->creation_pending_on_ui_ = false;
           self->closing_.store(true, std::memory_order_release);
           self->ReleaseRuntimeSlotOnUi();
           self->FlushCloseCallbacksOnUi();
-          notify(false, "SETTINGS_FAILED", "Could not create a private autoplay context");
+          notify(false, "SETTINGS_FAILED",
+                 profile_name.empty()
+                     ? "Could not create a private autoplay context"
+                     : "Could not create persistent browser profile");
           return;
         }
-        CefWindowInfo info;
-        info.SetAsWindowless(0);
-        CefBrowserSettings settings;
-        settings.windowless_frame_rate = 60;
-        settings.background_color = 0;
-        auto browser = CefBrowserHost::CreateBrowserSync(
-            info, self, initial_url, settings, nullptr, context);
-        if (!browser) {
-          self->closing_.store(true, std::memory_order_release);
-          self->ReleaseRuntimeSlotOnUi();
-          self->FlushCloseCallbacksOnUi();
-          notify(false, "CREATE_FAILED", "CEF could not create the browser");
-          return;
+        if (self->creation_pending_on_ui_) {
+          self->pending_context_ = context;
         }
-        std::string settings_error;
-        if (!requires_gesture && !chromium_settings::AllowAutoplay(browser, settings_error)) {
-          self->closing_.store(true, std::memory_order_release);
-          self->CloseOnUi({});
-          notify(false, "SETTINGS_FAILED", settings_error);
-          return;
-        }
-        if (self->closing_.load(std::memory_order_acquire)) {
-          self->CloseOnUi({});
-          notify(false, "DETACHED", "Browser was closed during creation");
-          return;
-        }
-        notify(true, "", "");
       });
 
   if (!posted) {

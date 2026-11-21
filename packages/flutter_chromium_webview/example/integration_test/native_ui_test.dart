@@ -151,7 +151,9 @@ void main() {
       await first.setFocus(true);
       await runJs(first, """
         document.querySelector('select').addEventListener('mousedown', () => document.title = 'select-mousedown:' + document.hasFocus());
-        document.title = 'select-ready';
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          document.title = 'select-ready';
+        }));
       """);
       await until(() => first.pageTitle == 'select-ready');
       await first.sendPointerInput(type: PointerInputType.move, x: 60, y: 40);

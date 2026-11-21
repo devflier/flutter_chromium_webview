@@ -25,13 +25,20 @@ sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev pulseaud
 ```
 
 ### Unprivileged User Namespaces and Sandbox Configuration
-Chromium keeps sandboxing enabled by default; the plugin does not fall back to `--no-sandbox`.
+Chromium keeps sandboxing enabled by default; the plugin never silently disables sandboxing on ordinary Linux installations (`.deb`, AppImage, local builds).
 
-- **Production / packaged applications (recommended):** Ship an application-specific AppArmor profile permitting `userns` for your executable (for example under `/etc/apparmor.d/<your-app>` granting `userns,`) or use distro-native packaging confinement (Flatpak/Snap/deb AppArmor profile) rather than relaxing system-wide kernel settings.
+- **Debian/Ubuntu `.deb` (recommended):** Ship a narrowly scoped AppArmor profile under `/etc/apparmor.d/<your-app>` permitting `userns,` specifically for your app executable and `lib/flutter_chromium_webview_subprocess`, preserving Chromium's native sandbox without relaxing system-wide kernel settings.
+- **Snap and Flatpak containers:** Strict Snap confinement (AppArmor + seccomp) and Flatpak (`bwrap`) block Chromium's nested inner user-namespace sandbox. When shipping inside a verified Snap (`$SNAP` + `$SNAP_NAME` + existing `$SNAP` directory) or Flatpak (`$FLATPAK_ID` + `/.flatpak-info`), the host package may explicitly opt out of the inner Chromium sandbox by setting `FLUTTER_CHROMIUM_WEBVIEW_ALLOW_CONTAINER_NO_SANDBOX=1` in the Snap/Flatpak manifest environment.
+  - **Security tradeoff:** Disabling Chromium's inner sandbox relies on Snap/Flatpak's outer container confinement rather than per-renderer kernel user/PID/seccomp isolation. Site isolation and renderer process separation remain enabled. This environment variable has **no effect** on standard non-containerized Linux hosts.
 - **Local development / CI on Ubuntu 24.04+ / 26.04:** If running unpackaged binaries on a host where AppArmor restricts unprivileged user namespaces (`kernel.apparmor_restrict_unprivileged_userns = 1`), you can temporarily permit user namespaces for local testing with:
 ```bash
 sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 ```
+
+### Media Controls, Password Store, and Crash Notifications
+- Set `CEF_SYSTEM_MEDIA_CONTROLS=0` before `ChromiumWebViewController.initialize()` if the host owns MPRIS/media keys and wants to suppress Chromium's duplicate media session.
+- Renderer terminations are reported via `CefRequestHandler::OnRenderProcessTerminated` as `browserCrash` events to Dart.
+- **Password store (strictly opt-in, testing only):** By default, Chromium uses the host desktop's native keyring (`detect`). For headless or CI environments without an unlocked keyring daemon, `FLUTTER_CHROMIUM_WEBVIEW_PASSWORD_STORE` may be explicitly set to one of `basic`, `gnome-libsecret`, `kwallet`, `kwallet5`, `kwallet6`, or `detect`. Setting `FLUTTER_CHROMIUM_WEBVIEW_PASSWORD_STORE=basic` stores cookie/credential encryption keys less securely than an OS keyring and must **not** be enabled by default in production deployments.
 
 ## CEF Distribution and Automatic Download
 

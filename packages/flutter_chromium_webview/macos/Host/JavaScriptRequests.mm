@@ -99,11 +99,14 @@ bool HostBrowserClient::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<
     return false;
 }
 
-void HostBrowserClient::OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser, TerminationStatus,
-                                                 int, const CefString&) {
+void HostBrowserClient::OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser, TerminationStatus status,
+                                                 int error_code, const CefString& error_string) {
     auto id = GetBrowserId(browser);
-    NSLog(@"[ChromiumBackend] OnRenderProcessTerminated called for browserId %lld", id);
-    if (auto* session = GetSession(id)) session->renderer_gone = true;
+    if (id == -1) return;
+    auto* session = GetSession(id);
+    if (!session || session->renderer_gone) return;
+    session->renderer_gone = true;
+    NSLog(@"[ChromiumBackend] OnRenderProcessTerminated called for browserId %lld status=%d code=%d", id, (int)status, error_code);
     InvalidateJavaScript(id, "renderer_gone", "Renderer process terminated");
 
     IPC::Message event;
@@ -111,7 +114,12 @@ void HostBrowserClient::OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
     event.payload = @{
         @"browserId": @(id),
         @"name": @"browserCrash",
-        @"args": @{@"browserId": @(id)}
+        @"args": @{
+            @"browserId": @(id),
+            @"status": @((int)status),
+            @"errorCode": @(error_code),
+            @"errorString": [NSString stringWithUTF8String:error_string.ToString().c_str()]
+        }
     };
     if (on_message_) on_message_(event);
 }

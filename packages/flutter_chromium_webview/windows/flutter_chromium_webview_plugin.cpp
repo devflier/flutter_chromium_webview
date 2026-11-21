@@ -51,6 +51,15 @@ FlutterChromiumWebviewPlugin::FlutterChromiumWebviewPlugin(
         if (message == WM_CLOSE) {
           plugin_pointer->CloseAll();
           CefRuntimeManager::GetInstance()->Shutdown();
+        } else if (message == WM_SIZE) {
+          const bool minimized = (wparam == SIZE_MINIMIZED);
+          const bool restored = (wparam == SIZE_RESTORED || wparam == SIZE_MAXIMIZED);
+          if ((minimized || restored) && plugin_pointer->window_minimized_ != minimized) {
+            plugin_pointer->window_minimized_ = minimized;
+            for (auto& pair : plugin_pointer->browsers_) {
+              static_cast<CefBrowserHandler*>(pair.second)->SetWindowMinimized(minimized);
+            }
+          }
         }
         return std::nullopt;
       });
@@ -197,45 +206,104 @@ void FlutterChromiumWebviewPlugin::HandleMethodCall(
       }
     };
     
-    // The handler takes ownership of the texture pointers
+    // The handler takes ownership of the texture pointers and holds a pending
+    // runtime slot until either OnBeforeClose or CancelPendingCreation runs.
+    runtime->BrowserPending();
     CefRefPtr<CefBrowserHandler> handler = new CefBrowserHandler(
-      texture_registrar, texture, popup_texture, texture_id, popup_texture_id, std::move(on_event));
+      texture_registrar, texture, popup_texture, texture_id, popup_texture_id,
+      std::move(on_event), /*runtime_slot_held=*/true);
     handler->javascript_policy.Configure(GetValue<std::string>(args, "javascriptChannels", "{}"));
-      
-    CefWindowInfo info;
-    info.SetAsWindowless(registrar_->GetView() ? registrar_->GetView()->GetNativeWindow() : nullptr);
-    CefBrowserSettings settings;
-    settings.windowless_frame_rate = 60;
-    settings.background_color = 0;
-    
+    handler->AddRef();
+    browsers_[browser_id] = handler.get();
+
     std::string initialUrl = GetValue<std::string>(args, "initialUrl", "about:blank");
     const bool requires_gesture = GetValue<bool>(args, "mediaPlaybackRequiresUserGesture", true);
     std::string profile_name = GetValue<std::string>(args, "profileName", "");
-    auto context = chromium_settings::CustomContext(requires_gesture, profile_name);
-    if (!requires_gesture && !context) {
-      handler->Close(); result->Error("SETTINGS_FAILED", "Could not create a private autoplay context"); return;
-    }
-    auto browser = CefBrowserHost::CreateBrowserSync(info, handler, initialUrl, settings, nullptr, context);
-    if (!browser) {
-      handler->Close();
-      result->Error("CREATE_FAILED", "CEF could not create the browser");
+
+    auto reply = std::shared_ptr<flutter::MethodResult<flutter::EncodableValue>>(std::move(result));
+    const std::weak_ptr<int> alive = lifetime_;
+    HWND parent_hwnd = registrar_->GetView() ? registrar_->GetView()->GetNativeWindow() : nullptr;
+
+    auto finish_create = [this, alive, handler, browser_id, texture_id, popup_texture_id,
+                          initialUrl, requires_gesture, parent_hwnd, reply](
+                             CefRefPtr<CefRequestContext> ctx) {
+      if (alive.expired() || handler->IsClosing()) {
+        handler->CancelPendingCreation();
+        if (!alive.expired()) {
+          auto it = browsers_.find(browser_id);
+          if (it != browsers_.end() && it->second == handler.get()) {
+            browsers_.erase(it);
+            handler->Release();
+          }
+          reply->Error("DETACHED", "Browser was closed before creation completed");
+        }
+        return;
+      }
+
+      handler->MarkCreationComplete();
+
+      std::string settings_error;
+      if (!requires_gesture && !chromium_settings::AllowAutoplay(ctx, settings_error)) {
+        auto it = browsers_.find(browser_id);
+        if (it != browsers_.end() && it->second == handler.get()) {
+          browsers_.erase(it);
+          handler->Release();
+        }
+        handler->Close();
+        reply->Error("SETTINGS_FAILED", settings_error);
+        return;
+      }
+
+      CefWindowInfo info;
+      info.SetAsWindowless(parent_hwnd);
+      CefBrowserSettings settings;
+      settings.windowless_frame_rate = 60;
+      settings.background_color = 0;
+
+      auto browser = CefBrowserHost::CreateBrowserSync(
+          info, handler, initialUrl, settings, nullptr, ctx);
+      if (!browser) {
+        auto it = browsers_.find(browser_id);
+        if (it != browsers_.end() && it->second == handler.get()) {
+          browsers_.erase(it);
+          handler->Release();
+        }
+        handler->Close();
+        reply->Error("CREATE_FAILED", "CEF could not create the browser");
+        return;
+      }
+
+      if (window_minimized_) {
+        handler->SetWindowMinimized(true);
+      }
+
+      flutter::EncodableMap res;
+      res[flutter::EncodableValue("browserId")] = flutter::EncodableValue(browser_id);
+      res[flutter::EncodableValue("textureId")] = flutter::EncodableValue(texture_id);
+      res[flutter::EncodableValue("popupTextureId")] = flutter::EncodableValue(popup_texture_id);
+      reply->Success(flutter::EncodableValue(res));
+    };
+
+    CefRefPtr<CefRequestContextHandler> ctx_handler =
+        new chromium_settings::ContextReadyHandler(std::move(finish_create));
+    auto context = chromium_settings::CustomContext(
+        requires_gesture, profile_name, ctx_handler);
+    if (!context) {
+      auto it = browsers_.find(browser_id);
+      if (it != browsers_.end() && it->second == handler.get()) {
+        browsers_.erase(it);
+        handler->Release();
+      }
+      handler->CancelPendingCreation();
+      reply->Error("SETTINGS_FAILED",
+                   profile_name.empty()
+                       ? "Could not create a private autoplay context"
+                       : "Could not create persistent browser profile");
       return;
     }
-    
-    std::string settings_error;
-    if (!requires_gesture && !chromium_settings::AllowAutoplay(browser, settings_error)) {
-      handler->Close();
-      result->Error("SETTINGS_FAILED", settings_error);
-      return;
+    if (handler->IsCreationPending()) {
+      handler->SetPendingContext(context);
     }
-    handler->AddRef();
-    browsers_[browser_id] = handler.get();
-    
-    flutter::EncodableMap res;
-    res[flutter::EncodableValue("browserId")] = flutter::EncodableValue(browser_id);
-    res[flutter::EncodableValue("textureId")] = flutter::EncodableValue(texture_id);
-    res[flutter::EncodableValue("popupTextureId")] = flutter::EncodableValue(popup_texture_id);
-    result->Success(flutter::EncodableValue(res));
     return;
   }
   
@@ -321,6 +389,8 @@ void FlutterChromiumWebviewPlugin::HandleMethodCall(
       if (GetValue<bool>(args, "focused", false)) keyboard_->SetBrowser(browser);
       else if (keyboard_->HasBrowser(browser)) keyboard_->SetBrowser(nullptr);
     }
+  } else if (method_call.method_name() == "setRenderingActive") {
+    handler->SetRenderingActive(GetValue<bool>(args, "active", true));
   } else if (method_call.method_name() == "updateBrowserSize") {
     double width = GetNumber(args, "width");
     double height = GetNumber(args, "height");

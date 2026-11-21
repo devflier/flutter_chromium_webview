@@ -21,17 +21,52 @@ CefBrowserHandler::CefBrowserHandler(flutter::TextureRegistrar* registrar,
                                    FlutterChromiumTexture* popup_texture,
                                    int64_t texture_id,
                                    int64_t popup_texture_id,
-                                   EventCallback on_event)
+                                   EventCallback on_event,
+                                   bool runtime_slot_held)
     : registrar_(registrar),
       texture_(texture),
       popup_texture_(popup_texture),
       texture_id_(texture_id),
       popup_texture_id_(popup_texture_id),
+      runtime_slot_held_(runtime_slot_held),
+      creation_pending_(runtime_slot_held),
       on_event_(std::move(on_event)) {}
 
 CefBrowserHandler::~CefBrowserHandler() {
   if (texture_) delete texture_;
   if (popup_texture_) delete popup_texture_;
+}
+
+CefRefPtr<CefResourceRequestHandler> CefBrowserHandler::GetResourceRequestHandler(
+    CefRefPtr<CefBrowser> browser,
+    CefRefPtr<CefFrame> frame,
+    CefRefPtr<CefRequest> request,
+    bool is_navigation,
+    bool is_download,
+    const CefString& request_initiator,
+    bool& disable_default_handling) {
+  return html_documents->GetResourceRequestHandler(
+      browser, frame, request, is_navigation, is_download, request_initiator,
+      disable_default_handling);
+}
+
+void CefBrowserHandler::OnRenderProcessTerminated(
+    CefRefPtr<CefBrowser> browser,
+    TerminationStatus status,
+    int error_code,
+    const CefString& error_string) {
+  if (closing_ || crash_notified_) return;
+  crash_notified_ = true;
+  user_agent->Cancel();
+  html_documents->Clear();
+  OnResetDialogState(browser);
+  if (on_event_) {
+    flutter::EncodableMap args;
+    args[flutter::EncodableValue("status")] = flutter::EncodableValue(static_cast<int>(status));
+    args[flutter::EncodableValue("errorCode")] = flutter::EncodableValue(error_code);
+    args[flutter::EncodableValue("errorString")] = flutter::EncodableValue(error_string.ToString());
+    on_event_("browserCrash", args);
+  }
 }
 
 void CefBrowserHandler::UnregisterTextures() {
@@ -41,27 +76,70 @@ void CefBrowserHandler::UnregisterTextures() {
   auto* popup = popup_texture_;
   texture_ = nullptr;
   popup_texture_ = nullptr;
+  if (texture) texture->Clear();
+  if (popup) popup->Clear();
   // The engine can still be invoking CopyPixels until unregistration completes.
   registrar_->UnregisterTexture(texture_id_, [texture] { delete texture; });
   registrar_->UnregisterTexture(popup_texture_id_, [popup] { delete popup; });
 }
 
+void CefBrowserHandler::ReleaseRuntimeSlot() {
+  if (runtime_slot_held_) {
+    runtime_slot_held_ = false;
+    CefRuntimeManager::GetInstance()->BrowserClosed();
+  }
+}
+
+void CefBrowserHandler::FlushCloseCallbacks() {
+  auto callbacks = std::move(close_callbacks_);
+  close_callbacks_.clear();
+  for (auto& callback : callbacks) {
+    if (callback) callback();
+  }
+}
+
+void CefBrowserHandler::CancelPendingCreation() {
+  creation_pending_ = false;
+  pending_context_ = nullptr;
+  closing_ = true;
+  on_event_ = {};
+  UnregisterTextures();
+  OnResetDialogState(nullptr);
+  ReleaseRuntimeSlot();
+  FlushCloseCallbacks();
+}
+
 void CefBrowserHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
   browser_ = browser;
-  CefRuntimeManager::GetInstance()->BrowserOpened();
+  creation_pending_ = false;
+  pending_context_ = nullptr;
+  if (!runtime_slot_held_) {
+    runtime_slot_held_ = true;
+    CefRuntimeManager::GetInstance()->BrowserOpened();
+  }
 }
 
 void CefBrowserHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
   user_agent->Cancel();
   html_documents->Clear();
   closing_ = true;
+  creation_pending_ = false;
+  pending_context_ = nullptr;
   on_event_ = {};
   UnregisterTextures();
   OnResetDialogState(nullptr);
+  if (browser) {
+    if (auto host = browser->GetHost()) {
+      if (auto ctx = host->GetRequestContext()) {
+        if (auto cm = ctx->GetCookieManager(nullptr)) {
+          cm->FlushStore(nullptr);
+        }
+      }
+    }
+  }
   browser_ = nullptr;
-  CefRuntimeManager::GetInstance()->BrowserClosed();
-  auto callbacks = std::move(close_callbacks_);
-  for (auto& callback : callbacks) callback();
+  ReleaseRuntimeSlot();
+  FlushCloseCallbacks();
 }
 
 bool CefBrowserHandler::OnBeforePopup(
@@ -70,7 +148,7 @@ bool CefBrowserHandler::OnBeforePopup(
     int popup_id,
     const CefString& target_url,
     const CefString& target_frame_name,
-    WindowOpenDisposition target_disposition,
+    CefLifeSpanHandler::WindowOpenDisposition target_disposition,
     bool user_gesture,
     const CefPopupFeatures& popupFeatures,
     CefWindowInfo& windowInfo,
@@ -95,18 +173,20 @@ void CefBrowserHandler::Close(std::function<void()> on_closed) {
   user_agent->Cancel();
   html_documents->Clear();
   if (on_closed) close_callbacks_.push_back(std::move(on_closed));
-  if (closing_ && browser_) return;
+  if (closing_ && (browser_ || creation_pending_)) return;
   closing_ = true;
   on_event_ = {};
   // Stop new frames before unregistering; there are no queued notifications.
   UnregisterTextures();
   OnResetDialogState(nullptr);
   if (browser_) {
+    browser_->GetHost()->WasHidden(true);
     browser_->GetHost()->SetFocus(false);
     browser_->GetHost()->CloseBrowser(true);
-  } else {
-    auto callbacks = std::move(close_callbacks_);
-    for (auto& callback : callbacks) callback();
+  } else if (!creation_pending_) {
+    pending_context_ = nullptr;
+    ReleaseRuntimeSlot();
+    FlushCloseCallbacks();
   }
 }
 
@@ -139,17 +219,25 @@ bool CefBrowserHandler::GetScreenPoint(CefRefPtr<CefBrowser> browser, int view_x
 void CefBrowserHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type,
                                const RectList& dirtyRects, const void* buffer,
                                int width, int height) {
-  if (closing_ || !registered_) return;
+  if (closing_ || !registered_ || window_minimized_) return;
+  std::vector<FlutterChromiumTexture::DirtyRect> converted;
+  converted.reserve(dirtyRects.size());
+  for (const auto& r : dirtyRects) {
+    converted.push_back({r.x, r.y, r.width, r.height});
+  }
   if (type == PET_VIEW) {
-    texture_->UpdateBuffer(buffer, width, height);
+    texture_->UpdateBuffer(buffer, width, height, converted);
     registrar_->MarkTextureFrameAvailable(texture_id_);
   } else if (type == PET_POPUP) {
-    popup_texture_->UpdateBuffer(buffer, width, height);
+    popup_texture_->UpdateBuffer(buffer, width, height, converted);
     registrar_->MarkTextureFrameAvailable(popup_texture_id_);
   }
 }
 
 void CefBrowserHandler::OnPopupShow(CefRefPtr<CefBrowser> browser, bool show) {
+  if (!show && popup_texture_) {
+    popup_texture_->Clear();
+  }
   if (on_event_) {
     flutter::EncodableMap args;
     args[flutter::EncodableValue("show")] = flutter::EncodableValue(show);
@@ -177,6 +265,41 @@ void CefBrowserHandler::SetSize(int width, int height) {
 void CefBrowserHandler::SetDevicePixelRatio(float dpr) {
   dpr_ = dpr > 0 ? dpr : 1;
   if (GetBrowser()) browser_->GetHost()->NotifyScreenInfoChanged();
+}
+
+void CefBrowserHandler::ApplyEffectiveFrameRate() {
+  auto browser = GetBrowser();
+  if (!browser) return;
+  const int fps = (window_minimized_ || !rendering_active_) ? 1 : active_frame_rate_;
+  browser->GetHost()->SetWindowlessFrameRate(fps);
+}
+
+void CefBrowserHandler::SetWindowMinimized(bool minimized) {
+  if (window_minimized_ == minimized) return;
+  window_minimized_ = minimized;
+  if (minimized) {
+    // Release retained pixel buffers immediately while minimized without
+    // calling WasHidden(true), so background audio playback is uninterrupted.
+    if (texture_) texture_->Clear();
+    if (popup_texture_) popup_texture_->Clear();
+  }
+  ApplyEffectiveFrameRate();
+  if (!minimized && !closing_) {
+    if (auto browser = GetBrowser()) {
+      browser->GetHost()->Invalidate(PET_VIEW);
+    }
+  }
+}
+
+void CefBrowserHandler::SetRenderingActive(bool active) {
+  if (rendering_active_ == active) return;
+  rendering_active_ = active;
+  ApplyEffectiveFrameRate();
+  if (active && !window_minimized_ && !closing_) {
+    if (auto browser = GetBrowser()) {
+      browser->GetHost()->Invalidate(PET_VIEW);
+    }
+  }
 }
 
 bool CefBrowserHandler::StartDragging(CefRefPtr<CefBrowser> browser, CefRefPtr<CefDragData> drag_data,

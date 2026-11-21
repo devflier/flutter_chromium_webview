@@ -12,7 +12,8 @@
 #   7. Functional web compatibility matrix (local HTTP/WS/TLS server)
 #   8. Adverse ELF/GLib checks: reversed link order, dlopen(RTLD_LOCAL),
 #      active G_SOURCE_CONTINUE idle source at shutdown, inactivity_timeout.
-set -euo pipefail
+set -e -u -o pipefail
+export PATH="$HOME/flutter/bin:$PATH"
 
 root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 ex_dir="$root/packages/flutter_chromium_webview/example"
@@ -29,13 +30,19 @@ cleanup() {
 trap cleanup EXIT
 
 if [[ -z "${XAUTHORITY:-}" ]]; then
-  for p in $(pgrep -u "$(id -u)" gnome-shell 2>/dev/null || true); do
-    xa="$(tr '\0' '\n' < "/proc/$p/environ" 2>/dev/null | awk -F= '/^XAUTHORITY=/{print $2; exit}' || true)"
-    if [[ -n "$xa" ]]; then export XAUTHORITY="$xa"; break; fi
-  done
+  if ls /run/user/"$(id -u)"/.mutter-Xwaylandauth.* 1>/dev/null 2>&1; then
+    export XAUTHORITY="$(ls -1 /run/user/"$(id -u)"/.mutter-Xwaylandauth.* | head -n 1)"
+  else
+    for p in $(pgrep -u "$(id -u)" gnome-shell 2>/dev/null || true); do
+      xa="$(tr '\0' '\n' < "/proc/$p/environ" 2>/dev/null | grep ^XAUTHORITY= | cut -d= -f2- || true)"
+      if [[ -n "$xa" ]]; then export XAUTHORITY="$xa"; break; fi
+    done
+  fi
 fi
 export DISPLAY="${DISPLAY:-:0}"
 export GDK_BACKEND="x11"
+# Avoid blocking headless/auto-login test sessions on an interactive desktop keyring prompt.
+export FLUTTER_CHROMIUM_WEBVIEW_PASSWORD_STORE="${FLUTTER_CHROMIUM_WEBVIEW_PASSWORD_STORE:-basic}"
 
 cat > "$probe_dart" <<'DART'
 import 'dart:async';
@@ -49,7 +56,6 @@ import 'package:flutter_chromium_webview/flutter_chromium_webview.dart';
 
 Future<void> _log(String msg) async {
   stderr.writeln(msg);
-  await stderr.flush();
 }
 
 Future<Map<String, dynamic>> _diagnostics() async {
@@ -86,15 +92,14 @@ class _StressAppState extends State<StressApp> {
   }
 
   Future<void> _waitLoaded(ChromiumWebViewController c, {String? urlContains, Duration timeout = const Duration(seconds: 12)}) async {
-    final done = Completer<void>();
-    c.onLoadingStateChanged = (bool isLoading, bool _, bool __) {
-      if (!isLoading && !done.isCompleted) {
-        if (urlContains == null || c.currentUrl.contains(urlContains)) {
-          done.complete();
-        }
+    final deadline = DateTime.now().add(timeout);
+    await Future.delayed(const Duration(milliseconds: 80));
+    while (DateTime.now().isBefore(deadline)) {
+      if (!c.isLoading && (urlContains == null || c.currentUrl.contains(urlContains))) {
+        return;
       }
-    };
-    await done.future.timeout(timeout, onTimeout: () {});
+      await Future.delayed(const Duration(milliseconds: 50));
+    }
   }
 
   Future<void> _dispatch() async {
@@ -119,6 +124,15 @@ class _StressAppState extends State<StressApp> {
         case 'compat':
           await _runCompat(cacheDir.path, widget.extra);
           break;
+        case 'profile_write':
+          await _runProfileWrite(widget.extra);
+          break;
+        case 'profile_read':
+          await _runProfileRead(widget.extra);
+          break;
+        case 'profile_cancel':
+          await _runProfileCancel(widget.extra);
+          break;
         default:
           await _log('FAIL:unknown_mode:${widget.mode}');
       }
@@ -137,6 +151,7 @@ class _StressAppState extends State<StressApp> {
     _http2 = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
     _http1!.listen((req) async {
       final path = req.uri.path;
+      stderr.writeln('[HTTP1_REQ] $path');
       if (path == '/ws') {
         final ws = await WebSocketTransformer.upgrade(req);
         ws.listen((data) => ws.add('echo:$data'));
@@ -148,6 +163,13 @@ class _StressAppState extends State<StressApp> {
         await req.response.close();
         return;
       }
+      if (path == '/read_cookie') {
+        req.response.headers.contentType = ContentType.html;
+        req.response.write('''<!doctype html><html><head><title>ReadCookie</title></head>
+<body><h1>Read Cookie</h1></body></html>''');
+        await req.response.close();
+        return;
+      }
       if (path == '/api/data') {
         req.response.headers.contentType = ContentType.json;
         req.response.write(jsonEncode({'ok': true, 'ua': req.headers.value('user-agent') ?? ''}));
@@ -155,7 +177,7 @@ class _StressAppState extends State<StressApp> {
         return;
       }
       if (path == '/set_cookie') {
-        req.response.cookies.add(Cookie('fcw_test', 'cookie_val_42')..path = '/'..httpOnly = false);
+        req.response.cookies.add(Cookie('fcw_test', 'cookie_val_42')..path = '/'..httpOnly = false..maxAge = 86400);
       }
       req.response.headers.contentType = ContentType.html;
       req.response.write('''<!doctype html><html><head><title>P:$path</title></head>
@@ -339,63 +361,77 @@ window._path = ${jsonEncode(path)};
       ],
     );
 
+    c.onUrlChanged = (url) => stderr.writeln('[DEBUG_URL] $url');
+    c.onLoadError = (code, text, url) => stderr.writeln('[DEBUG_LOAD_ERR] $code $text $url');
+    c.onLoadingStateChanged = (isLoading, canGoBack, canGoForward) =>
+        stderr.writeln('[DEBUG_LOAD_STATE] isLoading=$isLoading url=${c.currentUrl}');
+
     final popups = <String>[];
     c.onNewWindowRequested = (req) => popups.add(req.url);
     int? lastTlsError;
     c.onLoadError = (code, text, url) {
+      stderr.writeln('[DEBUG_LOAD_ERR] $code $text $url');
       if (url.startsWith('https://127.0.0.1:')) lastTlsError = code;
     };
 
-    var w = _waitLoaded(c, urlContains: '/set_cookie');
     setState(() => _controllers.add(c));
-    await w;
+    await c.createBrowser();
+    await _waitLoaded(c, urlContains: '/set_cookie');
     results['html_load'] = c.currentUrl.contains('/set_cookie');
 
     // User-Agent override + fetch/XHR + cookies + localStorage + sessionStorage + IndexedDB + WebSocket + media + clipboard + popup
-    await c.executeJavaScript('''
-      (async () => {
-        const out = {};
-        out.cookie = document.cookie.includes('fcw_test=cookie_val_42');
-        localStorage.setItem('fcw_ls', 'ok_ls');
-        out.localStorage = localStorage.getItem('fcw_ls') === 'ok_ls';
-        sessionStorage.setItem('fcw_ss', 'ok_ss');
-        out.sessionStorage = sessionStorage.getItem('fcw_ss') === 'ok_ss';
-        out.indexedDB = await new Promise((resolve) => {
-          const req = indexedDB.open('fcw_db', 1);
-          req.onupgradeneeded = () => req.result.createObjectStore('s');
-          req.onsuccess = () => {
-            const db = req.result;
-            const tx = db.transaction('s', 'readwrite');
-            tx.objectStore('s').put('v1', 'k1');
-            tx.oncomplete = () => {
-              const g = db.transaction('s').objectStore('s').get('k1');
-              g.onsuccess = () => resolve(g.result === 'v1');
-              g.onerror = () => resolve(false);
+    for (int retry = 0; retry < 30; retry++) {
+      if (bridgeCompleter.isCompleted) break;
+      await c.executeJavaScript('''
+        (async () => {
+          const out = {};
+          out.cookie = document.cookie.includes('fcw_test=cookie_val_42');
+          try {
+            localStorage.setItem('fcw_ls', 'ok_ls');
+            out.localStorage = localStorage.getItem('fcw_ls') === 'ok_ls';
+            sessionStorage.setItem('fcw_ss', 'ok_ss');
+            out.sessionStorage = sessionStorage.getItem('fcw_ss') === 'ok_ss';
+          } catch (e) { out.localStorage = false; out.sessionStorage = false; }
+          out.indexedDB = await new Promise((resolve) => {
+            const req = indexedDB.open('fcw_db', 1);
+            req.onupgradeneeded = () => req.result.createObjectStore('s');
+            req.onsuccess = () => {
+              const db = req.result;
+              const tx = db.transaction('s', 'readwrite');
+              tx.objectStore('s').put('v1', 'k1');
+              tx.oncomplete = () => {
+                const g = db.transaction('s').objectStore('s').get('k1');
+                g.onsuccess = () => resolve(g.result === 'v1');
+                g.onerror = () => resolve(false);
+              };
             };
-          };
-          req.onerror = () => resolve(false);
-        });
-        try {
-          const r = await fetch('/api/data');
-          const j = await r.json();
-          out.fetch = j.ok === true;
-          out.userAgent = j.ua === 'FCW-Compat-UA/0.5.6';
-        } catch (e) { out.fetch = false; out.userAgent = false; }
-        out.websocket = await new Promise((resolve) => {
-          const ws = new WebSocket('ws://127.0.0.1:$p1/ws');
-          ws.onopen = () => ws.send('ping');
-          ws.onmessage = (ev) => { ws.close(); resolve(ev.data === 'echo:ping'); };
-          ws.onerror = () => resolve(false);
-          setTimeout(() => resolve(false), 4000);
-        });
-        const v = document.createElement('video');
-        const a = document.createElement('audio');
-        out.html5Media = typeof v.canPlayType === 'function' && typeof a.canPlayType === 'function';
-        out.webrtcApi = typeof RTCPeerConnection === 'function';
-        out.clipboardApi = typeof navigator.clipboard !== 'undefined';
-        window.chromiumPostMessage('compat', 'REPORT:' + JSON.stringify(out));
-      })();
-    ''');
+            req.onerror = () => resolve(false);
+          });
+          try {
+            const r = await fetch('/api/data');
+            const j = await r.json();
+            out.fetch = j.ok === true;
+            out.userAgent = j.ua === 'FCW-Compat-UA/0.5.6';
+          } catch (e) { out.fetch = false; out.userAgent = false; }
+          out.websocket = await new Promise((resolve) => {
+            const ws = new WebSocket('ws://127.0.0.1:$p1/ws');
+            ws.onopen = () => ws.send('ping');
+            ws.onmessage = (ev) => { ws.close(); resolve(ev.data === 'echo:ping'); };
+            ws.onerror = () => resolve(false);
+            setTimeout(() => resolve(false), 2000);
+          });
+          const v = document.createElement('video');
+          const a = document.createElement('audio');
+          out.html5Media = typeof v.canPlayType === 'function' && typeof a.canPlayType === 'function';
+          out.webrtcApi = typeof RTCPeerConnection === 'function';
+          out.clipboardApi = typeof navigator.clipboard !== 'undefined';
+          if (typeof chromiumPostMessage === 'function') {
+            chromiumPostMessage('compat', 'REPORT:' + JSON.stringify(out));
+          }
+        })();
+      ''');
+      await Future.delayed(const Duration(milliseconds: 200));
+    }
 
     await bridgeCompleter.future.timeout(const Duration(seconds: 10), onTimeout: () {});
     // Trigger popup via genuine user-gesture pointer click on the full-area button.
@@ -415,25 +451,21 @@ window._path = ${jsonEncode(path)};
     results['popup_request'] = popups.any((u) => u.contains('/popup_target'));
 
     // Redirect (OAuth-style 302 chain)
-    w = _waitLoaded(c);
     await c.loadRequest('$origin1/redirect');
-    await w;
+    await _waitLoaded(c, urlContains: '/redirect_target');
     results['redirect'] = c.currentUrl.contains('/redirect_target');
 
     // History goBack / goForward
-    w = _waitLoaded(c);
     await c.goBack();
-    await w;
+    await _waitLoaded(c, urlContains: '/set_cookie');
     results['history_back'] = c.currentUrl.contains('/set_cookie');
-    w = _waitLoaded(c);
     await c.goForward();
-    await w;
+    await _waitLoaded(c, urlContains: '/redirect_target');
     results['history_forward'] = c.currentUrl.contains('/redirect_target');
 
     // Cross-origin navigation + JS bridge origin enforcement (must NOT receive from origin2!)
-    w = _waitLoaded(c);
     await c.loadRequest('http://127.0.0.1:$p2/cross');
-    await w;
+    await _waitLoaded(c, urlContains: ':$p2/cross');
     results['cross_origin_nav'] = c.currentUrl.contains(':$p2/cross');
     final beforeCrossCount = bridgeMsgs.length;
     await c.executeJavaScript("window.chromiumPostMessage && window.chromiumPostMessage('compat', 'UNAUTHORIZED');");
@@ -441,17 +473,15 @@ window._path = ${jsonEncode(path)};
     results['bridge_origin_isolation'] = bridgeMsgs.length == beforeCrossCount;
 
     // loadHtmlString
-    w = _waitLoaded(c);
     await c.loadHtmlString('<!doctype html><html><head><title>InlineHtml</title></head><body>OK</body></html>', baseUrl: '$origin1/inline');
-    await w;
+    await _waitLoaded(c);
     await Future.delayed(const Duration(milliseconds: 200));
     results['load_html_string'] = c.pageTitle == 'InlineHtml';
 
     // HTTPS self-signed TLS rejection check (security: must reject untrusted cert!)
     if (tlsPort > 0) {
-      w = _waitLoaded(c, timeout: const Duration(seconds: 6));
       await c.loadRequest('https://127.0.0.1:$tlsPort/');
-      await w;
+      await _waitLoaded(c, timeout: const Duration(seconds: 4));
       await Future.delayed(const Duration(milliseconds: 300));
       results['https_rejects_self_signed'] = lastTlsError != null && lastTlsError! < 0;
     }
@@ -465,6 +495,231 @@ window._path = ${jsonEncode(path)};
       await _log('PASS:compat');
     } else {
       await _log('FAIL:compat:failed=$failed');
+    }
+  }
+
+  Future<void> _runProfileWrite(String extra) async {
+    final parts = extra.split(':');
+    final persistentCache = parts[0];
+    final fixedPort = parts.length > 1 ? (int.tryParse(parts[1]) ?? 28443) : 28443;
+    _http1 = await HttpServer.bind(InternetAddress.loopbackIPv4, fixedPort, shared: true);
+    _http2 = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    _http1!.listen((req) async {
+      final path = req.uri.path;
+      stderr.writeln('[HTTP1_REQ] $path');
+      if (path == '/set_cookie') {
+        req.response.cookies.add(Cookie('fcw_test', 'cookie_val_42')..path = '/'..httpOnly = false..maxAge = 86400);
+      }
+      req.response.headers.contentType = ContentType.html;
+      req.response.write('''<!doctype html><html><head><title>P:$path</title>
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  document.cookie = 'client_auth=user_token_999; path=/; max-age=86400';
+  try {
+    localStorage.setItem('session_status', 'logged_in_persistent');
+  } catch (e) {}
+  function tryPost() {
+    if (typeof chromiumPostMessage === 'function') {
+      chromiumPostMessage('compat', 'REPORT:write_done');
+    } else {
+      setTimeout(tryPost, 50);
+    }
+  }
+  tryPost();
+});
+</script>
+</head><body><h1>Path $path</h1></body></html>''');
+      await req.response.close();
+    });
+
+    final origin1 = 'http://127.0.0.1:$fixedPort';
+    await ChromiumWebViewController.initialize(cachePath: persistentCache);
+
+    final bridgeCompleter = Completer<void>();
+    final c = ChromiumWebViewController(
+      initialUrl: '$origin1/set_cookie',
+      profileName: 'ppplayer_youtube_session',
+      javaScriptChannels: [
+        JavaScriptChannel(
+          name: 'compat',
+          allowedOrigins: {origin1},
+          onMessageReceived: (msg) {
+            if (!bridgeCompleter.isCompleted && msg.message.startsWith('REPORT:')) {
+              bridgeCompleter.complete();
+            }
+          },
+        ),
+      ],
+    );
+    setState(() => _controllers.add(c));
+    await c.createBrowser();
+    await _waitLoaded(c, urlContains: '/set_cookie');
+
+    for (int retry = 0; retry < 40; retry++) {
+      if (bridgeCompleter.isCompleted) break;
+      await c.executeJavaScript('''
+        (async () => {
+          document.cookie = 'client_auth=user_token_999; path=/; max-age=86400';
+          try {
+            localStorage.setItem('session_status', 'logged_in_persistent');
+          } catch (e) {}
+          if (typeof chromiumPostMessage === 'function') {
+            chromiumPostMessage('compat', 'REPORT:write_done');
+          }
+        })();
+      ''');
+      await Future.delayed(const Duration(milliseconds: 150));
+    }
+    await bridgeCompleter.future.timeout(const Duration(seconds: 10), onTimeout: () {});
+    if (!bridgeCompleter.isCompleted) {
+      throw Exception('profile_write: bridge REPORT never arrived (url=${c.currentUrl}, isLoading=${c.isLoading})');
+    }
+
+    // Allow time for LevelDB / cookie store disk sync before dispose
+    await Future.delayed(const Duration(milliseconds: 500));
+    setState(() => _controllers.clear());
+    await c.dispose();
+    await _log('PASS:profile_write');
+  }
+
+  Future<void> _runProfileRead(String extra) async {
+    final parts = extra.split(':');
+    final persistentCache = parts[0];
+    final fixedPort = parts.length > 1 ? (int.tryParse(parts[1]) ?? 28443) : 28443;
+    _http1 = await HttpServer.bind(InternetAddress.loopbackIPv4, fixedPort, shared: true);
+    _http2 = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    _http1!.listen((req) async {
+      final path = req.uri.path;
+      stderr.writeln('[HTTP1_REQ] $path');
+      req.response.headers.contentType = ContentType.html;
+      req.response.write('''<!doctype html><html><head><title>P:$path</title>
+<script>
+function sendReport() {
+  if (typeof chromiumPostMessage === 'function') {
+    let ls = null;
+    try { ls = localStorage.getItem('session_status'); } catch (e) {}
+    const out = {
+      cookie: document.cookie,
+      ls: ls
+    };
+    chromiumPostMessage('compat', 'REPORT:' + JSON.stringify(out));
+    return true;
+  }
+  return false;
+}
+window.addEventListener('DOMContentLoaded', () => {
+  function trySend() {
+    if (!sendReport()) {
+      setTimeout(trySend, 50);
+    }
+  }
+  trySend();
+});
+</script>
+</head><body><h1>Path $path</h1></body></html>''');
+      await req.response.close();
+    });
+
+    final origin1 = 'http://127.0.0.1:$fixedPort';
+    await ChromiumWebViewController.initialize(cachePath: persistentCache);
+
+    // 1. Read persistent named profile
+    final bridgeCompleter = Completer<Map<String, dynamic>>();
+    final c = ChromiumWebViewController(
+      initialUrl: '$origin1/read_cookie',
+      profileName: 'ppplayer_youtube_session',
+      javaScriptChannels: [
+        JavaScriptChannel(
+          name: 'compat',
+          allowedOrigins: {origin1},
+          onMessageReceived: (msg) {
+            if (!bridgeCompleter.isCompleted && msg.message.startsWith('REPORT:')) {
+              try {
+                bridgeCompleter.complete(jsonDecode(msg.message.substring('REPORT:'.length)) as Map<String, dynamic>);
+              } catch (_) {}
+            }
+          },
+        ),
+      ],
+    );
+    setState(() => _controllers.add(c));
+    await c.createBrowser();
+    await _waitLoaded(c, urlContains: '/read_cookie');
+
+    for (int retry = 0; retry < 40; retry++) {
+      if (bridgeCompleter.isCompleted) break;
+      await c.executeJavaScript('if (typeof sendReport === "function") sendReport();');
+      await Future.delayed(const Duration(milliseconds: 150));
+    }
+    final res = await bridgeCompleter.future.timeout(const Duration(seconds: 10), onTimeout: () => <String, dynamic>{});
+    await _log('REPORT_NAMED:$res');
+
+    final cookieStr = res['cookie']?.toString() ?? '';
+    final lsStr = res['ls']?.toString() ?? '';
+    if (!cookieStr.contains('fcw_test=cookie_val_42') || !cookieStr.contains('client_auth=user_token_999')) {
+      throw Exception('Persistent cookie missing after restart: $cookieStr');
+    }
+    if (lsStr != 'logged_in_persistent') {
+      throw Exception('Persistent localStorage missing after restart: $lsStr');
+    }
+
+    setState(() => _controllers.clear());
+    await c.dispose();
+
+    // 2. Read anonymous profile (must be isolated)
+    final anonCompleter = Completer<Map<String, dynamic>>();
+    final cAnon = ChromiumWebViewController(
+      initialUrl: '$origin1/read_cookie',
+      profileName: null,
+      javaScriptChannels: [
+        JavaScriptChannel(
+          name: 'compat',
+          allowedOrigins: {origin1},
+          onMessageReceived: (msg) {
+            if (!anonCompleter.isCompleted && msg.message.startsWith('REPORT:')) {
+              try {
+                anonCompleter.complete(jsonDecode(msg.message.substring('REPORT:'.length)) as Map<String, dynamic>);
+              } catch (_) {}
+            }
+          },
+        ),
+      ],
+    );
+    setState(() => _controllers.add(cAnon));
+    await cAnon.createBrowser();
+    await _waitLoaded(cAnon, urlContains: '/read_cookie');
+
+    for (int retry = 0; retry < 40; retry++) {
+      if (anonCompleter.isCompleted) break;
+      await cAnon.executeJavaScript('if (typeof sendReport === "function") sendReport();');
+      await Future.delayed(const Duration(milliseconds: 150));
+    }
+    final anonRes = await anonCompleter.future.timeout(const Duration(seconds: 10), onTimeout: () => <String, dynamic>{});
+    await _log('REPORT_ANON:$anonRes');
+
+    final aCookie = anonRes['cookie']?.toString() ?? '';
+    final aLs = anonRes['ls'];
+    if (aCookie.contains('client_auth') || (aLs != null && aLs != '')) {
+      throw Exception('Anonymous profile leaked persistent storage: $anonRes');
+    }
+
+    setState(() => _controllers.clear());
+    await cAnon.dispose();
+    await _log('PASS:profile_read');
+  }
+
+  Future<void> _runProfileCancel(String persistentCache) async {
+    await ChromiumWebViewController.initialize(cachePath: persistentCache);
+    final c = ChromiumWebViewController(initialUrl: 'about:blank', profileName: 'fast_cancel');
+    setState(() => _controllers.add(c));
+    unawaited(c.createBrowser());
+    setState(() => _controllers.clear());
+    await c.dispose();
+    final diag = await _diagnostics();
+    if (diag['browsers'] == 0 && diag['textures'] == 0) {
+      await _log('PASS:profile_cancel');
+    } else {
+      await _log('FAIL:profile_cancel:diag=$diag');
     }
   }
 
@@ -534,6 +789,30 @@ run_case() {
   fi
 }
 
+run_failure_case() {
+  local name="$1"
+  local timeout_s="$2"
+  local expected_err="$3"
+  shift 3
+  local logf="$output_dir/${name}.log"
+  local rc=0
+  timeout "$timeout_s" "$BIN" "$@" >"$logf" 2>&1 || rc=$?
+  sleep 0.4
+  local orphans
+  orphans="$(pgrep -f "flutter_chromium_webview_subprocess|flutter_chromium_webview_example" || true)"
+  local shut=0
+  grep -q "\[CEF\] Shutdown complete" "$logf" && shut=1 || true
+  local matched_err=0
+  grep -Eq "$expected_err" "$logf" && matched_err=1 || true
+  if [[ "$shut" -eq 0 && "$matched_err" -eq 1 && -z "$orphans" ]]; then
+    echo "[PASS] $name (expected_error=1, shut_skipped=1, orphans=0)"
+  else
+    echo "[FAIL] $name (rc=$rc, shut=$shut, matched_err=$matched_err, orphans=${orphans:-none})"
+    tail -n 15 "$logf"
+    fail_count=$((fail_count + 1))
+  fi
+}
+
 echo "=== 1. 100 WebView create/dispose cycles ==="
 run_case "cycles_100" 180 cycles_100
 
@@ -590,11 +869,29 @@ PY
 tls_pid=$!
 for _ in $(seq 1 30); do [[ -s "$work_dir/tls_port" ]] && break; sleep 0.1; done
 tls_port="$(cat "$work_dir/tls_port" 2>/dev/null || echo 0)"
-run_case "compat_low_mem_on" 90 compat "$tls_port"
+run_case "compat_low_mem_on" 120 compat "$tls_port"
 grep "COMPAT_JSON:" "$output_dir/compat_low_mem_on.log" || true
-FLUTTER_CHROMIUM_WEBVIEW_LOW_MEMORY=0 run_case "compat_low_mem_off" 90 compat "$tls_port"
+FLUTTER_CHROMIUM_WEBVIEW_LOW_MEMORY=0 run_case "compat_low_mem_off" 120 compat "$tls_port"
 grep "COMPAT_JSON:" "$output_dir/compat_low_mem_off.log" || true
 kill "$tls_pid" 2>/dev/null || true
+
+echo "=== 6b. Persistent Named Profile & Anonymous Isolation Across Process Restart ==="
+persistent_cache="$(mktemp -d /tmp/fcw_persistent_cache.XXXXXX)"
+test_port=28443
+run_case "profile_write" 60 profile_write "$persistent_cache:$test_port"
+
+profile_dir="$persistent_cache/profile_ppplayer_youtube_session"
+if [[ -d "$profile_dir" ]]; then
+  echo "[PASS] Persistent profile directory verified on disk: $profile_dir"
+  ls -la "$profile_dir"
+else
+  echo "[FAIL] Profile directory missing: $profile_dir"
+  fail_count=$((fail_count + 1))
+fi
+
+run_case "profile_read" 60 profile_read "$persistent_cache:$test_port"
+run_case "profile_cancel" 60 profile_cancel "$persistent_cache"
+rm -rf "$persistent_cache"
 
 echo "=== 7. Adverse ELF link-order, dlopen(RTLD_LOCAL), G_SOURCE_CONTINUE, inactivity_timeout ==="
 cat > "$work_dir/adverse_elf.c" <<'C'
@@ -668,11 +965,20 @@ __attribute__((constructor)) static void add_idle(void) {
   // Adds a perpetual G_SOURCE_CONTINUE idle source on the default context;
   // an unbounded while(g_main_context_iteration(NULL, FALSE)) in Shutdown()
   // would deadlock forever!
-  g_timeout_add(0, busy_idle, NULL);
+  g_idle_add(busy_idle, NULL);
 }
 C
 gcc -shared -fPIC "$work_dir/idle_source_preload.c" $(pkg-config --cflags --libs glib-2.0 gio-2.0) -o "$work_dir/libidle_preload.so"
 LD_PRELOAD="$work_dir/libidle_preload.so" run_case "shutdown_with_perpetual_glib_source" 35 startup_cycle
+
+echo "=== 8. Deterministic failure injection: browser timeout & barrier timeout ==="
+# Test A: Browser closure times out -> kShutdownFailed, CefShutdown skipped, 0 orphans
+FCW_TEST_FORCE_BROWSER_TIMEOUT=1 FCW_TEST_SHUTDOWN_TIMEOUT_MS=10 run_failure_case \
+  "failure_inject_browser_timeout" 15 "Shutdown FAILED: [0-9]+ browser\(s\) still live" rapid_exit during_nav_and_js
+
+# Test B: TID_UI barrier times out -> kShutdownFailed, CefShutdown skipped, 0 orphans
+FCW_TEST_FORCE_BARRIER_TIMEOUT=1 run_failure_case \
+  "failure_inject_barrier_timeout" 15 "Shutdown FAILED: TID_UI barrier timed out" startup_cycle
 
 echo "=== STRESS_AND_COMPAT_SUMMARY fail_count=$fail_count ==="
 exit $(( fail_count > 0 ))

@@ -12,8 +12,8 @@ On desktop operating systems, it embeds the [Chromium Embedded Framework (CEF)](
 
 ## Target Versions
 
-- **`flutter_chromium_webview`**: `0.5.6`
-- **`flutter_chromium_webview_platform_interface`**: `0.1.6`
+- **`flutter_chromium_webview`**: `0.5.7`
+- **`flutter_chromium_webview_platform_interface`**: `0.1.7`
 
 ---
 
@@ -21,7 +21,7 @@ On desktop operating systems, it embeds the [Chromium Embedded Framework (CEF)](
 
 | Platform | Engine | Rendering Mechanism | Status | Details |
 |---|---|---|---|---|
-| **macOS 13+** | CEF 149 (Chromium 149) | Accelerated IOSurface via Metal | Supported (`arm64` & `x86_64`) | [MACOS.md](packages/flutter_chromium_webview/MACOS.md) |
+| **macOS 13+** | CEF 149 (Chromium 149) | Accelerated IOSurface via Metal | Supported (Apple Silicon `arm64` verified; Intel `x86_64` unverified on physical hardware) | [MACOS.md](packages/flutter_chromium_webview/MACOS.md) |
 | **Windows 10+** | CEF 149 (Chromium 149) | Software pixel buffer to Texture | Supported (`x64`, sandboxed bootstrap runner) | [WINDOWS.md](packages/flutter_chromium_webview/WINDOWS.md) |
 | **Linux** | CEF 149 (Chromium 149) | Software pixel buffer to Texture | Supported (`x64`, X11 / XWayland via GTK3) | [LINUX.md](packages/flutter_chromium_webview/LINUX.md) |
 | **Android (API 24+)** | System Chromium WebView | Native Platform View (Hybrid Composition) | Supported (ARM64, ARM32, x86_64) | [ANDROID.md](packages/flutter_chromium_webview/ANDROID.md) |
@@ -83,7 +83,7 @@ Add `flutter_chromium_webview` to your dependencies in `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_chromium_webview: ^0.5.6
+  flutter_chromium_webview: ^0.5.7
 ```
 
 ### Platform Setup Guides
@@ -191,7 +191,7 @@ flutter run -d <android-device-id>
 ```
 flutter_chromium_webview/
 ├── packages/
-│   ├── flutter_chromium_webview/                   # Main Flutter plugin (0.5.6)
+│   ├── flutter_chromium_webview/                   # Main Flutter plugin (0.5.7)
 │   │   ├── example/                                # Example browser app
 │   │   ├── lib/                                    # Dart API
 │   │   ├── macos/                                  # macOS CEF & Metal backend
@@ -199,7 +199,7 @@ flutter_chromium_webview/
 │   │   ├── linux/                                  # Linux CEF backend
 │   │   ├── android/                                # Android WebView backend
 │   │   └── ios/                                    # iOS prototype (unregistered)
-│   └── flutter_chromium_webview_platform_interface/ # Platform interface (0.1.6)
+│   └── flutter_chromium_webview_platform_interface/ # Platform interface (0.1.7)
 │       └── example/                                # Platform interface example
 ├── docs/                                           # Architecture and technical guides
 └── scripts/                                        # Native validation and smoke tests

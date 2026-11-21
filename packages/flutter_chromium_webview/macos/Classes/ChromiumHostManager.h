@@ -28,6 +28,7 @@ typedef NS_ENUM(NSInteger, HostState) {
 - (void)ensureHostRunning:(void(^)(BOOL success, NSError* error))completion;
 - (void)launchHostWithCompletion:(void(^)(BOOL success, NSError* error))completion;
 - (void)launchHostWithKeychainBehavior:(NSString*)keychainBehavior completion:(void(^)(BOOL success, NSError* error))completion;
+- (void)launchHostWithCachePath:(NSString*)cachePath keychainBehavior:(NSString*)keychainBehavior completion:(void(^)(BOOL success, NSError* error))completion;
 - (void)shutdown;
 
 @end

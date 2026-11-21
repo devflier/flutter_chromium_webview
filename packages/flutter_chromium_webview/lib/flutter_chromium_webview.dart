@@ -20,7 +20,7 @@ library flutter_chromium_webview;
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart' show defaultTargetPlatform;
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, kDebugMode;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart' show PlatformViewHitTestBehavior;
@@ -328,11 +328,23 @@ class ChromiumWebViewController extends ChangeNotifier {
   /// a private, in-memory browser context with no shared cookies/storage.
   final bool mediaPlaybackRequiresUserGesture;
 
-  /// Called when the native browser process crashes and is being automatically restarted.
+  /// Called when the native browser process crashes.
+  ///
+  /// When [automaticallyRecoverFromCrash] is true, the controller attempts
+  /// bounded automatic browser recreation; when false, the host coordinates
+  /// recovery explicitly.
   final void Function()? onBrowserCrashed;
 
   /// Hosts may coordinate recovery themselves instead of creating a second browser.
   final bool automaticallyRecoverFromCrash;
+
+  /// Optional callback invoked when the native host view detaches.
+  VoidCallback? onDetached;
+
+  /// Maximum consecutive automatic crash recoveries allowed within
+  /// [_crashWindow] before stopping automatic restarts to prevent crash loops.
+  static const int maxAutoRecoveryAttempts = 3;
+  static const Duration _crashWindow = Duration(seconds: 30);
 
   static void _validateUserAgent(String? value) {
     if (value != null &&
@@ -466,28 +478,48 @@ class ChromiumWebViewController extends ChangeNotifier {
     final eventArgs = browserEvent.arguments;
     switch (browserEvent.name) {
       case 'browserCrash':
-        debugPrint(
-          '[Flutter] ChromiumWebViewController _dispatchEvent handling browserCrash',
-        );
-        // The underlying native browser crashed.
-        // Reset internal state and transparently trigger recreation.
         final oldId = _browserId;
-        if (oldId != null) {
-          _controllers.remove(oldId);
-          _pendingEvents.remove(oldId);
-          if (automaticallyRecoverFromCrash) _platform.disposeBrowser(oldId);
+        if (oldId == null || oldId != browserEvent.browserId) {
+          return;
         }
+        if (kDebugMode) {
+          debugPrint(
+            '[Flutter] ChromiumWebViewController _dispatchEvent handling browserCrash (browserId=$oldId)',
+          );
+        }
+        _failActiveJavaScript(
+          const JavaScriptException(
+            'renderer_gone',
+            'Browser renderer process terminated',
+          ),
+        );
+        _controllers.remove(oldId);
+        _pendingEvents.remove(oldId);
         _browserId = null;
         _textureId = null;
         _popupTextureId = null;
         _isPopupShowing = false;
-        _creation = automaticallyRecoverFromCrash
-            ? _create()
-            : oldId != null
-            ? _platform.disposeBrowser(oldId)
-            : Future<void>.value();
+        _dismissTransientUi();
+
+        final now = DateTime.now();
+        if (_lastCrashAt != null &&
+            now.difference(_lastCrashAt!) > _crashWindow) {
+          _consecutiveCrashCount = 0;
+        }
+        _lastCrashAt = now;
+        _consecutiveCrashCount++;
+
+        final canAutoRecover =
+            automaticallyRecoverFromCrash &&
+            _consecutiveCrashCount <= maxAutoRecoveryAttempts;
+        if (canAutoRecover) {
+          unawaited(_platform.disposeBrowser(oldId).catchError((Object _) {}));
+          _creation ??= _create();
+        } else {
+          _creation = _platform.disposeBrowser(oldId).catchError((Object _) {});
+        }
         onBrowserCrashed?.call();
-        notifyListeners();
+        if (!_isDisposed) notifyListeners();
         break;
       case 'javascriptMessage':
         final name = eventArgs['channel'];
@@ -536,6 +568,9 @@ class ChromiumWebViewController extends ChangeNotifier {
         _isLoading = isLoading;
         _canGoBack = canGoBack;
         _canGoForward = canGoForward;
+        if (!isLoading) {
+          _consecutiveCrashCount = 0;
+        }
         onLoadingStateChanged?.call(_isLoading, _canGoBack, _canGoForward);
         if (!_isDisposed) notifyListeners();
         break;
@@ -774,6 +809,49 @@ class ChromiumWebViewController extends ChangeNotifier {
   bool _isDetached = false;
   Future<void>? _creation;
   Future<void>? _disposal;
+  int _consecutiveCrashCount = 0;
+  DateTime? _lastCrashAt;
+  final Map<String, void Function(JavaScriptException)> _activeJavaScriptOps =
+      {};
+
+  /// Whether this controller has been disposed.
+  bool get isDisposed => _isDisposed;
+
+  /// Whether the native host view has detached from this controller.
+  bool get isDetached => _isDetached;
+
+  /// Number of consecutive crashes observed within the current recovery window.
+  int get consecutiveCrashCount => _consecutiveCrashCount;
+
+  void _failActiveJavaScript(JavaScriptException error) {
+    if (_activeJavaScriptOps.isEmpty) return;
+    final callbacks = List<void Function(JavaScriptException)>.of(
+      _activeJavaScriptOps.values,
+    );
+    _activeJavaScriptOps.clear();
+    for (final fail in callbacks) {
+      fail(error);
+    }
+  }
+
+  void _markDetached() {
+    if (_isDetached) return;
+    _isDetached = true;
+    final id = _browserId;
+    if (id != null) {
+      _controllers.remove(id);
+      _pendingEvents.remove(id);
+    }
+    _browserId = null;
+    _textureId = null;
+    _popupTextureId = null;
+    _isPopupShowing = false;
+    _failActiveJavaScript(
+      const JavaScriptException('detached', 'Flutter view has been detached'),
+    );
+    onDetached?.call();
+    if (!_isDisposed) notifyListeners();
+  }
 
   /// Initializes the global CEF runtime.
   ///
@@ -816,13 +894,11 @@ class ChromiumWebViewController extends ChangeNotifier {
     _creatingCount++;
     try {
       _ensureHandlerRegistered();
+      final deferredInitialLoad =
+          userAgent != null && initialUrl != 'about:blank';
       final result = await _platform.createBrowser(
         BrowserCreationParams(
-          initialUrl:
-              userAgent != null ||
-                  (!mediaPlaybackRequiresUserGesture && profileName == null)
-              ? 'about:blank'
-              : initialUrl,
+          initialUrl: deferredInitialLoad ? 'about:blank' : initialUrl,
           mediaPlaybackRequiresUserGesture: mediaPlaybackRequiresUserGesture,
           profileName: profileName,
           javaScriptChannels: {
@@ -861,9 +937,22 @@ class ChromiumWebViewController extends ChangeNotifier {
           } else {
             await _platform.loadUrl(newBrowserId, _lastLoadRequestUrl!);
           }
-        } else if (!_isDisposed &&
-            (userAgent != null ||
-                (!mediaPlaybackRequiresUserGesture && profileName == null))) {
+        } else if (!_isDisposed && deferredInitialLoad) {
+          if (_isLoading) {
+            final completer = Completer<void>();
+            void listener() {
+              if (!_isLoading && !completer.isCompleted) {
+                completer.complete();
+              }
+            }
+
+            addListener(listener);
+            await completer.future.timeout(
+              const Duration(seconds: 2),
+              onTimeout: () {},
+            );
+            removeListener(listener);
+          }
           await _platform.loadUrl(newBrowserId, initialUrl);
         }
       } catch (_) {
@@ -876,7 +965,9 @@ class ChromiumWebViewController extends ChangeNotifier {
         rethrow;
       }
     } catch (e) {
-      debugPrint('[Flutter] _create caught exception: $e');
+      if (kDebugMode) {
+        debugPrint('[Flutter] _create caught exception: $e');
+      }
       if (!_isDisposed &&
           automaticallyRecoverFromCrash &&
           e is PlatformException &&
@@ -885,6 +976,16 @@ class ChromiumWebViewController extends ChangeNotifier {
             'HOST_FAILED',
             'INIT_TIMEOUT',
           }.contains(e.code)) {
+        final now = DateTime.now();
+        if (_lastCrashAt != null &&
+            now.difference(_lastCrashAt!) > _crashWindow) {
+          _consecutiveCrashCount = 0;
+        }
+        _lastCrashAt = now;
+        _consecutiveCrashCount++;
+        if (_consecutiveCrashCount > maxAutoRecoveryAttempts) {
+          rethrow;
+        }
         // If the host crashes during initialization, createBrowser throws.
         // We simulate a browser crash event to recreate the browser transparently.
         _browserId = null;
@@ -896,7 +997,7 @@ class ChromiumWebViewController extends ChangeNotifier {
         notifyListeners();
 
         await Future.delayed(const Duration(milliseconds: 500));
-        if (!_isDisposed) {
+        if (!_isDisposed && !_isDetached) {
           await _create();
         }
         return;
@@ -920,7 +1021,7 @@ class ChromiumWebViewController extends ChangeNotifier {
       await operation(id);
     } on PlatformException catch (error) {
       if (error.code == 'DETACHED') {
-        _isDetached = true;
+        _markDetached();
         return;
       }
       rethrow;
@@ -1041,11 +1142,40 @@ class ChromiumWebViewController extends ChangeNotifier {
       );
     }
     final operationId = '${++_nextJavaScriptOperation}';
+    final completer = Completer<Object?>();
+    _activeJavaScriptOps[operationId] = (JavaScriptException error) {
+      if (!completer.isCompleted) completer.completeError(error);
+    };
     final future = _platform.evaluateJavaScript(
       id,
       js,
       operationId: operationId,
       timeoutMs: timeout.inMilliseconds,
+    );
+    unawaited(
+      future.then(
+        (value) {
+          if (!completer.isCompleted) completer.complete(value);
+        },
+        onError: (Object error, StackTrace stack) {
+          if (completer.isCompleted) return;
+          if (error is PlatformException) {
+            if (error.code == 'DETACHED') _markDetached();
+            final details = error.details;
+            completer.completeError(
+              JavaScriptException(
+                error.code,
+                error.message ?? 'JavaScript request failed',
+                name: details is Map ? details['name'] as String? : null,
+                stack: details is Map ? details['stack'] as String? : null,
+              ),
+              stack,
+            );
+          } else {
+            completer.completeError(error, stack);
+          }
+        },
+      ),
     );
     final removeListener = cancellationToken?._listen(() {
       unawaited(
@@ -1053,17 +1183,9 @@ class ChromiumWebViewController extends ChangeNotifier {
       );
     });
     try {
-      return await future;
-    } on PlatformException catch (error) {
-      if (error.code == 'DETACHED') _isDetached = true;
-      final details = error.details;
-      throw JavaScriptException(
-        error.code,
-        error.message ?? 'JavaScript request failed',
-        name: details is Map ? details['name'] as String? : null,
-        stack: details is Map ? details['stack'] as String? : null,
-      );
+      return await completer.future;
     } finally {
+      _activeJavaScriptOps.remove(operationId);
       removeListener?.call();
     }
   }
@@ -1077,6 +1199,26 @@ class ChromiumWebViewController extends ChangeNotifier {
   /// When [focused] is true, the browser captures keyboard events.
   Future<void> setFocus(bool focused) =>
       _invoke((id) => _platform.setFocus(id, focused));
+
+  static const MethodChannel _controlChannel = MethodChannel(
+    'flutter_chromium_webview',
+  );
+
+  /// Hints to the native off-screen renderer whether active 60 FPS visual
+  /// updates are currently needed. When [active] is false, supported desktop
+  /// backends lower their windowless frame rate without suspending audio or JS.
+  Future<void> setRenderingActive(bool active) => _invoke((id) async {
+    if (_platform is MethodChannelChromiumWebView) {
+      try {
+        await _controlChannel.invokeMethod<void>('setRenderingActive', {
+          'browserId': id,
+          'active': active,
+        });
+      } on MissingPluginException {
+        // Optional optimization not implemented on every platform backend.
+      }
+    }
+  });
 
   /// Updates the native viewport size and device pixel ratio (DPR).
   ///
@@ -1151,6 +1293,9 @@ class ChromiumWebViewController extends ChangeNotifier {
   Future<void> dispose() {
     if (_disposal != null) return _disposal!;
     _isDisposed = true;
+    _failActiveJavaScript(
+      const JavaScriptException('browser_closed', 'Browser disposed'),
+    );
     unawaited(_messages.close());
     _dismissTransientUi();
     super.dispose();

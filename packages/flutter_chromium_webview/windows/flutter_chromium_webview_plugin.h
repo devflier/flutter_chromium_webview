@@ -47,6 +47,7 @@ class FlutterChromiumWebviewPlugin : public flutter::Plugin {
   
   std::string session_id_;
   bool resetting_ = false;
+  bool window_minimized_ = false;
   int window_proc_id_ = -1;
   std::unique_ptr<CefKeyboard> keyboard_;
   std::shared_ptr<int> lifetime_ = std::make_shared<int>(0);
