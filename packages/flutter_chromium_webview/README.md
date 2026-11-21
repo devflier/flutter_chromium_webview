@@ -4,7 +4,7 @@ A high-performance Chromium web view plugin for Flutter on **Windows**, **macOS*
 
 Desktop platforms bundle a pinned Chromium engine through [CEF (Chromium Embedded Framework)](https://bitbucket.org/chromiumembedded/cef) with Off-Screen Rendering (OSR) directly into Flutter textures. Android integrates the system Chromium WebView using Flutter's hybrid composition platform view.
 
-> **Target Release: `0.5.7`**  
+> **Target Release: `0.5.7`**
 > Companion platform interface: [`flutter_chromium_webview_platform_interface: ^0.1.7`](https://pub.dev/packages/flutter_chromium_webview_platform_interface)
 
 ---
@@ -44,7 +44,7 @@ Desktop platforms bundle a pinned Chromium engine through [CEF (Chromium Embedde
 
 | Platform | Engine | Rendering Path | Status | Guide |
 |---|---|---|---|---|
-| **macOS 13+** | CEF 149 (Chromium 149) | Accelerated IOSurface via Metal | Supported (Apple Silicon `arm64` & Intel `x86_64`) | [MACOS.md](MACOS.md) |
+| **macOS 13+** | CEF 149 (Chromium 149) | Accelerated IOSurface via Metal | Supported (Apple Silicon `arm64` verified; Intel `x86_64` implementation target, unverified on physical Intel hardware) | [MACOS.md](MACOS.md) |
 | **Windows 10+** | CEF 149 (Chromium 149) | Software pixel buffer to Texture | Supported (`x64`, sandboxed bootstrap runner) | [WINDOWS.md](WINDOWS.md) |
 | **Linux** | CEF 149 (Chromium 149) | Software pixel buffer to Texture | Supported (`x64`, X11 / XWayland via GTK3) | [LINUX.md](LINUX.md) |
 | **Android (API 24+)** | System Chromium WebView | Native Platform View (Hybrid Composition) | Supported (ARM64, ARM32, x86_64) | [ANDROID.md](ANDROID.md) |
@@ -198,6 +198,23 @@ When you are done with the controller:
 await controller.dispose();
 ```
 
+`dispose()` is idempotent, waits for any in-flight `createBrowser()` initialization to settle or cancel safely, rejects pending `evaluateJavaScript` futures immediately, and releases native browser, texture, and `IOSurface`/buffer resources before completing.
+
+### Rendering Throttling (`setRenderingActive`)
+
+When a desktop WebView is minimized, hidden, or paused while audio or background JavaScript should continue running, hint to the off-screen renderer to lower its frame rate:
+
+```dart
+// Lower windowless rendering to 1 FPS while keeping audio & JS bridge active
+await controller.setRenderingActive(false);
+
+// Resume 60 FPS rendering and request an immediate repaint
+await controller.setRenderingActive(true);
+```
+
+- **Windows & macOS**: Throttles CEF's windowless frame rate (`60 FPS → 1 FPS`) without calling `WasHidden(true)`, preserving uninterrupted audio playback and JS bridge events; restores `60 FPS` and calls `Invalidate(PET_VIEW)` when re-activated.
+- **Linux & Android**: Gracefully handled as a no-op (`MissingPluginException` caught internally) so callers can invoke `setRenderingActive()` uniformly across all platforms.
+
 ### Navigation & HTML Loading
 
 ```dart
@@ -294,8 +311,8 @@ final controller = ChromiumWebViewController(
 );
 ```
 
-- When `profileName` is omitted, the browser shares the global cache and cookie store.
-- Setting `mediaPlaybackRequiresUserGesture: false` creates an ephemeral private context suitable for media playback without polluting persistent sessions.
+- When `profileName` is provided (strictly `[a-zA-Z0-9_]`, up to 128 characters, preventing path traversal), desktop backends create a persistent on-disk `CefRequestContext` at `<cachePath>/profile_<profileName>` so cookies (including `HttpOnly`) and `localStorage` survive across full application restarts on Windows, Linux, and macOS.
+- When `profileName` is omitted (`null`), browsers remain isolated from named profiles (and `mediaPlaybackRequiresUserGesture: false` uses an ephemeral in-memory context that does not leak cookies or storage into named profiles).
 
 ### Multiple Simultaneous WebViews
 
@@ -399,6 +416,7 @@ Set `automaticallyRecoverFromCrash: false` when the host coordinates its own bro
 - `FLUTTER_CHROMIUM_WEBVIEW_LOW_MEMORY=0`: Reverts the default validated low-memory Chromium profile (disabling spare renderers, MediaRouter, Translate, OptimizationHints, BackForwardCache, extensions, sync, and component updates) back to stock Chromium defaults for A/B testing across Windows, macOS, and Linux.
 - `CEF_SYSTEM_MEDIA_CONTROLS=0`: Disables Chromium's OS media session and hardware media-key handling (`HardwareMediaKeyHandling`, `MediaSessionService`) across Windows, macOS, and Linux when the host app owns OS media controls.
 - `FLUTTER_CHROMIUM_WEBVIEW_ALLOW_CONTAINER_NO_SANDBOX=1` (Linux only): Explicitly opts out of Chromium's inner user-namespace sandbox **only** when verified Snap or Flatpak outer confinement is detected. Ignored on ordinary Linux installations. See [LINUX.md](LINUX.md).
+- `FLUTTER_CHROMIUM_WEBVIEW_PASSWORD_STORE` (Linux testing only, opt-in): Overrides Chromium's `--password-store` backend (`basic`, `gnome-libsecret`, `kwallet`, `kwallet5`, `kwallet6`, `detect`). Never set by default; `basic` is intended strictly for headless/CI testing because it is less secure than OS keyring storage. See [LINUX.md](LINUX.md).
 
 ---
 

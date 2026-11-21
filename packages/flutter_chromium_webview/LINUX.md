@@ -35,9 +35,10 @@ Chromium keeps sandboxing enabled by default; the plugin never silently disables
 sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 ```
 
-### Media Controls and Crash Notifications
+### Media Controls, Password Store, and Crash Notifications
 - Set `CEF_SYSTEM_MEDIA_CONTROLS=0` before `ChromiumWebViewController.initialize()` if the host owns MPRIS/media keys and wants to suppress Chromium's duplicate media session.
 - Renderer terminations are reported via `CefRequestHandler::OnRenderProcessTerminated` as `browserCrash` events to Dart.
+- **Password store (strictly opt-in, testing only):** By default, Chromium uses the host desktop's native keyring (`detect`). For headless or CI environments without an unlocked keyring daemon, `FLUTTER_CHROMIUM_WEBVIEW_PASSWORD_STORE` may be explicitly set to one of `basic`, `gnome-libsecret`, `kwallet`, `kwallet5`, `kwallet6`, or `detect`. Setting `FLUTTER_CHROMIUM_WEBVIEW_PASSWORD_STORE=basic` stores cookie/credential encryption keys less securely than an OS keyring and must **not** be enabled by default in production deployments.
 
 ## CEF Distribution and Automatic Download
 
