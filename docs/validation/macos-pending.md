@@ -4,7 +4,7 @@
 - **Package:** `devflier/flutter_chromium_webview`
 - **Version:** `0.5.6`
 - **Working Branch:** `exp/linux-cef-mtml-0.5.6`
-- **Target Commit SHA:** `8d23fc3b80033b16aea5a21a218ac43109025e44`
+- **Target Commit SHA:** `849dd572d48a94bdce27119006ad1b0080540bec`
 - **Status Date:** November 21, 2026
 
 ## Platform Verification Matrix
