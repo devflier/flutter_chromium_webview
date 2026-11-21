@@ -1,4 +1,5 @@
 #import "ChromiumHostManager.h"
+#include <errno.h>
 
 @interface ChromiumHostManager () {
     HostState _state;
@@ -202,10 +203,24 @@
 
 - (void)checkSocketReady {
     if ([[NSFileManager defaultManager] fileExistsAtPath:_socketPath]) {
-        [_socketWaitTimer invalidate];
-        _socketWaitTimer = nil;
-        [self connectIpc];
-        return;
+        NSError* err = nil;
+        if ([_ipcClient connectToSocket:_socketPath error:&err]) {
+            [_socketWaitTimer invalidate];
+            _socketWaitTimer = nil;
+            [self beginHandshake];
+            return;
+        }
+        // The socket path appears on disk after bind() and before listen()
+        // completes; retry transient ECONNREFUSED/ENOENT while waiting.
+        const BOOL transient = [err.domain isEqualToString:NSPOSIXErrorDomain] &&
+            (err.code == ECONNREFUSED || err.code == ENOENT || err.code == EAGAIN);
+        if (!transient || !_task.isRunning) {
+            [_socketWaitTimer invalidate];
+            _socketWaitTimer = nil;
+            [self failLaunchWithError:err];
+            [_task terminate];
+            return;
+        }
     }
     
     _socketWaitAttempts++;
@@ -217,16 +232,9 @@
     }
 }
 
-- (void)connectIpc {
+- (void)beginHandshake {
     [self transitionToState:HostStateConnecting];
     NSLog(@"[ChromiumHostManager] connecting");
-    
-    NSError* err = nil;
-    if (![_ipcClient connectToSocket:_socketPath error:&err]) {
-        [self failLaunchWithError:err];
-        [_task terminate];
-        return;
-    }
     
     [self transitionToState:HostStateHandshaking];
     
