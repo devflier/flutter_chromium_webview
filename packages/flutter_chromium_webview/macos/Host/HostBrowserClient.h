@@ -39,6 +39,8 @@ public:
         chromium_bridge::Policy javascript_policy;
         std::string context_token;
         bool renderer_gone = false;
+        bool closing = false;
+        CefRefPtr<CefRequestContext> pending_context;
         CefRefPtr<chromium_settings::UserAgent> user_agent;
         CefRefPtr<CefDevToolsMessageObserver> media_observer;
         CefRefPtr<CefRegistration> media_observer_registration;
@@ -79,7 +81,6 @@ public:
                                           CefRefPtr<CefProcessMessage> message) override;
 
     CefRefPtr<CefRequestHandler> GetRequestHandler() override {
-        NSLog(@"[CEFHost] GetRequestHandler called");
         return this;
     }
     

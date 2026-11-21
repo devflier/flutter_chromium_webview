@@ -144,7 +144,7 @@ requires a native Mac build/runtime pass. Remaining work includes:
 ppplayer's repository was read for compatibility planning; no app files, playback
 dependencies or release settings were modified.
 
-## Hosts with native media controls
+## Hosts with native media controls and memory profile
 
 Chromium publishes system media controls by default. If your app owns
 `MPNowPlayingInfoCenter` and `MPRemoteCommandCenter`, set
@@ -156,4 +156,6 @@ embedded players, including cross-origin iframes. Audio/video playback remains a
 this setting.
 
 For a Swift macOS runner, call `setenv("CEF_SYSTEM_MEDIA_CONTROLS", "0", 1)`
-in `applicationDidFinishLaunching` before starting playback.
+in `applicationDidFinishLaunching` or `MainFlutterWindow.awakeFromNib` before starting playback.
+
+The validated low-memory Chromium feature profile is also enabled by default on macOS (while preserving GPU/Metal acceleration and sandboxing). Set `FLUTTER_CHROMIUM_WEBVIEW_LOW_MEMORY=0` to revert to stock defaults for A/B testing. Release builds suppress per-message IPC/telemetry `NSLog` traffic and DevTools `Media.enable` attachment.

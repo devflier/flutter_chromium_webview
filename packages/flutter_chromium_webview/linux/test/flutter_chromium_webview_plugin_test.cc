@@ -300,5 +300,46 @@ TEST(CefRuntimeManager, FailureInjection_ReinitializationPreventedInTerminalStat
   runtime->ResetForTesting();
 }
 
+TEST(LinuxContainerSandboxPolicy, DefaultAndNormalLinuxAlwaysPreserveNativeSandbox) {
+  ContainerSandboxInputs normal;
+  EXPECT_FALSE(ShouldDisableInnerSandboxForContainer(normal));
+
+  // Explicit opt-in on an ordinary non-container Linux host MUST NOT disable
+  // Chromium's sandbox.
+  normal.allow_container_no_sandbox = true;
+  EXPECT_FALSE(ShouldDisableInnerSandboxForContainer(normal));
+}
+
+TEST(LinuxContainerSandboxPolicy, ContainerRequiresExplicitOptInAndVerifiedConfinement) {
+  // Snap without explicit opt-in stays sandboxed by default.
+  ContainerSandboxInputs snap;
+  snap.snap_env_set = true;
+  snap.snap_name_set = true;
+  snap.snap_dir_exists = true;
+  EXPECT_FALSE(ShouldDisableInnerSandboxForContainer(snap));
+
+  // Snap with explicit opt-in allows inner sandbox opt-out.
+  snap.allow_container_no_sandbox = true;
+  EXPECT_TRUE(ShouldDisableInnerSandboxForContainer(snap));
+
+  // Missing verified Snap directory rejects opt-out.
+  snap.snap_dir_exists = false;
+  EXPECT_FALSE(ShouldDisableInnerSandboxForContainer(snap));
+
+  // Flatpak without explicit opt-in stays sandboxed by default.
+  ContainerSandboxInputs flatpak;
+  flatpak.flatpak_id_set = true;
+  flatpak.flatpak_info_exists = true;
+  EXPECT_FALSE(ShouldDisableInnerSandboxForContainer(flatpak));
+
+  // Flatpak with explicit opt-in and /.flatpak-info allows inner sandbox opt-out.
+  flatpak.allow_container_no_sandbox = true;
+  EXPECT_TRUE(ShouldDisableInnerSandboxForContainer(flatpak));
+
+  // Spoofed FLATPAK_ID without /.flatpak-info rejects opt-out.
+  flatpak.flatpak_info_exists = false;
+  EXPECT_FALSE(ShouldDisableInnerSandboxForContainer(flatpak));
+}
+
 }  // namespace test
 }  // namespace flutter_chromium_webview

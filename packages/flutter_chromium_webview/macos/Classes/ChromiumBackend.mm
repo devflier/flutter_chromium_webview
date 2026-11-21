@@ -162,7 +162,9 @@ static void StartSurfacePortListener() {
                     NSLog(@"[ChromiumBackend] Failed to lookup IOSurface from mach port");
                     continue;
                 }
+#if DEBUG
                 NSLog(@"[ChromiumBackend] Successfully looked up IOSurface %p for slot %u, browserId %llu", surface, slot, browserId);
+#endif
                 
                 dispatch_async(dispatch_get_main_queue(), ^{
                     for (auto* core : cores) {

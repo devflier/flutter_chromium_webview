@@ -611,4 +611,99 @@ void main() {
       expect(callbackCount, 0);
     },
   );
+
+  test(
+    'bounded crash recovery stops after maxAutoRecoveryAttempts and resets after load',
+    () async {
+      var createCalls = 0;
+      var crashCallbacks = 0;
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+            const MethodChannel('flutter_chromium_webview'),
+            (MethodCall call) async {
+              log.add(call);
+              if (call.method == 'createBrowser') {
+                final id = ++createCalls;
+                return {
+                  'browserId': id,
+                  'textureId': 100 + id,
+                  'popupTextureId': 200 + id,
+                };
+              }
+              return null;
+            },
+          );
+
+      final controller = ChromiumWebViewController(
+        onBrowserCrashed: () => crashCallbacks++,
+      );
+      await controller.createBrowser();
+      expect(createCalls, 1);
+
+      // Crash 1, 2, 3 trigger automatic recovery.
+      for (var i = 1; i <= ChromiumWebViewController.maxAutoRecoveryAttempts; i++) {
+        await sendNativeEvent(i, 'browserCrash', {});
+        await Future<void>.delayed(Duration.zero);
+        expect(createCalls, i + 1);
+      }
+      expect(crashCallbacks, ChromiumWebViewController.maxAutoRecoveryAttempts);
+
+      // Crash 4 exceeds the consecutive recovery bound: notifies once and stops recreating.
+      final fourthId = createCalls;
+      await sendNativeEvent(fourthId, 'browserCrash', {});
+      await Future<void>.delayed(Duration.zero);
+      expect(createCalls, fourthId);
+      expect(
+        crashCallbacks,
+        ChromiumWebViewController.maxAutoRecoveryAttempts + 1,
+      );
+
+      // Duplicate crash for the already-cleared browser ID is ignored.
+      await sendNativeEvent(fourthId, 'browserCrash', {});
+      await Future<void>.delayed(Duration.zero);
+      expect(
+        crashCallbacks,
+        ChromiumWebViewController.maxAutoRecoveryAttempts + 1,
+      );
+
+      await controller.dispose();
+    },
+  );
+
+  test(
+    'pending evaluateJavaScript fails immediately on browser crash or disposal',
+    () async {
+      final neverCompletes = Completer<Object?>();
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(
+            const MethodChannel('flutter_chromium_webview'),
+            (MethodCall call) async {
+              if (call.method == 'createBrowser') {
+                return {'browserId': 1, 'textureId': 101, 'popupTextureId': -1};
+              }
+              if (call.method == 'evaluateJavaScript') {
+                return neverCompletes.future;
+              }
+              return null;
+            },
+          );
+
+      final controller = ChromiumWebViewController(
+        automaticallyRecoverFromCrash: false,
+      );
+      await controller.createBrowser();
+
+      final pendingEval = controller.evaluateJavaScript('1 + 1');
+      await Future<void>.delayed(Duration.zero);
+      await sendNativeEvent(1, 'browserCrash', {});
+
+      await expectLater(
+        pendingEval,
+        throwsA(
+          isA<JavaScriptException>().having((e) => e.code, 'code', 'renderer_gone'),
+        ),
+      );
+      await controller.dispose();
+    },
+  );
 }

@@ -1,4 +1,16 @@
-## Unreleased
+## 0.5.7
+
+* Dart: disable the 1-second `DebugHeartbeat` JavaScript timer by default in `ChromiumYoutubePlayerController` (opt-in via `enableDebugHeartbeat: true`), track and clear all JS interval timers on `pagehide`, `beforeunload`, reload, and disposal, and gate diagnostic logging to debug mode.
+* Dart: reject pending and new `ChromiumYoutubePlayerController` commands immediately on browser detachment/disposal instead of waiting for the 5-second `commandTimeout`, fail pending `evaluateJavaScript` futures immediately on crash/detachment/disposal, deduplicate crash notifications per browser generation, and bound consecutive automatic crash recovery attempts (`maxAutoRecoveryAttempts = 3`).
+* Android: emit `browserCrash` (instead of `loadError`) from `onRenderProcessGone` with duplicate-notification guard, unregister `Application.ActivityLifecycleCallbacks` on both Activity detach and engine teardown while preventing duplicate registrations across configuration changes, and remove unconditional Release `ChromiumBG` logging and commented experimental code.
+* Windows: replace the fixed 10 ms `SetTimer` CEF polling loop with CEF's event-driven `external_message_pump` (`OnScheduleMessagePumpWork` via a hidden `HWND_MESSAGE` window), lowering idle CPU and eliminating unnecessary wakeups while preserving Win32 main-thread affinity and clean shutdown.
+* Windows: optimize `FlutterChromiumTexture` with a bounded reusable frame buffer pool (eliminating per-frame 8+ MB allocations in steady state), runtime-detected SSSE3/SSE2 SIMD BGRA→RGBA conversion, and explicit buffer release (`Clear()`) on popup hide and browser close.
+* Windows & Linux: implement `CefRequestHandler::OnRenderProcessTerminated` (deduplicated) so renderer crashes reliably emit `browserCrash` events to Dart across all supported platforms; deduplicate `OnRenderProcessTerminated` on macOS.
+* Linux: add explicit, container-verified inner-sandbox opt-out (`FLUTTER_CHROMIUM_WEBVIEW_ALLOW_CONTAINER_NO_SANDBOX=1` restricted strictly to verified Snap or Flatpak confinement; ordinary Linux `.deb`/AppImage/desktop hosts always retain Chromium's native sandbox) with GoogleTest security-matrix unit tests.
+* Linux: harden the MTML shutdown state machine with an 8-state lifecycle, `TID_UI` synchronization barrier, bounded GLib context drain, and 8 failure-injection GoogleTest cases.
+* Windows, macOS & Linux: unify the validated opt-out low-memory Chromium feature profile (`FLUTTER_CHROMIUM_WEBVIEW_LOW_MEMORY=0` to revert) and `CEF_SYSTEM_MEDIA_CONTROLS=0` duplicate media-session suppression via a shared native flags helper, and gate macOS Release per-IPC/per-frame `NSLog` and `Media.enable` DevTools attachment behind `#if DEBUG`.
+
+## 0.5.6
 
 * Linux: refactor CEF lifecycle to `multi_threaded_message_loop = true` (CEF 149.0.4), eliminating the 100% idle CPU spin (issue #12), removing `CefRunMessageLoop()` re-entry `SIGTRAP` crashes, and requiring zero global `GApplication` symbol interposition. Isolated idle main-thread CPU drops from ~99.9% to `0.0–0.2%` (`0.9%` full process tree on static idle page), and active navigation GTK main-thread CPU drops by ~47% (`8.38% → 4.41%`).
 * Linux: enforce strict GTK main-thread vs CEF `TID_UI` thread affinity across browser creation, input/IME (`CefKeyboard`), dialogs, context menus, texture registration, coalesced `OnPaint` notifications, and condition-variable + `TID_UI` barrier shutdown across multi-window, `g_application_hold()` window reopen, and direct `g_application_quit()` flows.

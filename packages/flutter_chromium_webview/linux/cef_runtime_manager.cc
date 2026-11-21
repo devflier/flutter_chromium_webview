@@ -2,9 +2,43 @@
 #include <chrono>
 #include <iostream>
 #include <linux/limits.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <utility>
 #include "include/cef_task.h"
+#include "../native/chromium_flags.h"
+
+bool ShouldDisableInnerSandboxForContainer(const ContainerSandboxInputs& inputs) {
+  if (!inputs.allow_container_no_sandbox) {
+    return false;
+  }
+  const bool verified_snap =
+      inputs.snap_env_set && inputs.snap_name_set && inputs.snap_dir_exists;
+  const bool verified_flatpak =
+      inputs.flatpak_id_set && inputs.flatpak_info_exists;
+  return verified_snap || verified_flatpak;
+}
+
+bool ShouldDisableInnerSandboxForCurrentProcess() {
+  ContainerSandboxInputs inputs;
+  const char* opt_in = g_getenv("FLUTTER_CHROMIUM_WEBVIEW_ALLOW_CONTAINER_NO_SANDBOX");
+  inputs.allow_container_no_sandbox = opt_in && std::string(opt_in) == "1";
+
+  const char* snap = g_getenv("SNAP");
+  const char* snap_name = g_getenv("SNAP_NAME");
+  inputs.snap_env_set = snap && snap[0] != '\0';
+  inputs.snap_name_set = snap_name && snap_name[0] != '\0';
+  if (inputs.snap_env_set) {
+    struct stat st = {};
+    inputs.snap_dir_exists = (stat(snap, &st) == 0 && S_ISDIR(st.st_mode));
+  }
+
+  const char* flatpak_id = g_getenv("FLATPAK_ID");
+  inputs.flatpak_id_set = flatpak_id && flatpak_id[0] != '\0';
+  inputs.flatpak_info_exists = (access("/.flatpak-info", F_OK) == 0);
+
+  return ShouldDisableInnerSandboxForContainer(inputs);
+}
 
 namespace {
 class LambdaCefTask : public CefTask {
@@ -24,26 +58,22 @@ class SoftwareRenderingApp : public CefApp {
   void OnBeforeCommandLineProcessing(const CefString& process_type,
                                      CefRefPtr<CefCommandLine> command_line) override {
     command_line->AppendSwitchWithValue("ozone-platform", "x11");
-    // CPU off-screen rendering is the supported v0.1.0 path.
+    // CPU off-screen rendering is the supported Linux path.
     command_line->AppendSwitch("disable-gpu");
     command_line->AppendSwitch("disable-gpu-compositing");
-    // Opt-out for A/B measurement or hosts needing stock Chromium behavior.
-    const char* low_memory = g_getenv("FLUTTER_CHROMIUM_WEBVIEW_LOW_MEMORY");
-    const bool apply_low_memory = !(low_memory && std::string(low_memory) == "0");
-    if (process_type.empty() && apply_low_memory) {
-      // Disable background desktop Chrome services and speculative spare
-      // renderer creation to reduce idle RAM while preserving sandboxing,
-      // site isolation, and multi-process security.
-      command_line->AppendSwitch("disable-background-networking");
-      command_line->AppendSwitch("disable-component-update");
-      command_line->AppendSwitch("disable-default-apps");
-      command_line->AppendSwitch("disable-extensions");
-      command_line->AppendSwitch("disable-sync");
-      command_line->AppendSwitch("metrics-recording-only");
-      command_line->AppendSwitchWithValue(
-          "disable-features",
-          "SpareRendererForSitePerProcess,OptimizationHints,"
-          "OptimizationTargetPrediction,MediaRouter,Translate,BackForwardCache");
+    if (ShouldDisableInnerSandboxForCurrentProcess()) {
+      command_line->AppendSwitch("no-sandbox");
+      command_line->AppendSwitch("disable-setuid-sandbox");
+    }
+    chromium_flags::ApplyLowMemoryProfile(process_type, command_line);
+    chromium_flags::ApplySystemMediaControlsPolicy(command_line);
+    if (const char* store = g_getenv("FLUTTER_CHROMIUM_WEBVIEW_PASSWORD_STORE")) {
+      std::string value(store);
+      if (value == "basic" || value == "gnome-libsecret" ||
+          value == "kwallet" || value == "kwallet5" ||
+          value == "kwallet6" || value == "detect") {
+        command_line->AppendSwitchWithValue("password-store", value);
+      }
     }
   }
 
@@ -122,9 +152,17 @@ bool CefRuntimeManager::Initialize(const std::string& cache_path, int argc, char
   CefMainArgs main_args(argc > 0 ? argc : 1, argc > 0 ? argv : default_argv);
   CefSettings settings;
 
-  // Keep Chromium's sandbox enabled. Unsupported hosts must fail explicitly;
-  // no automatic --no-sandbox fallback is permitted.
+  // Keep Chromium's sandbox enabled on normal Linux hosts. Only disable the
+  // inner sandbox when the host explicitly opts in AND a verified Snap or
+  // Flatpak outer container confinement is detected.
   settings.windowless_rendering_enabled = true;
+  if (ShouldDisableInnerSandboxForCurrentProcess()) {
+    std::cerr << "[CEF] Verified Snap/Flatpak confinement with explicit "
+                 "FLUTTER_CHROMIUM_WEBVIEW_ALLOW_CONTAINER_NO_SANDBOX=1; "
+                 "disabling inner Chromium sandbox."
+              << std::endl;
+    settings.no_sandbox = true;
+  }
 
   // Run CEF's browser-process UI message loop on its own dedicated thread so
   // GTK's g_application_run() runs unmodified with zero idle CPU spin and zero
@@ -189,7 +227,7 @@ void CefRuntimeManager::Shutdown() {
     if (ms > 0) browser_timeout = std::chrono::milliseconds(ms);
   }
   if (g_getenv("FCW_TEST_FORCE_BROWSER_TIMEOUT")) {
-    browser_timeout = std::chrono::milliseconds(50);
+    browser_timeout = std::chrono::milliseconds(0);
   }
 
   const auto browser_deadline = std::chrono::steady_clock::now() + browser_timeout;

@@ -61,3 +61,11 @@ To verify deployment after the release build, use a fresh absolute output path:
 The smoke check launches the copied bundle, sends an ordinary window close,
 requires exit code zero and CEF shutdown completion, and checks for surviving
 subprocesses. CI runs this check after its release build.
+
+## Performance, Memory, and Media Controls
+
+- **Event-driven message pump**: Windows runs CEF with `external_message_pump = true` and `CefBrowserProcessHandler::OnScheduleMessagePumpWork()` marshaled through a hidden `HWND_MESSAGE` window on the Flutter Win32 UI thread. No fixed 10 ms polling timer runs while idle, eliminating unnecessary wakeups while preserving Win32 thread affinity and responsive input/rendering.
+- **Pooled SIMD texture pipeline**: `FlutterChromiumTexture` reuses a bounded pool of pixel buffers across `OnPaint` frames (avoiding repeated multi-megabyte heap allocations at 1080p/4K), converts BGRA→RGBA using runtime-detected SSSE3/SSE2 SIMD instructions, and releases retained buffers immediately when popups hide or browsers close (`Clear()` + `WasHidden(true)`).
+- **Low-memory profile**: Enabled by default in the browser process (disabling speculative spare renderers and unused desktop Chrome services while preserving sandboxing, site isolation, JavaScript, and media playback). Set `FLUTTER_CHROMIUM_WEBVIEW_LOW_MEMORY=0` for A/B testing against stock defaults.
+- **Duplicate media-session suppression**: Set `CEF_SYSTEM_MEDIA_CONTROLS=0` before `ChromiumWebViewController.initialize()` if the host owns Windows media controls and wants to disable Chromium's SMTC/hardware media-key session.
+- **Renderer crash notifications**: `CefRequestHandler::OnRenderProcessTerminated` emits deduplicated `browserCrash` events to Dart.

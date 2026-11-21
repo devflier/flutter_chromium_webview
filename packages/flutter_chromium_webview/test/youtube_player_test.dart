@@ -268,4 +268,133 @@ void main() {
       await subscription.cancel();
     },
   );
+
+  test(
+    'debug heartbeat is disabled by default, opt-in when enabled, and tracks timer cleanup',
+    () async {
+      final defaultHtml = player.buildHtmlDocument();
+      final defaultConfigMatch = RegExp(
+        r"atob\('([^']+)'\)",
+      ).firstMatch(defaultHtml);
+      expect(defaultConfigMatch, isNotNull);
+      final defaultConfig =
+          jsonDecode(utf8.decode(base64Decode(defaultConfigMatch!.group(1)!)))
+              as Map<String, dynamic>;
+      expect(defaultConfig['debugHeartbeat'], isFalse);
+      expect(defaultHtml, contains('if(config.debugHeartbeat===true)'));
+      expect(defaultHtml, contains('clearInterval(heartbeatTimer)'));
+      expect(defaultHtml, contains("addEventListener('pagehide',cleanup)"));
+      expect(defaultHtml, contains("addEventListener('beforeunload',cleanup)"));
+
+      final defaultEvents = <Map<String, Object?>>[];
+      final defaultSub = player.events.listen(defaultEvents.add);
+      await player.initialize();
+      await send({'DebugHeartbeat': '{"state":1}'});
+      await Future<void>.delayed(Duration.zero);
+      expect(
+        defaultEvents.where((e) => e.containsKey('DebugHeartbeat')),
+        isEmpty,
+      );
+      await defaultSub.cancel();
+
+      final optIn = ChromiumYoutubePlayerController(
+        documentUrl: 'https://player.example/embed',
+        enableDebugHeartbeat: true,
+        readyTimeout: const Duration(milliseconds: 100),
+        commandTimeout: const Duration(milliseconds: 100),
+      );
+      final optInHtml = optIn.buildHtmlDocument();
+      final optInConfigMatch = RegExp(
+        r"atob\('([^']+)'\)",
+      ).firstMatch(optInHtml);
+      expect(optInConfigMatch, isNotNull);
+      final optInConfig =
+          jsonDecode(utf8.decode(base64Decode(optInConfigMatch!.group(1)!)))
+              as Map<String, dynamic>;
+      expect(optInConfig['debugHeartbeat'], isTrue);
+      await optIn.dispose();
+    },
+  );
+
+  test(
+    'detached browser rejects commands immediately without waiting for commandTimeout',
+    () async {
+      await player.dispose();
+      player = ChromiumYoutubePlayerController(
+        documentUrl: 'https://player.example/embed',
+        readyTimeout: const Duration(seconds: 5),
+        commandTimeout: const Duration(seconds: 5),
+      );
+      var detached = false;
+      messenger.setMockMethodCallHandler(channel, (call) async {
+        if (call.method == 'createBrowser') {
+          return {'browserId': 1, 'textureId': 2, 'popupTextureId': 3};
+        }
+        if (call.method == 'loadHtmlString') {
+          generation++;
+          await send({'Ready': true});
+        }
+        if (call.method == 'executeJavaScript') {
+          if (detached) {
+            throw PlatformException(
+              code: 'DETACHED',
+              message: 'Flutter view has been detached',
+            );
+          }
+          // Do not reply immediately for in-flight detachment check below.
+        }
+        return null;
+      });
+
+      await player.initialize();
+      detached = true;
+
+      final sw = Stopwatch()..start();
+      await expectLater(player.playVideo(), throwsStateError);
+      sw.stop();
+      expect(
+        sw.elapsedMilliseconds,
+        lessThan(500),
+        reason: 'Detached command must reject immediately, not wait 5s timeout',
+      );
+      expect(player.webViewController.isDetached, isTrue);
+
+      // Subsequent commands also reject immediately without hanging.
+      final sw2 = Stopwatch()..start();
+      expect(() => player.pauseVideo(), throwsStateError);
+      sw2.stop();
+      expect(sw2.elapsedMilliseconds, lessThan(200));
+    },
+  );
+
+  test(
+    'duplicate crash events for the same browser generation notify once',
+    () async {
+      await player.dispose();
+      player = ChromiumYoutubePlayerController(
+        documentUrl: 'https://player.example/embed',
+        recoverAutomatically: false,
+      );
+      final events = <Map<String, Object?>>[];
+      final sub = player.events.listen(events.add);
+      await player.initialize();
+
+      for (var i = 0; i < 3; i++) {
+        await messenger.handlePlatformMessage(
+          channel.name,
+          const StandardMethodCodec().encodeMethodCall(
+            const MethodCall('onBrowserEvent', {
+              'browserId': 1,
+              'event': 'browserCrash',
+              'args': <String, Object?>{},
+            }),
+          ),
+          (_) {},
+        );
+      }
+      await Future<void>.delayed(Duration.zero);
+      expect(events.where((e) => e['BrowserCrashed'] == true), hasLength(1));
+      await sub.cancel();
+    },
+  );
 }

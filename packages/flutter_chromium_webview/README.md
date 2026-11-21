@@ -4,8 +4,8 @@ A high-performance Chromium web view plugin for Flutter on **Windows**, **macOS*
 
 Desktop platforms bundle a pinned Chromium engine through [CEF (Chromium Embedded Framework)](https://bitbucket.org/chromiumembedded/cef) with Off-Screen Rendering (OSR) directly into Flutter textures. Android integrates the system Chromium WebView using Flutter's hybrid composition platform view.
 
-> **Target Release: `0.5.3`**  
-> Companion platform interface: [`flutter_chromium_webview_platform_interface: ^0.1.6`](https://pub.dev/packages/flutter_chromium_webview_platform_interface)
+> **Target Release: `0.5.7`**  
+> Companion platform interface: [`flutter_chromium_webview_platform_interface: ^0.1.7`](https://pub.dev/packages/flutter_chromium_webview_platform_interface)
 
 ---
 
@@ -89,7 +89,7 @@ Add the package to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  flutter_chromium_webview: ^0.5.3
+  flutter_chromium_webview: ^0.5.7
 ```
 
 Because desktop platforms require native runtime bootstrapping, follow the platform-specific instructions below:
@@ -381,16 +381,24 @@ Supported open video codecs: **VP8**, **VP9**, **AV1**, **Vorbis**, **Opus**. St
 
 ### Crash Recovery & Fault Tolerance
 
-If the Chromium renderer or GPU subprocess crashes, `flutter_chromium_webview` detects the failure and fires `onBrowserCrashed`:
+If the Chromium renderer or GPU subprocess crashes, `flutter_chromium_webview` detects the failure across Windows, macOS, Linux, and Android and fires `onBrowserCrashed`:
 
 ```dart
-controller.onBrowserCrashed = () {
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(content: Text('Browser process crashed. Reloading...')),
-  );
-  controller.reload();
-};
+final controller = ChromiumWebViewController(
+  automaticallyRecoverFromCrash: true, // Bounded automatic recovery (max 3 consecutive)
+  onBrowserCrashed: () {
+    // Handle crash notification or coordinate custom recovery.
+  },
+);
 ```
+
+Set `automaticallyRecoverFromCrash: false` when the host coordinates its own browser lifecycle and recovery.
+
+### Runtime Environment Configuration
+
+- `FLUTTER_CHROMIUM_WEBVIEW_LOW_MEMORY=0`: Reverts the default validated low-memory Chromium profile (disabling spare renderers, MediaRouter, Translate, OptimizationHints, BackForwardCache, extensions, sync, and component updates) back to stock Chromium defaults for A/B testing across Windows, macOS, and Linux.
+- `CEF_SYSTEM_MEDIA_CONTROLS=0`: Disables Chromium's OS media session and hardware media-key handling (`HardwareMediaKeyHandling`, `MediaSessionService`) across Windows, macOS, and Linux when the host app owns OS media controls.
+- `FLUTTER_CHROMIUM_WEBVIEW_ALLOW_CONTAINER_NO_SANDBOX=1` (Linux only): Explicitly opts out of Chromium's inner user-namespace sandbox **only** when verified Snap or Flatpak outer confinement is detected. Ignored on ordinary Linux installations. See [LINUX.md](LINUX.md).
 
 ---
 

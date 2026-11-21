@@ -65,6 +65,7 @@ class CefBrowserHandler : public CefClient,
                           public CefLifeSpanHandler,
                           public CefDisplayHandler,
                           public CefLoadHandler,
+                          public CefRequestHandler,
                           public CefJSDialogHandler,
                           public CefContextMenuHandler,
                           public CefFocusHandler {
@@ -85,7 +86,19 @@ class CefBrowserHandler : public CefClient,
   // Internally mutex-protected across GTK/TID_UI writes and CEF IO-thread reads.
   CefRefPtr<chromium_html::Documents> html_documents = new chromium_html::Documents();
 
-  CefRefPtr<CefRequestHandler> GetRequestHandler() override { return html_documents; }
+  CefRefPtr<CefRequestHandler> GetRequestHandler() override { return this; }
+  CefRefPtr<CefResourceRequestHandler> GetResourceRequestHandler(
+      CefRefPtr<CefBrowser> browser,
+      CefRefPtr<CefFrame> frame,
+      CefRefPtr<CefRequest> request,
+      bool is_navigation,
+      bool is_download,
+      const CefString& request_initiator,
+      bool& disable_default_handling) override;
+  void OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
+                                 TerminationStatus status,
+                                 int error_code,
+                                 const CefString& error_string) override;
   bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
       CefProcessId source, CefRefPtr<CefProcessMessage> message) override;
   CefRefPtr<CefRenderHandler> GetRenderHandler() override { return this; }
@@ -101,7 +114,7 @@ class CefBrowserHandler : public CefClient,
   void OnBeforeClose(CefRefPtr<CefBrowser> browser) override;
   bool OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int popup_id,
                     const CefString& target_url, const CefString& target_frame_name,
-                    WindowOpenDisposition target_disposition,
+                    CefLifeSpanHandler::WindowOpenDisposition target_disposition,
                     bool user_gesture, const CefPopupFeatures& popupFeatures,
                     CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client,
                     CefBrowserSettings& settings,
@@ -178,11 +191,13 @@ class CefBrowserHandler : public CefClient,
   bool runtime_slot_held_ = false;
   bool creation_pending_on_ui_ = false;
   bool close_requested_on_ui_ = false;
+  bool crash_notified_on_ui_ = false;
   int width_ = 1;
   int height_ = 1;
   float dpr_ = 1.0f;
   PendingCallbacks<CefRefPtr<CefJSDialogCallback>> pending_dialogs_;
   PendingCallbacks<CefRefPtr<CefRunContextMenuCallback>> pending_menus_;
+  CefRefPtr<CefRequestContext> pending_context_;
   CefRefPtr<CefBrowser> browser_;
   std::vector<std::function<void()>> close_callbacks_;
 

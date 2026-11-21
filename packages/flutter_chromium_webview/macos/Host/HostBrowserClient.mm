@@ -237,66 +237,122 @@ void HostBrowserClient::CreateBrowser(int64_t browser_id, const std::string& url
     // Bind the returned browser to this exact session on the CEF UI thread.
     // Picking an arbitrary unbound session in OnAfterCreated swaps concurrent
     // browsers (and consequently their textures, focus and input destinations).
-    creating_browser_id_ = browser_id;
-    auto context = chromium_settings::CustomContext(requiresGesture, profile);
-    auto browser = CefBrowserHost::CreateBrowserSync(window_info, this, url,
-                                                     browser_settings, extra_info, context);
-    creating_browser_id_ = -1;
-    auto& created = _sessions.at(browser_id);
-    if (!browser) {
+    CefRefPtr<HostBrowserClient> self = this;
+    auto finishCreate = [self, browser_id, url, request_id, requiresGesture,
+                         window_info, browser_settings, extra_info](
+                            CefRefPtr<CefRequestContext> context) mutable {
+        @autoreleasepool {
+        auto it = self->_sessions.find(browser_id);
+        if (it == self->_sessions.end() || it->second.closing) {
+            if (it != self->_sessions.end()) {
+                it->second.pending_context = nullptr;
+                self->_sessions.erase(it);
+                g_counters.activeBrowsers--;
+            }
+            IPC::Message error;
+            error.type = "error";
+            error.requestId = request_id;
+            error.payload = @{@"code": @"detached", @"browserId": @(browser_id)};
+            if (self->on_message_) self->on_message_(error);
+            return;
+        }
+        it->second.pending_context = nullptr;
+
+        std::string settingsError;
+        if (!requiresGesture && (!context || !chromium_settings::AllowAutoplay(context, settingsError))) {
+            self->_sessions.erase(it);
+            g_counters.activeBrowsers--;
+            IPC::Message error;
+            error.type = "error";
+            error.requestId = request_id;
+            error.payload = @{@"message": [NSString stringWithUTF8String:settingsError.c_str()]};
+            if (self->on_message_) self->on_message_(error);
+            return;
+        }
+
+        self->creating_browser_id_ = browser_id;
+        auto browser = CefBrowserHost::CreateBrowserSync(window_info, self, url,
+                                                         browser_settings, extra_info, context);
+        self->creating_browser_id_ = -1;
+        auto createdIt = self->_sessions.find(browser_id);
+        if (createdIt == self->_sessions.end()) {
+            if (browser) browser->GetHost()->CloseBrowser(true);
+            return;
+        }
+        auto& created = createdIt->second;
+        if (!browser) {
+            self->_sessions.erase(createdIt);
+            g_counters.activeBrowsers--;
+            IPC::Message error;
+            error.type = "error";
+            error.requestId = request_id;
+            error.payload = @{@"code": @"create_failed", @"browserId": @(browser_id)};
+            if (self->on_message_) self->on_message_(error);
+            return;
+        }
+        created.browser = browser;
+#if DEBUG
+        NSLog(@"[CEFHost] browserCreated id=%lld", browser_id);
+        created.media_observer = new MediaDevToolsObserver(self, browser_id);
+        created.media_observer_registration = browser->GetHost()->AddDevToolsMessageObserver(created.media_observer);
+        CefRefPtr<CefDictionaryValue> params = CefDictionaryValue::Create();
+        browser->GetHost()->ExecuteDevToolsMethod(0, "Media.enable", params);
+#endif
+
+        IPC::Message ack;
+        ack.type = "browserCreated";
+        ack.requestId = request_id;
+        ack.browserId = std::to_string(browser_id);
+        ack.payload = @{@"browserId": @(browser_id)};
+        if (self->on_message_) self->on_message_(ack);
+
+        // Allocate IOSurfaces using the latest session dimensions.
+        const int surfWidth = created.width;
+        const int surfHeight = created.height;
+        NSDictionary* surfaceProps = @{
+            (id)kIOSurfaceWidth: @(surfWidth),
+            (id)kIOSurfaceHeight: @(surfHeight),
+            (id)kIOSurfaceBytesPerElement: @4,
+            (id)kIOSurfacePixelFormat: @(kCVPixelFormatType_32BGRA)
+        };
+        created.io_surfaces.clear();
+        for (int i = 0; i < 3; i++) {
+            IOSurfaceRef surface = IOSurfaceCreate((__bridge CFDictionaryRef)surfaceProps);
+            if (surface) g_counters.activeIOSurfaces++;
+            created.io_surfaces.push_back(surface);
+            mach_port_t port = surface ? IOSurfaceCreateMachPort(surface) : MACH_PORT_NULL;
+            if (port == MACH_PORT_NULL) continue;
+            g_counters.activeMachSendRights++;
+            SendSurfacePort(port, i, browser_id, surfWidth, surfHeight, created.generation, false);
+            mach_port_deallocate(mach_task_self(), port);
+            g_counters.activeMachSendRights--;
+        }
+        created.current_surface_slot = 0;
+        }
+    };
+
+    if (requiresGesture && profile.empty()) {
+        finishCreate(nullptr);
+        return;
+    }
+
+    CefRefPtr<CefRequestContextHandler> ctxHandler =
+        new chromium_settings::ContextReadyHandler(std::move(finishCreate));
+    auto context = chromium_settings::CustomContext(requiresGesture, profile, ctxHandler);
+    if (!context) {
         _sessions.erase(browser_id);
         g_counters.activeBrowsers--;
         IPC::Message error;
         error.type = "error";
         error.requestId = request_id;
-        error.payload = @{@"code": @"create_failed", @"browserId": @(browser_id)};
+        error.payload = @{@"code": @"settings_failed", @"browserId": @(browser_id)};
         if (on_message_) on_message_(error);
         return;
     }
-    created.browser = browser;
-    std::string settingsError;
-    if (!requiresGesture && (!context || !chromium_settings::AllowAutoplay(browser, settingsError))) {
-        CloseBrowser(browser_id);
-        IPC::Message error;
-        error.type = "error";
-        error.requestId = request_id;
-        error.payload = @{@"message": [NSString stringWithUTF8String:settingsError.c_str()]};
-        if (on_message_) on_message_(error);
-        return;
+    auto pendingIt = _sessions.find(browser_id);
+    if (pendingIt != _sessions.end() && !pendingIt->second.browser) {
+        pendingIt->second.pending_context = context;
     }
-    NSLog(@"[CEFHost] browserCreated id=%lld", browser_id);
-    created.media_observer = new MediaDevToolsObserver(this, browser_id);
-    created.media_observer_registration = browser->GetHost()->AddDevToolsMessageObserver(created.media_observer);
-    CefRefPtr<CefDictionaryValue> params = CefDictionaryValue::Create();
-    browser->GetHost()->ExecuteDevToolsMethod(0, "Media.enable", params);
-
-    IPC::Message ack;
-    ack.type = "browserCreated";
-    ack.requestId = request_id;
-    ack.browserId = std::to_string(browser_id);
-    ack.payload = @{@"browserId": @(browser_id)};
-    if (on_message_) on_message_(ack);
-    
-    // Allocate IOSurfaces
-    NSDictionary* surfaceProps = @{
-        (id)kIOSurfaceWidth: @(width),
-        (id)kIOSurfaceHeight: @(height),
-        (id)kIOSurfaceBytesPerElement: @4,
-        (id)kIOSurfacePixelFormat: @(kCVPixelFormatType_32BGRA)
-    };
-    created.io_surfaces.clear();
-    for (int i = 0; i < 3; i++) {
-        IOSurfaceRef surface = IOSurfaceCreate((__bridge CFDictionaryRef)surfaceProps);
-        if (surface) g_counters.activeIOSurfaces++;
-        created.io_surfaces.push_back(surface);
-        mach_port_t port = surface ? IOSurfaceCreateMachPort(surface) : MACH_PORT_NULL;
-        if (port == MACH_PORT_NULL) continue;
-        g_counters.activeMachSendRights++;
-        SendSurfacePort(port, i, browser_id, width, height, created.generation, false);
-        mach_port_deallocate(mach_task_self(), port);
-        g_counters.activeMachSendRights--;
-    }
-    created.current_surface_slot = 0;
 }
 
 void HostBrowserClient::SetUserAgent(const IPC::Message& request) {
@@ -370,8 +426,11 @@ void HostBrowserClient::CloseBrowser(int64_t browser_id) {
     ClearHtml(browser_id);
     InvalidateJavaScript(browser_id, "browser_closed", "Browser closed");
     auto it = _sessions.find(browser_id);
-    if (it != _sessions.end() && it->second.browser) {
-        it->second.browser->GetHost()->CloseBrowser(true);
+    if (it != _sessions.end()) {
+        it->second.closing = true;
+        if (it->second.browser) {
+            it->second.browser->GetHost()->CloseBrowser(true);
+        }
     }
 }
 
@@ -382,6 +441,12 @@ void HostBrowserClient::ResizeBrowser(int64_t browser_id, int width, int height,
     NSLog(@"[CEFHost] ResizeBrowser called for %lld, width=%d, height=%d, scale=%f", browser_id, width, height, scale_factor);
     auto it = _sessions.find(browser_id);
     if (it != _sessions.end()) {
+        if (!it->second.browser) {
+            it->second.width = width;
+            it->second.height = height;
+            it->second.deviceScaleFactor = scale_factor;
+            return;
+        }
         if (it->second.width == width && 
             it->second.height == height && 
             it->second.deviceScaleFactor == scale_factor &&
@@ -471,6 +536,15 @@ void HostBrowserClient::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
 
 void HostBrowserClient::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
     CEF_REQUIRE_UI_THREAD();
+    if (browser) {
+        if (auto host = browser->GetHost()) {
+            if (auto ctx = host->GetRequestContext()) {
+                if (auto cm = ctx->GetCookieManager(nullptr)) {
+                    cm->FlushStore(nullptr);
+                }
+            }
+        }
+    }
     int64_t id = GetBrowserId(browser);
     if (id != -1) {
         if (auto* session = GetSession(id); session && session->user_agent) session->user_agent->Cancel();
@@ -581,6 +655,7 @@ void HostBrowserClient::OnPaint(CefRefPtr<CefBrowser> browser,
         session->current_surface_slot = (session->current_surface_slot + 1) % 3;
     }
     
+#if DEBUG
     uint64_t now = mach_absolute_time();
     if (session->lastPrintTime == 0) session->lastPrintTime = now;
     if (session->frameSequence % 60 == 0) {
@@ -592,6 +667,7 @@ void HostBrowserClient::OnPaint(CefRefPtr<CefBrowser> browser,
         session->lastPrintTime = now;
         session->totalGpuBlitTimeMs = 0;
     }
+#endif
     }
 }
 
@@ -737,6 +813,7 @@ void HostBrowserClient::OnAcceleratedPaint(CefRefPtr<CefBrowser> browser,
     
     session->current_surface_slot = (slot + 1) % 3;
     
+#if DEBUG
     uint64_t now = mach_absolute_time();
     if (session->lastPrintTime == 0) session->lastPrintTime = now;
     if (session->frameSequence % 60 == 0) {
@@ -749,6 +826,7 @@ void HostBrowserClient::OnAcceleratedPaint(CefRefPtr<CefBrowser> browser,
         session->lastPrintTime = now;
         session->totalGpuBlitTimeMs = 0;
     }
+#endif
     }
 }
 

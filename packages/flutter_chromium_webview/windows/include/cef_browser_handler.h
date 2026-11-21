@@ -18,6 +18,7 @@ class CefBrowserHandler : public CefClient,
                           public CefLifeSpanHandler,
                           public CefDisplayHandler,
                           public CefLoadHandler,
+                          public CefRequestHandler,
                           public CefJSDialogHandler,
                           public CefContextMenuHandler,
                           public CefFocusHandler {
@@ -29,12 +30,25 @@ class CefBrowserHandler : public CefClient,
                     FlutterChromiumTexture* popup_texture, 
                     int64_t texture_id,
                     int64_t popup_texture_id,
-                    EventCallback on_event);
+                    EventCallback on_event,
+                    bool runtime_slot_held = false);
   ~CefBrowserHandler() override;
   chromium_bridge::Policy javascript_policy;
   CefRefPtr<chromium_settings::UserAgent> user_agent = new chromium_settings::UserAgent();
   CefRefPtr<chromium_html::Documents> html_documents = new chromium_html::Documents();
-  CefRefPtr<CefRequestHandler> GetRequestHandler() override { return html_documents; }
+  CefRefPtr<CefRequestHandler> GetRequestHandler() override { return this; }
+  CefRefPtr<CefResourceRequestHandler> GetResourceRequestHandler(
+      CefRefPtr<CefBrowser> browser,
+      CefRefPtr<CefFrame> frame,
+      CefRefPtr<CefRequest> request,
+      bool is_navigation,
+      bool is_download,
+      const CefString& request_initiator,
+      bool& disable_default_handling) override;
+  void OnRenderProcessTerminated(CefRefPtr<CefBrowser> browser,
+                                 TerminationStatus status,
+                                 int error_code,
+                                 const CefString& error_string) override;
   bool OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
       CefProcessId source, CefRefPtr<CefProcessMessage> message) override;
 
@@ -49,7 +63,7 @@ class CefBrowserHandler : public CefClient,
   void OnAfterCreated(CefRefPtr<CefBrowser> browser) override;
   void OnBeforeClose(CefRefPtr<CefBrowser> browser) override;
   bool OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int popup_id,
-                    const CefString& target_url, const CefString& target_frame_name, WindowOpenDisposition target_disposition,
+                    const CefString& target_url, const CefString& target_frame_name, CefLifeSpanHandler::WindowOpenDisposition target_disposition,
                     bool user_gesture, const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo,
                     CefRefPtr<CefClient>& client, CefBrowserSettings& settings,
                     CefRefPtr<CefDictionaryValue>& extra_info, bool* no_javascript_access) override;
@@ -90,12 +104,22 @@ class CefBrowserHandler : public CefClient,
   void CloseContextMenu(int menu_id, int command_id);
   void SetSize(int width, int height);
   void SetDevicePixelRatio(float dpr);
+  void SetWindowMinimized(bool minimized);
+  void SetRenderingActive(bool active);
+  void SetPendingContext(CefRefPtr<CefRequestContext> context) { pending_context_ = std::move(context); }
+  void MarkCreationComplete() { creation_pending_ = false; pending_context_ = nullptr; }
+  void CancelPendingCreation();
+  bool IsCreationPending() const { return creation_pending_; }
+  bool IsClosing() const { return closing_; }
   void Close(std::function<void()> on_closed = {});
   
   CefRefPtr<CefBrowser> GetBrowser() const { return closing_ ? nullptr : browser_; }
 
  private:
   void UnregisterTextures();
+  void ApplyEffectiveFrameRate();
+  void ReleaseRuntimeSlot();
+  void FlushCloseCallbacks();
   flutter::TextureRegistrar* registrar_;
   FlutterChromiumTexture* texture_;
   FlutterChromiumTexture* popup_texture_;
@@ -104,6 +128,12 @@ class CefBrowserHandler : public CefClient,
   
   bool registered_ = true;
   bool closing_ = false;
+  bool runtime_slot_held_ = false;
+  bool creation_pending_ = false;
+  bool crash_notified_ = false;
+  bool window_minimized_ = false;
+  bool rendering_active_ = true;
+  int active_frame_rate_ = 60;
   int width_ = 1;
   int height_ = 1;
   float dpr_ = 1;
@@ -111,6 +141,7 @@ class CefBrowserHandler : public CefClient,
   PendingCallbacks<CefRefPtr<CefJSDialogCallback>> pending_dialogs_;
   PendingCallbacks<CefRefPtr<CefRunContextMenuCallback>> pending_menus_;
   EventCallback on_event_;
+  CefRefPtr<CefRequestContext> pending_context_;
   CefRefPtr<CefBrowser> browser_;
   std::vector<std::function<void()>> close_callbacks_;
   

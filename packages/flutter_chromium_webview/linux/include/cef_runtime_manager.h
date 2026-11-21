@@ -42,6 +42,25 @@ enum class CefRuntimeState {
   kShutdownFailed,   // browser-close or barrier timed out; CefShutdown() skipped
 };
 
+// Inputs used to evaluate whether Chromium's inner user-namespace sandbox may
+// be disabled inside an outer Linux container (Snap or Flatpak).
+//
+// Security invariant: disabling the inner sandbox requires BOTH an explicit
+// host opt-in (FLUTTER_CHROMIUM_WEBVIEW_ALLOW_CONTAINER_NO_SANDBOX=1) AND a
+// verified Snap or Flatpak container environment. Normal Linux installations
+// (.deb, AppImage, local builds) always retain Chromium's native sandbox.
+struct ContainerSandboxInputs {
+  bool allow_container_no_sandbox = false;
+  bool snap_env_set = false;
+  bool snap_name_set = false;
+  bool snap_dir_exists = false;
+  bool flatpak_id_set = false;
+  bool flatpak_info_exists = false;
+};
+
+bool ShouldDisableInnerSandboxForContainer(const ContainerSandboxInputs& inputs);
+bool ShouldDisableInnerSandboxForCurrentProcess();
+
 // Manages the process-global CEF runtime on Linux using CEF's dedicated
 // multi-threaded message loop (multi_threaded_message_loop = true).
 //

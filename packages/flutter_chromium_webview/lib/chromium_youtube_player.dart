@@ -19,6 +19,7 @@ class ChromiumYoutubePlayerController {
     this.readyTimeout = const Duration(seconds: 30),
     this.commandTimeout = const Duration(seconds: 5),
     this.recoverAutomatically = true,
+    this.enableDebugHeartbeat = false,
     @visibleForTesting this.iframeApiUrl = 'https://www.youtube.com/iframe_api',
   }) {
     final document = _httpUrl(documentUrl);
@@ -40,23 +41,60 @@ class ChromiumYoutubePlayerController {
       onBrowserCrashed: _onBrowserCrashed,
       automaticallyRecoverFromCrash: recoverAutomatically,
     );
+    webViewController.onDetached = _onBrowserDetached;
+  }
+
+  void _failPending(Object error) {
+    if (_ready?.isCompleted == false) _ready!.completeError(error);
+    if (_pending.isEmpty) return;
+    final pending = List<Completer<Object?>>.of(_pending.values);
+    _pending.clear();
+    for (final completion in pending) {
+      if (!completion.isCompleted) completion.completeError(error);
+    }
+  }
+
+  void _onBrowserDetached() {
+    if (_closed) return;
+    _generation++;
+    _failPending(StateError('Browser detached'));
   }
 
   void _onBrowserCrashed() {
-    debugPrint(
-      '[ChromiumYoutubePlayerController] Browser crashed, reloading...',
-    );
-    final error = StateError('Browser crashed');
-    if (_ready?.isCompleted == false) _ready!.completeError(error);
-    for (final completion in _pending.values) {
-      if (!completion.isCompleted) completion.completeError(error);
-    }
-    _pending.clear();
-    if (!recoverAutomatically) {
-      _events.add(const {'BrowserCrashed': true});
+    if (_closed) return;
+    final currentBrowserGen = webViewController.browserGeneration;
+    if (_lastCrashBrowserGeneration == currentBrowserGen &&
+        currentBrowserGen > 0) {
       return;
     }
-    unawaited(reload().catchError((Object _) {}));
+    _lastCrashBrowserGeneration = currentBrowserGen;
+    if (kDebugMode) {
+      debugPrint(
+        '[ChromiumYoutubePlayerController] Browser crashed (autoRecover=$recoverAutomatically)',
+      );
+    }
+    _generation++;
+    _failPending(StateError('Browser crashed'));
+    if (!recoverAutomatically) {
+      if (!_events.isClosed) {
+        _events.add(const {'BrowserCrashed': true});
+      }
+      return;
+    }
+    if (webViewController.consecutiveCrashCount >
+        ChromiumWebViewController.maxAutoRecoveryAttempts) {
+      if (!_events.isClosed) {
+        _events.add(const {'BrowserCrashed': true});
+      }
+      return;
+    }
+    if (_recovering) return;
+    _recovering = true;
+    unawaited(
+      reload()
+          .catchError((Object _) {})
+          .whenComplete(() => _recovering = false),
+    );
   }
 
   /// HTTP(S) document URL chosen by the host; supplies origin and referrer.
@@ -64,6 +102,12 @@ class ChromiumYoutubePlayerController {
 
   /// Disable when the host coordinates generation-aware recovery.
   final bool recoverAutomatically;
+
+  /// Opt-in 1-second JavaScript diagnostic heartbeat (`DebugHeartbeat` events).
+  ///
+  /// Disabled by default to eliminate unnecessary JavaScript timers, bridge
+  /// traffic, JSON serialization, and logging during normal playback.
+  final bool enableDebugHeartbeat;
 
   /// The maximum duration to wait for the player to become ready.
   final Duration readyTimeout;
@@ -97,7 +141,9 @@ class ChromiumYoutubePlayerController {
   int? _error;
   bool _playing = false;
   bool _closed = false;
+  bool _recovering = false;
   int _generation = 0;
+  int? _lastCrashBrowserGeneration;
   int _nextRequest = 0;
   int _queued = 0;
   String? _videoId;
@@ -127,6 +173,12 @@ class ChromiumYoutubePlayerController {
 
   void _checkOpen() {
     if (_closed) throw StateError('YouTube controller is disposed');
+    if (webViewController.isDisposed) {
+      throw StateError('WebView controller is disposed');
+    }
+    if (webViewController.isDetached) {
+      throw StateError('Browser detached');
+    }
   }
 
   /// Initializes the YouTube player.
@@ -150,6 +202,7 @@ class ChromiumYoutubePlayerController {
 
   Future<void> _loadDocument() async {
     _checkOpen();
+    _failPending(StateError('YouTube player reloaded'));
     _generation++;
     _state = null;
     _error = null;
@@ -157,6 +210,10 @@ class ChromiumYoutubePlayerController {
     // Observe rejection even if native loading fails before awaiting readiness.
     unawaited(ready.future.catchError((Object _) {}));
     await webViewController.loadHtmlString(_html(), baseUrl: documentUrl);
+    _checkOpen();
+    if (webViewController.browserId == null) {
+      throw StateError('Browser detached');
+    }
     await ready.future.timeout(readyTimeout);
     _checkOpen();
   }
@@ -177,6 +234,10 @@ class ChromiumYoutubePlayerController {
 
   Future<Object?> _request(String method, List<Object?> args) async {
     _checkOpen();
+    if (webViewController.browserId == null) {
+      throw StateError('Browser detached');
+    }
+    final generation = _generation;
     final id = ++_nextRequest;
     final completion = Completer<Object?>();
     _pending[id] = completion;
@@ -185,9 +246,16 @@ class ChromiumYoutubePlayerController {
     try {
       await webViewController
           .executeJavaScript(
-            'window.__chromiumYoutubeDispatch(${jsonEncode({'id': id, 'generation': _generation, 'method': method, 'args': args})});',
+            'window.__chromiumYoutubeDispatch(${jsonEncode({'id': id, 'generation': generation, 'method': method, 'args': args})});',
           )
           .timeout(commandTimeout);
+      _checkOpen();
+      if (webViewController.browserId == null) {
+        throw StateError('Browser detached');
+      }
+      if (generation != _generation) {
+        throw StateError('YouTube player generation changed');
+      }
       return await reply;
     } finally {
       _pending.remove(id);
@@ -220,7 +288,10 @@ class ChromiumYoutubePlayerController {
       return;
     }
     if (decoded['DebugHeartbeat'] != null) {
-      debugPrint('[ChromiumBG] JS Heartbeat -> ${decoded['DebugHeartbeat']}');
+      if (!enableDebugHeartbeat) return;
+      if (kDebugMode) {
+        debugPrint('[ChromiumBG] JS Heartbeat -> ${decoded['DebugHeartbeat']}');
+      }
     }
     if (decoded['Ready'] == true && _ready?.isCompleted == false) {
       _ready!.complete();
@@ -487,14 +558,18 @@ class ChromiumYoutubePlayerController {
   Future<void> dispose() => _disposing ??= _dispose();
   Future<void> _dispose() async {
     _closed = true;
-    final error = StateError('YouTube controller is disposed');
-    if (_ready?.isCompleted == false) _ready!.completeError(error);
-    for (final completion in _pending.values) {
-      if (!completion.isCompleted) completion.completeError(error);
+    _generation++;
+    if (webViewController.onDetached == _onBrowserDetached) {
+      webViewController.onDetached = null;
     }
+    _failPending(StateError('YouTube controller is disposed'));
     await webViewController.dispose();
     await _events.close();
   }
+
+  /// Returns the generated player HTML document. Exposed for testing.
+  @visibleForTesting
+  String buildHtmlDocument() => _html();
 
   String _html() {
     // Embed JSON through an inert base64 string; no URL can terminate a script.
@@ -506,6 +581,7 @@ class ChromiumYoutubePlayerController {
           'origin': Uri.parse(documentUrl).origin,
           'referrer': documentUrl,
           'api': iframeApiUrl,
+          'debugHeartbeat': enableDebugHeartbeat,
         }),
       ),
     );
@@ -515,13 +591,15 @@ class ChromiumYoutubePlayerController {
 </head><body><div id="player"></div><script>
 'use strict';
 const config=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob('$config'),c=>c.charCodeAt(0))));
-let player, timer;
-function send(key,value){try{chromiumPostMessage(config.playerId,JSON.stringify({playerId:config.playerId,generation:config.generation,[key]:value}));}catch(_){}}
+let player, timer, heartbeatTimer, destroyed=false;
+function stopTimers(){if(timer!==undefined){clearInterval(timer);timer=undefined;}if(heartbeatTimer!==undefined){clearInterval(heartbeatTimer);heartbeatTimer=undefined;}}
+function cleanup(){destroyed=true;stopTimers();if(player&&player.destroy){try{player.destroy();}catch(_){}player=null;}}
+function send(key,value){if(destroyed)return;try{chromiumPostMessage(config.playerId,JSON.stringify({playerId:config.playerId,generation:config.generation,[key]:value}));}catch(_){}}
 const media=document.createElement('video');
 send('MediaCapabilities',{userAgent:navigator.userAgent,vp9:media.canPlayType('video/webm; codecs="vp9"'),av1:media.canPlayType('video/mp4; codecs="av01.0.05M.08"'),h264:media.canPlayType('video/mp4; codecs="avc1.42E01E"'),aac:media.canPlayType('audio/mp4; codecs="mp4a.40.2"'),opus:media.canPlayType('audio/webm; codecs="opus"')});
 const methods=new Set(['loadVideoById','cueVideoById','loadPlaylist','cuePlaylist','nextVideo','previousVideo','playVideoAt','getPlaylist','getPlaylistIndex','playVideo','pauseVideo','seekTo','setVolume','getVolume','getCurrentTime','getDuration','getVideoData']);
 window.__chromiumYoutubeDispatch=function(request){
- if(request.generation!==config.generation)return;
+ if(destroyed||request.generation!==config.generation)return;
  try{
   if(request.method==='getVideoPlaybackQuality'){
     const v=document.querySelector('video');
@@ -536,27 +614,32 @@ window.__chromiumYoutubeDispatch=function(request){
  }catch(error){send('Result',{id:request.id,error:String(error.message||error)});}
 };
 window.onYouTubeIframeAPIReady=function(){
+ if(destroyed)return;
  player=new YT.Player('player',{host:'https://www.youtube.com',playerVars:{enablejsapi:1,playsinline:1,origin:config.origin,widget_referrer:config.referrer},events:{
  onReady:()=>{
+   if(destroyed)return;
    send('Ready',true);
-   // Phase B: Debug Heartbeat
-   setInterval(()=>{
-     const state = player && player.getPlayerState ? player.getPlayerState() : null;
-     const time = player && player.getCurrentTime ? player.getCurrentTime() : null;
-     const idx = player && player.getPlaylistIndex ? player.getPlaylistIndex() : null;
-     send('DebugHeartbeat', JSON.stringify({
-       perfTimestamp: performance.now(),
-       state: state,
-       currentTime: time,
-       loadedFraction: player && player.getVideoLoadedFraction ? player.getVideoLoadedFraction() : null,
-       duration: player && player.getDuration ? player.getDuration() : null,
-       playlistIndex: idx,
-       hidden: document.hidden,
-       visibility: document.visibilityState
-     }));
-   }, 1000);
+   if(config.debugHeartbeat===true){
+     if(heartbeatTimer!==undefined){clearInterval(heartbeatTimer);}
+     heartbeatTimer=setInterval(()=>{
+       if(destroyed||!player){stopTimers();return;}
+       const state=player.getPlayerState?player.getPlayerState():null;
+       const time=player.getCurrentTime?player.getCurrentTime():null;
+       const idx=player.getPlaylistIndex?player.getPlaylistIndex():null;
+       send('DebugHeartbeat',JSON.stringify({
+         perfTimestamp:performance.now(),
+         state:state,
+         currentTime:time,
+         loadedFraction:player.getVideoLoadedFraction?player.getVideoLoadedFraction():null,
+         duration:player.getDuration?player.getDuration():null,
+         playlistIndex:idx,
+         hidden:document.hidden,
+         visibility:document.visibilityState
+       }));
+     },1000);
+   }
  },
- onStateChange:event=>{clearInterval(timer);send('StateChange',event.data);if(event.data===1)timer=setInterval(()=>send('VideoState',JSON.stringify({currentTime:player.getCurrentTime(),loadedFraction:player.getVideoLoadedFraction(),playlistIndex:player.getPlaylistIndex?player.getPlaylistIndex():null})),250);},
+ onStateChange:event=>{if(timer!==undefined){clearInterval(timer);timer=undefined;}send('StateChange',event.data);if(!destroyed&&event.data===1){timer=setInterval(()=>{if(destroyed||!player){stopTimers();return;}send('VideoState',JSON.stringify({currentTime:player.getCurrentTime(),loadedFraction:player.getVideoLoadedFraction(),playlistIndex:player.getPlaylistIndex?player.getPlaylistIndex():null}));},250);}},
  onError:event=>send('PlayerError',event.data),
  onPlaybackRateChange:event=>send('PlaybackRateChange',event.data),
  onPlaybackQualityChange:event=>send('PlaybackQualityChange',event.data),
@@ -565,7 +648,8 @@ window.onYouTubeIframeAPIReady=function(){
 };
 const script=document.createElement('script');script.src=config.api;
 script.onerror=()=>send('ApiLoadError',true);document.head.appendChild(script);
-window.addEventListener('pagehide',()=>{clearInterval(timer);if(player&&player.destroy)player.destroy();});
+window.addEventListener('pagehide',cleanup);
+window.addEventListener('beforeunload',cleanup);
 </script></body></html>''';
   }
 }

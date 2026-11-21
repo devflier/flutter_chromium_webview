@@ -1,6 +1,7 @@
 #import "ChromiumHostApp.h"
 #import "IpcConnection.h"
 #import "HostBrowserClient.h"
+#include "../../native/chromium_flags.h"
 
 @interface ChromiumHostAppDelegate : NSObject <IpcServerDelegate, IpcConnectionDelegate>
 @property (nonatomic, strong) IpcServer* server;
@@ -45,7 +46,9 @@
 }
 
 - (void)connection:(IpcConnection*)connection didReceiveMessage:(const IPC::Message&)message {
+#if DEBUG
     NSLog(@"[CEFHost] Received message of type: %s", message.type.c_str());
+#endif
     if (!self.isHandshakeDone) {
         if (message.type == "hello") {
             NSString* token = message.payload[@"token"];
@@ -414,14 +417,9 @@ void ChromiumHostApp::OnBeforeCommandLineProcessing(const CefString& process_typ
 
     // Hosts that publish their own native media controls can opt out of
     // Chromium's separate OS session, including cross-origin iframe sessions.
-    std::string disabled_features = command_line->GetSwitchValue("disable-features").ToString();
-    if (!disabled_features.empty()) disabled_features += ",";
-    disabled_features += "Accessibility";
-    const char* systemMediaControls = getenv("CEF_SYSTEM_MEDIA_CONTROLS");
-    if (systemMediaControls && strcmp(systemMediaControls, "0") == 0) {
-        disabled_features += ",HardwareMediaKeyHandling,MediaSessionService";
-    }
-    command_line->AppendSwitchWithValue("disable-features", disabled_features);
+    chromium_flags::AppendDisabledFeatures(command_line, "Accessibility");
+    chromium_flags::ApplyLowMemoryProfile(process_type, command_line);
+    chromium_flags::ApplySystemMediaControlsPolicy(command_line);
     command_line->AppendSwitch("disable-renderer-accessibility");
     command_line->AppendSwitch("ignore-gpu-blocklist");
     command_line->AppendSwitch("enable-gpu");

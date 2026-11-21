@@ -1,18 +1,23 @@
 package dev.devflier.flutter_chromium_webview;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.content.MutableContextWrapper;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Message;
+import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.PermissionRequest;
+import android.webkit.RenderProcessGoneDetail;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
@@ -36,8 +41,8 @@ import io.flutter.plugin.platform.PlatformViewFactory;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import java.nio.charset.StandardCharsets;
 import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -46,29 +51,51 @@ import java.util.Set;
 import java.util.UUID;
 
 /** Android system Chromium WebView backend. All access runs on Flutter's UI thread. */
-import android.app.Application;
-import android.os.Bundle;
-
 public final class FlutterChromiumWebviewPlugin implements FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware, Application.ActivityLifecycleCallbacks {
   private static final String PROFILE_PREFIX = "flutter_chromium_private_";
   private final Map<Integer, Browser> browsers = new HashMap<>();
   private Context context;
-  private Context activityContext;
+  private Activity activityContext;
+  private Application registeredApplication;
+  private boolean lifecycleCallbacksRegistered;
   private MethodChannel channel;
   private int nextId;
   private String session;
-  @Override public void onAttachedToActivity(ActivityPluginBinding binding) { 
-    activityContext = binding.getActivity(); 
-    binding.getActivity().getApplication().registerActivityLifecycleCallbacks(this);
-  }
-  @Override public void onDetachedFromActivity() { 
-    if (activityContext != null) {
-      ((android.app.Activity) activityContext).getApplication().unregisterActivityLifecycleCallbacks(this);
+
+  private void registerActivityLifecycle(Activity activity) {
+    unregisterActivityLifecycle();
+    activityContext = activity;
+    if (activity != null) {
+      Application app = activity.getApplication();
+      if (app != null) {
+        app.registerActivityLifecycleCallbacks(this);
+        registeredApplication = app;
+        lifecycleCallbacksRegistered = true;
+      }
     }
-    activityContext = null; 
   }
-  @Override public void onDetachedFromActivityForConfigChanges() { onDetachedFromActivity(); }
-  @Override public void onReattachedToActivityForConfigChanges(ActivityPluginBinding binding) { onAttachedToActivity(binding); }
+
+  private void unregisterActivityLifecycle() {
+    if (lifecycleCallbacksRegistered && registeredApplication != null) {
+      registeredApplication.unregisterActivityLifecycleCallbacks(this);
+    }
+    lifecycleCallbacksRegistered = false;
+    registeredApplication = null;
+    activityContext = null;
+  }
+
+  @Override public void onAttachedToActivity(ActivityPluginBinding binding) {
+    registerActivityLifecycle(binding.getActivity());
+  }
+  @Override public void onDetachedFromActivity() {
+    unregisterActivityLifecycle();
+  }
+  @Override public void onDetachedFromActivityForConfigChanges() {
+    unregisterActivityLifecycle();
+  }
+  @Override public void onReattachedToActivityForConfigChanges(ActivityPluginBinding binding) {
+    registerActivityLifecycle(binding.getActivity());
+  }
   private static void deleteProfileWhenUnused(String name, int attempt) {
     try { ProfileStore.getInstance().deleteProfile(name); }
     catch (IllegalStateException inUse) {
@@ -100,82 +127,29 @@ public final class FlutterChromiumWebviewPlugin implements FlutterPlugin, Method
       });
   }
   @Override public void onDetachedFromEngine(FlutterPluginBinding binding) {
-    channel.setMethodCallHandler(null);
+    unregisterActivityLifecycle();
+    if (channel != null) {
+      channel.setMethodCallHandler(null);
+    }
     for (Browser browser : browsers.values()) browser.destroy();
-    browsers.clear(); channel = null; context = null;
-    activityContext = null;
+    browsers.clear();
+    channel = null;
+    context = null;
   }
 
-  private void logBg(String event) {
-    if (browsers.isEmpty()) return;
-    for (Browser b : browsers.values()) {
-      boolean attached = b.web != null && b.web.getParent() != null;
-      String parent = attached ? b.web.getParent().getClass().getSimpleName() : "null";
-      int windowVisibility = b.web != null ? b.web.getWindowVisibility() : -1;
-      android.util.Log.i("ChromiumBG", "webview=" + (b.web != null ? b.web.hashCode() : "null") 
-        + " event=" + event + " attached=" + attached + " parent=" + parent + " windowVis=" + windowVisibility);
-    }
-  }
-
-  @Override public void onActivityCreated(android.app.Activity activity, Bundle savedInstanceState) {}
-  @Override public void onActivityStarted(android.app.Activity activity) { logBg("activityStarted"); }
-  @Override public void onActivityResumed(android.app.Activity activity) { logBg("activityResumed"); }
-  @Override public void onActivityPaused(android.app.Activity activity) { logBg("activityPaused"); }
-  @Override public void onActivityStopped(android.app.Activity activity) { 
-    logBg("activityStopped"); 
-    // EXPERIMENT B: Reparent to VirtualDisplay
-    /*
-    for (Browser b : browsers.values()) {
-      if (b.web != null) {
-        if (b.web.getParent() instanceof ViewGroup) {
-          ((ViewGroup) b.web.getParent()).removeView(b.web);
-        }
-        // attach to virtual display presentation...
+  @Override public void onActivityCreated(Activity activity, Bundle savedInstanceState) {}
+  @Override public void onActivityStarted(Activity activity) {}
+  @Override public void onActivityResumed(Activity activity) {}
+  @Override public void onActivityPaused(Activity activity) {}
+  @Override public void onActivityStopped(Activity activity) {}
+  @Override public void onActivitySaveInstanceState(Activity activity, Bundle outState) {}
+  @Override public void onActivityDestroyed(Activity activity) {
+    if (activity == activityContext) {
+      for (Browser browser : browsers.values()) {
+        browser.detachFromActivity(context);
       }
     }
-    */
   }
-  @Override public void onActivitySaveInstanceState(android.app.Activity activity, Bundle outState) {}
-  @Override public void onActivityDestroyed(android.app.Activity activity) { logBg("activityDestroyed"); }
-
-  
-  // EXPERIMENT B: Background Host
-  /*
-  private static class BackgroundHost {
-    private android.hardware.display.VirtualDisplay virtualDisplay;
-    private android.app.Presentation presentation;
-    private android.widget.FrameLayout container;
-
-    void start(Context context) {
-      if (virtualDisplay != null) return;
-      android.hardware.display.DisplayManager dm = (android.hardware.display.DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE);
-      virtualDisplay = dm.createVirtualDisplay("ChromiumBG", 1280, 720, 160, null, 0);
-      presentation = new android.app.Presentation(context, virtualDisplay.getDisplay());
-      container = new android.widget.FrameLayout(context);
-      presentation.setContentView(container);
-      presentation.show();
-      android.util.Log.i("ChromiumBG", "BackgroundHost Presentation started");
-    }
-
-    void attach(WebView web) {
-      if (container != null) {
-        if (web.getParent() instanceof ViewGroup) ((ViewGroup) web.getParent()).removeView(web);
-        container.addView(web, new android.widget.FrameLayout.LayoutParams(
-            android.view.ViewGroup.LayoutParams.MATCH_PARENT, 
-            android.view.ViewGroup.LayoutParams.MATCH_PARENT));
-        android.util.Log.i("ChromiumBG", "WebView attached to BackgroundHost");
-      }
-    }
-
-    void stop() {
-      if (presentation != null) { presentation.dismiss(); presentation = null; }
-      if (virtualDisplay != null) { virtualDisplay.release(); virtualDisplay = null; }
-      container = null;
-      android.util.Log.i("ChromiumBG", "BackgroundHost Presentation stopped");
-    }
-  }
-  private BackgroundHost bgHost;
-  */
 
   private void event(Browser browser, String name, Map<String, Object> args) {
     if (channel == null || browser.closed) return;
@@ -291,6 +265,7 @@ public final class FlutterChromiumWebviewPlugin implements FlutterPlugin, Method
     String profile;
     volatile HtmlDocument document;
     boolean closed;
+    boolean crashNotified;
     boolean pendingFocus;
     int nextDialog;
     @SuppressLint("SetJavaScriptEnabled") Browser(int id, MethodCall call) throws Exception {
@@ -310,17 +285,6 @@ public final class FlutterChromiumWebviewPlugin implements FlutterPlugin, Method
           // Chromium from hiding the document and suspending its media here.
           // Ordinary browsing WebViews retain Android's visibility behavior.
           super.onWindowVisibilityChanged(backgroundMedia ? View.VISIBLE : visibility);
-          android.util.Log.i("ChromiumBG", "webview=" + hashCode() + " onWindowVisibilityChanged visibility=" + visibility);
-        }
-        @Override
-        public void onPause() {
-          super.onPause();
-          android.util.Log.i("ChromiumBG", "webview=" + hashCode() + " onPause");
-        }
-        @Override
-        public void onResume() {
-          super.onResume();
-          android.util.Log.i("ChromiumBG", "webview=" + hashCode() + " onResume");
         }
       };
       web.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
@@ -368,9 +332,21 @@ public final class FlutterChromiumWebviewPlugin implements FlutterPlugin, Method
             if (request.isForMainFrame()) event(Browser.this, "loadError", map("errorCode", error.getErrorCode(),
               "errorText", error.getDescription().toString(), "failedUrl", request.getUrl().toString()));
           }
-          @Override public boolean onRenderProcessGone(WebView view, android.webkit.RenderProcessGoneDetail detail) {
-            event(Browser.this, "loadError", map("errorCode", -1, "errorText", "WebView renderer exited", "failedUrl", view.getUrl() == null ? "" : view.getUrl()));
-            browsers.remove(id); destroy(); return true;
+          @Override public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
+            if (!closed && !crashNotified) {
+              crashNotified = true;
+              boolean didCrash = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+                  && detail != null && detail.didCrash();
+              int priority = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && detail != null
+                  ? detail.rendererPriorityAtExit() : -1;
+              event(Browser.this, "browserCrash", map(
+                  "didCrash", didCrash,
+                  "rendererPriorityAtExit", priority,
+                  "failedUrl", view.getUrl() == null ? "" : view.getUrl()));
+            }
+            browsers.remove(id);
+            destroy();
+            return true;
           }
         });
         web.setWebChromeClient(new WebChromeClient() {
@@ -435,6 +411,15 @@ public final class FlutterChromiumWebviewPlugin implements FlutterPlugin, Method
         + "bridge.postMessage(JSON.stringify({message,origin:securityOrigin,href:location.href}));return true;}});})();";
       WebViewCompat.addDocumentStartJavaScript(web, script, allOrigins);
     }
+    void detachFromActivity(Context appContext) {
+      if (closed) return;
+      if (web.getParent() instanceof ViewGroup) {
+        ((ViewGroup) web.getParent()).removeView(web);
+      }
+      if (appContext != null) {
+        viewContext.setBaseContext(appContext);
+      }
+    }
     void destroy() {
       if (closed) return; closed = true;
       document = null;
@@ -490,7 +475,6 @@ public final class FlutterChromiumWebviewPlugin implements FlutterPlugin, Method
             web.setAlpha(0f);
             web.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
             ((ViewGroup) decor).addView(web, new ViewGroup.LayoutParams(1, 1));
-            android.util.Log.i("ChromiumBG", "webview=" + web.hashCode() + " parked on DecorView");
           }
         } else {
           viewContext.setBaseContext(applicationContext);
