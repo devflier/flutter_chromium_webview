@@ -284,9 +284,9 @@ Automated verification (`test_linux_stress_and_compat.sh`, 20 checks + 7 Flutter
 
 ## I. Release Decision
 
-**Verdict: `READY WITH DOCUMENTED LIMITATIONS`**
+**Verdict: `READY WITH DOCUMENTED LIMITATIONS`** (for the refactored `exp/linux-cef-mtml-0.5.6` branch, initially merged to `main` in PR #13 for `0.5.6` and subsequently hardened further for `0.5.7`):
 
-- All Critical and High defects resolved and verified.
+- All Critical and High defects resolved and independently verified in the Ubuntu x86_64 VM with CEF `149.0.4`.
 - Shutdown timeout safety fully verified: both browser closure timeout and TID_UI barrier timeout explicitly transition to `kShutdownFailed` and abort `CefShutdown()`, preventing use-after-free and crash hazards.
 - GTK main thread callback cleanup verified with bounded non-blocking drain loops.
 - Deterministic failure injection verified at both native unit test and integration process levels.
@@ -297,6 +297,6 @@ Automated verification (`test_linux_stress_and_compat.sh`, 20 checks + 7 Flutter
 
 ## J. Git Status
 
-- Preserved working baseline: `fix/linux-cef-lifecycle-0.5.6` (`2b493c3` local / `aca408d` VM) — intact, untouched.
-- Active refactored branch: `exp/linux-cef-mtml-0.5.6` — ready for maintainer review.
-- Release branch (`release/0.5.6` / `main`): **untouched**. Nothing has been merged, pushed, tagged, or published.
+- Superseded checkpoint: `fix/linux-cef-lifecycle-0.5.6` (`2b493c3` local / `aca408d` VM, one-shot `CefRunMessageLoop()` design).
+- The refactored `exp/linux-cef-mtml-0.5.6` branch was initially merged to `main` in PR #13 (issue #12), and `0.5.6` was released on `main` via PR #14 (`v0.5.6`).
+- Subsequent shutdown hardening, cross-platform persistent profiles, rendering throttling, and macOS/Windows/Android fixes continue on `exp/linux-cef-mtml-0.5.6` targeting `0.5.7`.

@@ -109,15 +109,17 @@ The software baseline uses `LIBGL_ALWAYS_SOFTWARE=1`,
   are bounded and retained only while browser creation is pending.
 - Widget-owned focus callbacks are detached when replacing/removing a widget.
 - GTK application shutdown requests browser closure before runtime shutdown.
-- Linux runs one-shot `CefRunMessageLoop()` from a GLib idle callback and
-  coordinates quit via `GApplication` hold/release/quit lifecycle tracking so
-  multi-window apps, `g_application_hold()` window reopen, and direct
-  `g_application_quit()` exit cleanly without triggering CEF 149's
-  `KeepAliveRegistry::Register()` trap or post-`CefShutdown()` `AtExitManager`
-  traps. `scripts/check_linux_idle_cpu.sh`, `scripts/test_linux_lifecycle.sh`,
+- Linux runs CEF with `multi_threaded_message_loop = true`, so Chromium's UI
+  loop lives on CEF's own thread and no longer attaches a `MessagePumpGlib`
+  source to the GTK main context (the cause of the ~100% idle CPU spin in issue
+  #12). GTK, `FlMethodChannel` and texture registration stay on the GTK main
+  thread; CEF callbacks marshal back with `g_idle_add_full`. Shutdown closes
+  browsers, waits on a barrier, and flushes `TID_UI` before `CefShutdown()`.
+  `scripts/check_linux_idle_cpu.sh`, `scripts/test_linux_lifecycle.sh`,
   `scripts/benchmark_linux_cpu.sh`, and `scripts/benchmark_linux_memory.sh`
   guard idle CPU, lifecycle stability, and RAM consumption (see
-  `docs/linux-0.5.6-benchmarks.md`).
+  `docs/linux-0.5.6-benchmarks.md` and
+  `docs/linux-0.5.6-final-hardening-audit.md`).
 - Windows uses the CEF M138+ sandbox bootstrap and a client runner DLL, with
   sandbox information passed to process dispatch and initialization. Its child
   Flutter HWND forwards keyboard/IME input while the browser owns focus.
