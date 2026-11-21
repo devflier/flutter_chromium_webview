@@ -291,8 +291,8 @@ void HostBrowserClient::CreateBrowser(int64_t browser_id, const std::string& url
             return;
         }
         created.browser = browser;
-#if DEBUG
         NSLog(@"[CEFHost] browserCreated id=%lld", browser_id);
+#if DEBUG
         created.media_observer = new MediaDevToolsObserver(self, browser_id);
         created.media_observer_registration = browser->GetHost()->AddDevToolsMessageObserver(created.media_observer);
         CefRefPtr<CefDictionaryValue> params = CefDictionaryValue::Create();
