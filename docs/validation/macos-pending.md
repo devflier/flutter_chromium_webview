@@ -1,11 +1,12 @@
-# macOS Native Validation Handoff (Pending)
+# macOS Native Validation Report (VERIFIED on Apple Silicon)
 
 ## Document Metadata
 - **Package:** `devflier/flutter_chromium_webview`
-- **Version:** `0.5.6`
+- **Version:** `0.5.7` (0.5.6 release line, branch `exp/linux-cef-mtml-0.5.6`)
 - **Working Branch:** `exp/linux-cef-mtml-0.5.6`
-- **Target Commit SHA:** `849dd572d48a94bdce27119006ad1b0080540bec`
+- **Verified Code Commit SHA:** `a16413f6cdad269139bcf78804321921ecb5770a` (superseding handoff SHA `849dd572d48a94bdce27119006ad1b0080540bec`)
 - **Status Date:** November 21, 2026
+- **Hardware & Toolchain:** Apple Silicon (`arm64`), macOS `27.0.1` (`26A434`), Xcode `27.0` (`27A266a`), Apple clang `21.0.0` (`clang-2100.3.34.2`), Flutter `3.47.7` (Dart `3.13.5`), CEF `149.0.4+g2f1bfd8+chromium-149.0.7827.156` (`macosarm64`).
 
 ## Platform Verification Matrix
 
@@ -13,121 +14,97 @@
 |---|---|---|
 | **Windows 11 (x64)** | **VERIFIED** | 283 MB idle baseline, native D3D11/buffer-pooled texture sharing, event-driven external message pump, persistent named profiles verified across restarts, Release build verified, zero CEF orphan processes, route-local accessibility preserved. |
 | **Ubuntu Linux (x86_64)** | **VERIFIED** | `validate_linux.sh` PASS (analyzer, 83/83 package unit tests, 2/2 example widget tests, 7/7 Linux integration tests, Release build, 0% idle main-thread CPU); `test_linux_lifecycle.sh` PASS (14 scenarios + 10/10 repeats); `test_linux_stress_and_compat.sh` PASS (`fail_count=0`, 100 create/dispose cycles, 100 rapid resizes, 5-view multi-WebView, 20/20 startup/shutdown cycles, low-mem on/off web compat matrix, persistent named cookies & `localStorage` verified across process restarts, anonymous profile isolation, disposal during context init, adverse ELF/GLib checks, failure injection, 0 orphan CEF processes). |
-| **macOS (Apple Silicon / Intel)** | **PENDING** | Native build and hardware execution pending handoff to Apple hardware. Cross-platform code review and static guards applied; do not claim native macOS verification until executed on macOS. |
+| **Android** | **VERIFIED (CI)** | GitHub Actions run `44912421940` green (API 36 emulator checks + release APK). |
+| **macOS (Apple Silicon `arm64`)** | **VERIFIED** | Persistent `cachePath` forwarding & `setRenderingActive` throttling implemented (`a16413f`); Host & Release example builds green; 83/83 Dart tests; 12/12 macOS integration suites (incl. 50-cycle `resource_stability_test` & 20-cycle `host_crash_test`), `texture_test`, `run_input_tests.sh`, `javascript_smoke.py`, `test_packaging.py`, `smoke_macos.py` all green; all 4 Apple-hardware acceptance scenarios verified with 0 leaked resources, 0 surviving processes after `Cmd+Q`, and 0 `.ips` crash reports; PPPlayer macOS Release bundle built (`423.1 MB`, `163.2 MB` idle RSS with lazy restore) and smoke-verified. |
 
 ---
 
-## 1. Files Modified for macOS and Shared Native Architecture
+## 1. Files Modified for macOS Persistence, Throttling & Shared Native Architecture
 
-The following files contain modifications affecting macOS and cross-platform native browser management:
+### Previous Cross-Platform Hardening (`849dd57`)
+- `packages/flutter_chromium_webview/native/browser_settings.h` — persistent named profile context resolution (`ProfileCachePath` -> `<root_cache_path>/profile_<name>`) and `ContextReadyHandler`.
+- `packages/flutter_chromium_webview/native/chromium_flags.h` — low-memory profile flags and `CEF_SYSTEM_MEDIA_CONTROLS=0` opt-out.
+- `packages/flutter_chromium_webview/macos/Host/HostBrowserClient.mm` — `@autoreleasepool` around `finishCreate`, premature `IOSurface` allocation guard in `ResizeBrowser()`, and single active `source_metal_texture` cache in `OnAcceleratedPaint`.
 
-- `packages/flutter_chromium_webview/native/browser_settings.h`
-  - Added support for persistent named profile context creation, context caching, and sandboxing flags.
-- `packages/flutter_chromium_webview/native/chromium_flags.h`
-  - Added low-memory flags, software/accelerated frame budget limits, and headless rendering flags.
-- `packages/flutter_chromium_webview/macos/Classes/ChromiumBackend.mm`
-  - Added asynchronous browser creation handling and safe bridge lifecycle callbacks.
-- `packages/flutter_chromium_webview/macos/Host/ChromiumHostApp.mm`
-  - Host process initialization, signal handling, and shutdown lifecycle.
-- `packages/flutter_chromium_webview/macos/Host/HostBrowserClient.h`
-  - Header updates for session management, single source Metal texture tracking, and asynchronous callback safety.
-- `packages/flutter_chromium_webview/macos/Host/HostBrowserClient.mm`
-  - Wrapped `finishCreate` in `@autoreleasepool { ... }` to eliminate ARC autorelease pool accumulation during asynchronous browser initialization.
-  - Guarded `ResizeBrowser()` against premature `IOSurface` allocation when invoked before the `CefBrowser` instance is ready.
-  - Refactored `OnAcceleratedPaint` Metal texture cache: retains only the active source `MTLTexture` matching `IOSurfaceGetID(cefSurface)` rather than retaining every historical surface ID across the session lifetime.
-- `packages/flutter_chromium_webview/macos/Host/JavaScriptRequests.mm`
-  - PostMessage and script evaluation routing.
+### Resolved macOS Fixes (`a16413f`)
+- `packages/flutter_chromium_webview/macos/Classes/ChromiumHostManager.h` & `.mm` — added `launchHostWithCachePath:keychainBehavior:completion:`, preserved `_cachePath` and `_keychainBehavior` across host crash restarts, forwarded `--cache-path=<path>` to `ChromiumWebViewHost`, and honored `CEF_INPUT_TEST_USE_MOCK_KEYCHAIN=1`.
+- `packages/flutter_chromium_webview/macos/Classes/ChromiumBackend.mm` — passed caller `cache` into `ChromiumHostManager` from `Runtime::Initialize()`, and wired `setRenderingActive` over IPC.
+- `packages/flutter_chromium_webview/macos/Host/main.mm` — parsed `--cache-path=`, ensured the directory exists and resolved symlinks for `settings.root_cache_path` / `settings.cache_path`, retaining a safe PID-scoped temporary fallback only when omitted or empty.
+- `packages/flutter_chromium_webview/macos/Host/ChromiumHostApp.mm` — handled `setRenderingActive` IPC messages and honored `CEF_INPUT_TEST_USE_MOCK_KEYCHAIN=1` in `OnBeforeCommandLineProcessing`.
+- `packages/flutter_chromium_webview/macos/Host/HostBrowserClient.h` & `.mm` — implemented `SetRenderingActive(browser_id, active)` using `SetWindowlessFrameRate(1)` when inactive (without calling `WasHidden(true)` so audio and JS bridge continue uninterrupted) and restoring `SetWindowlessFrameRate(60)` + `Invalidate(PET_VIEW)` when active.
+- `packages/flutter_chromium_webview/macos/Host/build_host.sh` — added missing `NativeUi.mm` to standalone host link list.
+- `packages/flutter_chromium_webview/macos/test/input_test.mm` — implemented mock `ChromiumHostManager` selectors to compile warning-free.
 
 ---
 
-## 2. Known Risk & Architectural Constraint (Immediate Action Required on macOS)
+## 2. Automated Build & Test Evidence (Apple Silicon `arm64`)
 
-> [!WARNING]
-> **PID-Scoped Cache Path in macOS Host Process (`macos/Host/main.mm:87-89`)**
-> 
-> In `macos/Host/main.mm`, the CEF cache directory is currently constructed as:
-> ```objc
-> NSString* cachePath = [NSTemporaryDirectory() stringByAppendingPathComponent:
->     [NSString stringWithFormat:@"cef_cache_%d", [[NSProcessInfo processInfo] processIdentifier]]];
-> ```
-> Because `[[NSProcessInfo processInfo] processIdentifier]` produces a unique PID on each application run:
-> - **In-Session Persistence:** Multiple browser instances within the *same* application session share cookies and web storage for identical `profileName`s.
-> - **Cross-Restart Persistence:** Cookies, `localStorage`, and session state do **not** survive across full application restarts because the cache directory changes on each launch.
-> 
-> **Resolution on macOS:** Forward the configured `cachePath` from `ChromiumWebViewController.initialize(cachePath: ...)` via the IPC bootstrap handshake to the Host process so it uses a persistent directory rather than a PID-scoped temporary path.
+| Suite / Command | Result | Key Details |
+|---|---|---|
+| `macos/Host/build_host.sh` | **PASS** | Compiled `arm64` `ChromiumWebViewHost.app` + embedded CEF `149.0.4` and 5 signed helpers |
+| `example`: `flutter build macos --release` | **PASS** | Clean Release bundle build |
+| `flutter analyze --no-fatal-infos` | **PASS** | 0 errors |
+| `dart format --output=none --set-exit-if-changed` | **PASS** | 46 tracked `.dart` files, 0 formatting diffs |
+| `flutter test --reporter expanded` | **PASS** | 83/83 Dart unit/widget tests passed |
+| `bash macos/test/run_input_tests.sh` | **PASS** | `input_client_test`, warning-free `input_test`, 22/22 `input_smoke.py` checks |
+| `macos/Host/javascript_smoke.py` | **PASS** | 9/9 JS bridge, isolation, cancellation, renderer crash recovery checks |
+| `unittest discover -s macos/test -p 'test_*.py'` | **PASS** | 10/10 packaging & entitlement regression tests |
+| `texture_test` (Debug native ownership test) | **PASS** | Exit 0, zero IOSurface / FlutterTexture leaks |
+| `scripts/smoke_macos.py` (copied Release bundle) | **PASS** | Logged persistent `cachePath`, clean `Cmd+Q` exit (code 0), `[CEFHost] CefShutdown complete`, 0 survivors |
+| `integration_test/plugin_integration_test.dart` | **PASS** | 20 create/dispose cycles, `browsers: 0, textures: 0` |
+| `integration_test/input_scaling_test.dart` | **PASS** | Multi-DPR pointer/resize/wheel verification |
+| `integration_test/native_ui_test.dart` | **PASS** | Dialogs, menus, dropdown disposal, isolation |
+| `integration_test/javascript_bridge_test.dart` | **PASS** | Origin isolation, navigation, lifetime |
+| `integration_test/html_loading_test.dart` | **PASS** | HTML base URL, relative resources, reload |
+| `integration_test/browser_settings_test.dart` | **PASS** | User-agent & autoplay isolation |
+| `integration_test/youtube_adapter_test.dart` | **PASS** | Adapter contract & player isolation |
+| `integration_test/evaluate_javascript_test.dart` | **PASS** | Async JS evaluation & error propagation |
+| `integration_test/host_crash_test.dart` | **PASS** | 20/20 `SIGKILL` host crash & recovery cycles on shared persistent `cachePath` |
+| `integration_test/gpu_recovery_test.dart` | **PASS** | GPU crash & recovery |
+| `integration_test/renderer_recovery_test.dart` | **PASS** | 2/2 renderer crash recovery cycles (`44` Metal frames resumed per cycle) |
+| `integration_test/resource_stability_test.dart` | **PASS** | **50/50** create/dispose + multi-resolution resize cycles (`28s`), exact return to baseline counters (`activeBrowsers: 0`, `activeIOSurfaces: 0`, `activeMetalTextures: 0`, `activeFlutterTextures: 0`, `pendingIpcRequests: 0`, baseline Mach rights) |
 
 ---
 
-## 3. macOS Native Validation Plan
+## 3. Apple Hardware Verification Scenarios (Recorded Measurements)
 
-Execute the following steps on native macOS hardware (MacBook / Mac Studio):
+### Scenario 1 — Cross-Restart Persistent Named Profile & Anonymous Isolation
+- **Run 1 (`profile_write`):** Initialized with persistent `cachePath`, created browser with `profileName: 'ppplayer_youtube_session'`, wrote `HttpOnly` cookie `fcw_http=http_val_42`, JS-accessible cookie `fcw_js=js_val_42`, `document.cookie` `client_auth=user_token_999`, and `localStorage['session_status'] = 'logged_in_persistent'`. Confirmed `<cachePath>/profile_ppplayer_youtube_session` created directly under `root_cache_path`. Quit via `NSRunningApplication.terminate()` (`Cmd+Q`): exit code `0`, `[CEFHost] CefShutdown complete`, `0` surviving processes.
+- **Run 2 (`profile_read` — brand-new process relaunch with same `cachePath`):**
+  - Named profile (`ppplayer_youtube_session`) HTTP `Cookie` header received by server: `fcw_http=http_val_42; fcw_js=js_val_42; client_auth=user_token_999`
+  - Named profile `document.cookie`: `fcw_js=js_val_42; client_auth=user_token_999`
+  - Named profile `localStorage['session_status']`: `'logged_in_persistent'`
+  - Anonymous profile (`profileName: null`): HTTP `Cookie` header `""`, `document.cookie` `""`, `localStorage['session_status']` `null` (zero leakage).
+  - Clean `Cmd+Q` exit: exit code `0`, `[CEFHost] CefShutdown complete`, `0` surviving processes.
 
-### Step 3.1: Environment Verification
-```bash
-sw_vers
-uname -m
-flutter --version
-clang++ --version
-```
-Ensure Xcode 15+ command line tools and Flutter 3.47+ are available.
+### Scenario 2 — Browser Disposal While Initializing (20 Iterations)
+- Executed 20 iterations of `unawaited(controller.createBrowser())` immediately followed by `await controller.dispose()` across named profiles `fast_cancel_0..19`.
+- **Result:** Zero crashes, zero dangling `ContextReadyHandler` callbacks.
+- **Post-loop diagnostics:** `browsers: 0`, `textures: 0`, `focused: false`, `pumpRunning: true`.
+- **Post-loop resource counters:** Exact match to pre-test baseline (`client`/`host`: `activeBrowsers: 0`, `activeIOSurfaces: 0`, `activeMetalTextures: 0`, `activeFlutterTextures: 0`, `pendingIpcRequests: 0`, `activeMachSendRights: 1/0`, `activeMachReceiveRights: 1/0`).
 
-### Step 3.2: Build the Host Subprocess and Example App
-```bash
-cd packages/flutter_chromium_webview/macos/Host
-./build_host.sh
+### Scenario 3 — Throttled Rendering (`setRenderingActive`) & Audio / JS Continuity
+- **Active (2.0 s window):** `120` completed Metal frames (**60.0 FPS**), `0` failed Metal frames, `20` JS bridge heartbeats (10 Hz), audio `currentTime` delta `+1.987 s`.
+- **Inactive (`setRenderingActive(false)`, 3.0 s window):** `2` completed Metal frames (**0.67 FPS** — ~90x GPU blit reduction), `pausedWhileInactive: false`, `30` JS bridge heartbeats (10 Hz uninterrupted), audio `currentTime` delta `+3.012 s`.
+- **Restored (`setRenderingActive(true)`, 2.0 s window):** `91` completed Metal frames (immediate resume to 60 FPS), `0` failed Metal frames, audio `currentTime` delta `+1.988 s`.
 
-cd ../../example
-flutter clean
-flutter pub get
-flutter build macos --release
-```
+### Scenario 4 — 1080p Metal Texture Ownership, RSS & Clean Shutdown
+- Resized viewport to `1920x1080` and sampled `getResourceCounters` across 5 seconds of continuous 1080p animated rendering (`702` total completed Metal frames, `0` failed):
+  - `host.activeMetalTextures`: `[4, 4, 4, 4, 4]` (strictly 1 active `source_metal_texture` + 3 `dest_metal_textures` ring; zero stale handle accumulation).
+  - `host.activeIOSurfaces`: `[3, 3, 3, 3, 3]`.
+- Post-disposal counters returned to exact baseline (`0` browsers, `0` IOSurfaces, `0` Metal textures, `0` Flutter textures).
+- Debug probe process tree RSS before quit: Runner `206.4 MB`, Host `142.7 MB`, 4 Helpers `88.8 + 72.6 + 56.9 + 60.9 MB`.
+- Clean `Cmd+Q` exit across all runs: `0` surviving `ChromiumWebViewHost` / `ChromiumWebView Helper` processes, `0` new `.ips` crash reports in `~/Library/Logs/DiagnosticReports`.
 
-### Step 3.3: Automated Test Execution
-Run Dart unit and widget tests:
-```bash
-cd packages/flutter_chromium_webview
-flutter test
-```
-
-Run macOS input and lifecycle verification scripts:
-```bash
-bash macos/test/run_input_tests.sh
-```
-
-### Step 3.4: Manual Scenario Verification
-
-1. **Browser Lifecycle & Autorelease Memory Check:**
-   - Launch `example` app under Xcode Instruments (Allocations & Leaks).
-   - Create and dispose 50 browser instances.
-   - Confirm that autoreleased Objective-C objects from `finishCreate` and blit blocks do not leak into the parent runloop.
-2. **Accelerated Metal Blit & IOSurface Caching:**
-   - Play a 1080p 60fps video.
-   - Monitor GPU memory in Instruments / Activity Monitor.
-   - Confirm `source_metal_texture` is replaced when surface ID changes without accumulating stale texture handles.
-3. **Resize & Minimization:**
-   - Resize window rapidly across various aspect ratios.
-   - Minimize and restore the window; verify playback resumes cleanly without black frames or Metal synchronization assertions.
-4. **CEF Profile-Persistence Test Scenarios (In-Session & Cross-Restart):**
-   - Load a local HTTP page with a named profile (`profileName: 'ppplayer_youtube_session'`), set both HTTP cookies and `document.cookie` + `localStorage`.
-   - Dispose the controller (`await controller.dispose()`), create a new controller with the same `profileName` in the same session, and verify cookies and `localStorage` are restored.
-   - Open an anonymous controller (`profileName: null`) and verify zero leakage of the named profile's cookies or `localStorage`.
-   - After fixing the PID-scoped cache path in `macos/Host/main.mm`, repeat the check across a full application restart (`Cmd+Q` -> relaunch).
-5. **Browser Disposal While Initializing:**
-   - Trigger `unawaited(controller.createBrowser())` for a named profile and immediately call `await controller.dispose()` before `OnRequestContextInitialized` fires.
-   - Repeat 20 times and confirm zero dangling `ContextReadyHandler` callbacks, zero Objective-C/ARC crashes, and `0` active browsers/textures afterward.
-6. **Throttled Rendering (`setRenderingActive`) Audio Verification:**
-   - Start YouTube/HTML5 audio+video playback in a `ChromiumWebViewController`.
-   - Call `await controller.setRenderingActive(false)` (or minimize/hide the player window) and confirm audio playback, JS bridge events, and subtitles continue without stutter or interruption.
-   - Call `await controller.setRenderingActive(true)` (or restore the window) and verify smooth 60 FPS Metal texture rendering resumes immediately without stale frames.
-7. **Clean Shutdown:**
-   - Quit application via `Cmd+Q` while a browser is active and playing media.
-   - Verify the host process terminates promptly with 0 orphan processes and no crash reports in `~/Library/Logs/DiagnosticReports`.
+### PPPlayer macOS Release Validation
+- Synchronized vendored snapshot (`147/147` tracked source hashes verified via `scripts/verify_chromium_snapshot.py`; `14/14` `scripts/test_*.py` checks including `test_macos_quit_handshake.py` passed).
+- Built `PPPlayer.app` macOS Release (`423.1 MB`).
+- Verified idle startup with desktop lazy restore: **1 process total (`0` Chromium Host/Helper processes spawned at idle), `163.2 MB` total RSS**, clean `Cmd+Q` exit (`0` survivors, `0` new `.ips` crash reports).
+- Verified `PPPlayer.app`'s embedded Release `ChromiumWebViewHost` persists `profile_ppplayer_youtube_session` (`HttpOnly` cookie, `document.cookie`, and `localStorage`) across full host restarts, handles `setRenderingActive(false/true)`, and completes `[CEFHost] CefShutdown complete`.
 
 ---
 
 ## 4. Fallback Paths & Runtime Escape Hatches
-
-If any macOS regression is observed during native validation:
 - **Low-memory Chromium flags (`native/chromium_flags.h`):** Set `FLUTTER_CHROMIUM_WEBVIEW_LOW_MEMORY=0` before launching to revert to stock Chromium feature flags for A/B comparison.
-- **System media controls suppression:** Set `CEF_SYSTEM_MEDIA_CONTROLS=0` only when the host owns `MPNowPlayingInfoCenter` directly; unset it to restore Chromium's default media session handling.
-- **Custom context / named profiles (`native/browser_settings.h`):** Verify `CustomContext` compiles cleanly against the pinned macOS CEF binary headers (`CefRequestContext::CreateContext(settings, handler)` and `ContextReadyHandler::OnRequestContextInitialized`).
+- **System media controls suppression:** Set `CEF_SYSTEM_MEDIA_CONTROLS=0` when the host owns `MPNowPlayingInfoCenter` directly; unset to restore Chromium's default media session handling.
+- **Mock keychain override for tests:** Set `CEF_INPUT_TEST_USE_MOCK_KEYCHAIN=1` or `CEF_KEYCHAIN_BEHAVIOR=mock` (default) to avoid macOS Keychain prompts during automated runs.
