@@ -40,6 +40,8 @@ public:
         std::string context_token;
         bool renderer_gone = false;
         bool closing = false;
+        bool rendering_active = true;
+        int active_frame_rate = 60;
         CefRefPtr<CefRequestContext> pending_context;
         CefRefPtr<chromium_settings::UserAgent> user_agent;
         CefRefPtr<CefDevToolsMessageObserver> media_observer;
@@ -148,6 +150,7 @@ public:
     void CloseBrowser(int64_t browser_id);
     void RecoverGpuProcess();
     void ResizeBrowser(int64_t browser_id, int width, int height, double scale_factor);
+    void SetRenderingActive(int64_t browser_id, bool active);
 
     BrowserSession* GetSession(int64_t browser_id);
 

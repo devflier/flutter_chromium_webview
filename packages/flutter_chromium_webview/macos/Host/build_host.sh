@@ -9,7 +9,7 @@ clang++ -std=c++20 -arch arm64 -x objective-c++ -fobjc-arc \
   -I../cef/root \
   -F../cef/root/Release \
   -L../cef/build/lib \
-  main.mm ChromiumHostApp.mm IpcServer.mm IpcConnection.mm HostBrowserClient.mm JavaScriptRequests.mm ../Classes/Protocol.mm \
+  main.mm ChromiumHostApp.mm IpcServer.mm IpcConnection.mm HostBrowserClient.mm JavaScriptRequests.mm NativeUi.mm ../Classes/Protocol.mm \
   -framework "Chromium Embedded Framework" \
   -framework Cocoa \
   -framework IOSurface \

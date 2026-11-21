@@ -274,6 +274,12 @@
                 session->browser->GetHost()->SetFocus(focused);
             }
         });
+    } else if (message.type == "setRenderingActive") {
+        int64_t browserId = [message.payload[@"browserId"] longLongValue];
+        bool active = message.payload[@"active"] ? [message.payload[@"active"] boolValue] : true;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.browserClient->SetRenderingActive(browserId, active);
+        });
     } else if (message.type == "sendKeyEvent" || message.type == "keyDown" ||
                message.type == "keyUp" || message.type == "textInput") {
         int64_t browserId = [message.payload[@"browserId"] longLongValue];
@@ -405,8 +411,11 @@ void ChromiumHostApp::OnBeforeCommandLineProcessing(const CefString& process_typ
     // If "--use-system-keychain" or CEF_KEYCHAIN_BEHAVIOR=system is explicitly configured,
     // allow Chromium to use the macOS system keychain.
     const char* envKeychain = getenv("CEF_KEYCHAIN_BEHAVIOR");
+    const char* testMockKeychain = getenv("CEF_INPUT_TEST_USE_MOCK_KEYCHAIN");
     bool forceSystem = (envKeychain && strcmp(envKeychain, "system") == 0) || command_line->HasSwitch("use-system-keychain");
-    bool forceMock = (envKeychain && strcmp(envKeychain, "mock") == 0) || command_line->HasSwitch("use-mock-keychain");
+    bool forceMock = (envKeychain && strcmp(envKeychain, "mock") == 0) ||
+                     (testMockKeychain && strcmp(testMockKeychain, "1") == 0) ||
+                     command_line->HasSwitch("use-mock-keychain");
 
     if (forceSystem && !forceMock) {
         command_line->AppendSwitchWithValue("password-store", "keychain");

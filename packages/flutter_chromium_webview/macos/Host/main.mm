@@ -22,6 +22,7 @@ int main(int argc, char* argv[]) {
         [ChromiumHostApplication sharedApplication];
         NSString* socketPath = nil;
         NSString* expectedToken = nil;
+        NSString* requestedCachePath = nil;
         pid_t parentPid = 0;
         
         for (int i = 1; i < argc; ++i) {
@@ -32,6 +33,8 @@ int main(int argc, char* argv[]) {
                 expectedToken = [arg substringFromIndex:@"--ipc-token=".length];
             } else if ([arg hasPrefix:@"--parent-pid="]) {
                 parentPid = [[arg substringFromIndex:@"--parent-pid=".length] intValue];
+            } else if ([arg hasPrefix:@"--cache-path="]) {
+                requestedCachePath = [arg substringFromIndex:@"--cache-path=".length];
             }
         }
         
@@ -83,8 +86,30 @@ int main(int argc, char* argv[]) {
         settings.no_sandbox = false;
         settings.windowless_rendering_enabled = true;
         
-        // Prevent process singleton behavior from causing CefInitialize to return false
-        NSString* cachePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"cef_cache_%d", getpid()]];
+        // Use caller-provided persistent cachePath when present; fall back to a
+        // PID-scoped temporary cache only when omitted/empty (e.g., standalone host smoke tests).
+        NSString* cachePath = nil;
+        if (requestedCachePath.length > 0 && requestedCachePath.isAbsolutePath) {
+            NSError* dirError = nil;
+            if ([[NSFileManager defaultManager] createDirectoryAtPath:requestedCachePath
+                                          withIntermediateDirectories:YES
+                                                           attributes:nil
+                                                                error:&dirError]) {
+                cachePath = [requestedCachePath stringByResolvingSymlinksInPath];
+            } else {
+                NSLog(@"[CEFHost] Failed to create requested cachePath %@: %@", requestedCachePath, dirError);
+            }
+        }
+        if (!cachePath.length) {
+            NSString* fallbackPath = [NSTemporaryDirectory() stringByAppendingPathComponent:
+                [NSString stringWithFormat:@"cef_cache_%d", getpid()]];
+            [[NSFileManager defaultManager] createDirectoryAtPath:fallbackPath
+                                      withIntermediateDirectories:YES
+                                                       attributes:nil
+                                                            error:nil];
+            cachePath = [fallbackPath stringByResolvingSymlinksInPath];
+        }
+        NSLog(@"[CEFHost] cachePath: %@", cachePath);
         CefString(&settings.root_cache_path) = [cachePath UTF8String];
         CefString(&settings.cache_path) = [cachePath UTF8String];
         NSString* logPath = NSProcessInfo.processInfo.environment[@"CEF_LOG_FILE"] ?: @"/tmp/cef.log";

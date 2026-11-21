@@ -291,6 +291,9 @@ void HostBrowserClient::CreateBrowser(int64_t browser_id, const std::string& url
             return;
         }
         created.browser = browser;
+        if (!created.rendering_active) {
+            browser->GetHost()->SetWindowlessFrameRate(1);
+        }
         NSLog(@"[CEFHost] browserCreated id=%lld", browser_id);
 #if DEBUG
         created.media_observer = new MediaDevToolsObserver(self, browser_id);
@@ -504,6 +507,21 @@ void HostBrowserClient::ResizeBrowser(int64_t browser_id, int width, int height,
         if (it->second.browser) {
             it->second.browser->GetHost()->NotifyScreenInfoChanged();
             it->second.browser->GetHost()->WasResized();
+        }
+    }
+}
+
+void HostBrowserClient::SetRenderingActive(int64_t browser_id, bool active) {
+    CEF_REQUIRE_UI_THREAD();
+    auto* session = GetSession(browser_id);
+    if (!session || session->closing) return;
+    if (session->rendering_active == active) return;
+    session->rendering_active = active;
+    if (session->browser) {
+        auto host = session->browser->GetHost();
+        host->SetWindowlessFrameRate(active ? session->active_frame_rate : 1);
+        if (active) {
+            host->Invalidate(PET_VIEW);
         }
     }
 }

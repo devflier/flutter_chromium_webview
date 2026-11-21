@@ -6,6 +6,8 @@
     NSString* _socketPath;
     NSString* _token;
     NSString* _tempDir;
+    NSString* _cachePath;
+    NSString* _keychainBehavior;
     
     void(^_launchCompletion)(BOOL, NSError*);
     NSTimer* _socketWaitTimer;
@@ -54,7 +56,7 @@
         return;
     }
     if (_state == HostStateStopped || _state == HostStateFailed) {
-        [self launchHostWithCompletion:completion];
+        [self launchHostWithCachePath:_cachePath keychainBehavior:_keychainBehavior completion:completion];
         return;
     }
     if (completion) {
@@ -67,10 +69,14 @@
 }
 
 - (void)launchHostWithCompletion:(void(^)(BOOL success, NSError* error))completion {
-    [self launchHostWithKeychainBehavior:@"mock" completion:completion];
+    [self launchHostWithCachePath:_cachePath keychainBehavior:_keychainBehavior ?: @"mock" completion:completion];
 }
 
 - (void)launchHostWithKeychainBehavior:(NSString*)keychainBehavior completion:(void(^)(BOOL success, NSError* error))completion {
+    [self launchHostWithCachePath:_cachePath keychainBehavior:keychainBehavior completion:completion];
+}
+
+- (void)launchHostWithCachePath:(NSString*)cachePath keychainBehavior:(NSString*)keychainBehavior completion:(void(^)(BOOL success, NSError* error))completion {
     if (_state == HostStateReady) {
         completion(YES, nil);
         return;
@@ -79,6 +85,9 @@
         completion(NO, [NSError errorWithDomain:@"HostManager" code:1 userInfo:@{NSLocalizedDescriptionKey:@"Already launching"}]);
         return;
     }
+
+    _cachePath = [cachePath copy];
+    _keychainBehavior = [keychainBehavior copy];
     
     // A connection and its delayed callbacks belong to one host launch.
     // Never let a dying host disconnect a replacement connection.
@@ -145,9 +154,16 @@
         [NSString stringWithFormat:@"--ipc-token=%@", _token],
         [NSString stringWithFormat:@"--parent-pid=%d", getpid()],
     ]];
+    if (_cachePath.length > 0 && _cachePath.isAbsolutePath) {
+        [taskArguments addObject:[NSString stringWithFormat:@"--cache-path=%@", _cachePath]];
+    }
     
     NSString* envKeychain = NSProcessInfo.processInfo.environment[@"CEF_KEYCHAIN_BEHAVIOR"];
+    NSString* testMockKeychain = NSProcessInfo.processInfo.environment[@"CEF_INPUT_TEST_USE_MOCK_KEYCHAIN"];
     NSString* effectiveBehavior = envKeychain.length ? envKeychain : keychainBehavior;
+    if ([testMockKeychain isEqualToString:@"1"]) {
+        effectiveBehavior = @"mock";
+    }
     if (!effectiveBehavior.length) {
         effectiveBehavior = @"mock";
     }

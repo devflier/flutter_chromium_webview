@@ -11,7 +11,10 @@ static std::vector<IPC::Message> messages;
 @end
 @implementation ChromiumHostManager
 + (instancetype)sharedManager { static ChromiumHostManager* mgr=[ChromiumHostManager new]; return mgr; }
+- (void)ensureHostRunning:(void(^)(BOOL, NSError*))completion { completion(YES,nil); }
 - (void)launchHostWithCompletion:(void(^)(BOOL, NSError*))completion { completion(YES,nil); }
+- (void)launchHostWithKeychainBehavior:(NSString*)keychainBehavior completion:(void(^)(BOOL, NSError*))completion { completion(YES,nil); }
+- (void)launchHostWithCachePath:(NSString*)cachePath keychainBehavior:(NSString*)keychainBehavior completion:(void(^)(BOOL, NSError*))completion { completion(YES,nil); }
 - (void)shutdown {}
 - (ChromiumIpcClient*)ipcClient { static RecordingClient* client=[RecordingClient new]; return client; }
 @end
