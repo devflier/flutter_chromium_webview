@@ -945,6 +945,7 @@ class ChromiumWebViewController extends ChangeNotifier {
                 completer.complete();
               }
             }
+
             addListener(listener);
             await completer.future.timeout(
               const Duration(seconds: 2),
@@ -1042,8 +1043,9 @@ class ChromiumWebViewController extends ChangeNotifier {
 
   void _closeMenu(int menuId, int commandId) {
     unawaited(
-      _invoke((id) => _platform.closeContextMenu(id, menuId, commandId))
-          .catchError((Object _) {}),
+      _invoke(
+        (id) => _platform.closeContextMenu(id, menuId, commandId),
+      ).catchError((Object _) {}),
     );
   }
 

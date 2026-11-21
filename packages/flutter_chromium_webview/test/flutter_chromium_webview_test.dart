@@ -641,7 +641,11 @@ void main() {
       expect(createCalls, 1);
 
       // Crash 1, 2, 3 trigger automatic recovery.
-      for (var i = 1; i <= ChromiumWebViewController.maxAutoRecoveryAttempts; i++) {
+      for (
+        var i = 1;
+        i <= ChromiumWebViewController.maxAutoRecoveryAttempts;
+        i++
+      ) {
         await sendNativeEvent(i, 'browserCrash', {});
         await Future<void>.delayed(Duration.zero);
         expect(createCalls, i + 1);
@@ -700,7 +704,11 @@ void main() {
       await expectLater(
         pendingEval,
         throwsA(
-          isA<JavaScriptException>().having((e) => e.code, 'code', 'renderer_gone'),
+          isA<JavaScriptException>().having(
+            (e) => e.code,
+            'code',
+            'renderer_gone',
+          ),
         ),
       );
       await controller.dispose();
